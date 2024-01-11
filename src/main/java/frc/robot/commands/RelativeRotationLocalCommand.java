@@ -56,10 +56,6 @@ public class RelativeRotationLocalCommand extends Command {
   @Override
   public void execute() {
     curAngle = localizer.getGlobalOrientation() - initialAngle;
-    if(curAngle >= targetAngle - tolerance && curAngle <= targetAngle + tolerance) {
-      this.isFinished = true;
-      rotDriveBase.setRotation(0);
-    }
   }
 
   // Called once the command ends or is interrupted.
@@ -71,6 +67,10 @@ public class RelativeRotationLocalCommand extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return this.isFinished;
+    if(curAngle >= targetAngle - tolerance && curAngle <= targetAngle + tolerance) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }
