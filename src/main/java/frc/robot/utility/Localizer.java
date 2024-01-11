@@ -115,11 +115,7 @@ public class Localizer {
      * the enum AprilTag
      */
     public void updateWithAprilTag(AprilTag tag, Vector3D relative_position, double angle) {
-<<<<<<< HEAD:src/main/java/frc/robot/utility/Localizer.Java
         throw new UnsupportedOperationException();
-=======
-
->>>>>>> 9770c40716d2adb02f3b7c7eeef34631ecba14fb:src/main/java/frc/robot/utility/Localizer.java
     }
 
 }
