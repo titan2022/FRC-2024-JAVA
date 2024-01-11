@@ -43,7 +43,6 @@ public class RelativeRotationLocalCommand extends Command {
     this.targetAngle = angle.getRadians();
     this.curAngle = 0;
     this.speed_radpers = speed;
-    this.speed = speed / 50;
     this.tolerance = 1; // 1 radian
   }
 

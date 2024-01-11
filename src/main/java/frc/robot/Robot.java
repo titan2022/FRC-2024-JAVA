@@ -23,7 +23,7 @@ import static frc.robot.utility.Constants.getSwerveDriveTalonRotaryConfig;
 
 public class Robot extends TimedRobot {
     private WPI_Pigeon2 pigeon = new WPI_Pigeon2(40);
-    private Localizer localizer = new Localizer(0, 0);
+    private Localizer localizer = new Localizer(0, 0, 0);
     private SwerveDriveSubsystem drive = new SwerveDriveSubsystem(getSwerveDriveTalonDriveConfig(),
             getSwerveDriveTalonRotaryConfig(), localizer);
     private final XboxController xbox = new XboxController(0);

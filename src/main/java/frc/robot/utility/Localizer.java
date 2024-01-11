@@ -14,14 +14,15 @@ package frc.robot.utility;
 
 public class Localizer {
 
-    public Vector2D globalPosition;
-    public Vector2D localPosition;
-    public double globalOrientation;
-    public double localOrientation;
-    public boolean on_blue_side;
+    public Vector2D globalPosition = new Vector2D();
+    public Vector2D localPosition = new Vector2D();
+    public double globalOrientation = 0;
+    public double localOrientation = 0;
+    public boolean on_blue_side = false;
 
-    public Localizer(double inputX, double inputY, double inputlocalOrientation, double inputLocalOrientation) {
-        throw new UnsupportedOperationException();
+    public Localizer(double inputX, double inputY, double inputlocalOrientation) {
+        localPosition = new Vector2D(inputX, inputY);
+        localOrientation = inputlocalOrientation;
     }
 
     /**
@@ -114,8 +115,8 @@ public class Localizer {
      * Decide whether you will use the IDs specified in rule book via int or using
      * the enum AprilTag
      */
-    public void updateWithAprilTag(AprilTag tag, Vector3D relative_position, double angle) {
+    // public void updateWithAprilTag(AprilTag tag, Vector3D relative_position, double angle) {
 
-    }
+    // }
 
 }
