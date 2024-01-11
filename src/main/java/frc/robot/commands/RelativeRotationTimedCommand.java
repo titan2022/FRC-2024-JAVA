@@ -7,14 +7,14 @@ package frc.robot.commands;
 import frc.robot.subsystems.RotationalDrivebase;
 import frc.robot.utility.Localizer;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 
 /**
  * Creates a rotation command in radians which 
  * goes counter clockwise with the front of the 
  * robot being 0
  */
-public class RelativeRotationTimedCommand extends CommandBase {
+public class RelativeRotationTimedCommand extends Command {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final RotationalDrivebase rotDriveBase;
   private final Rotation2d angle;
