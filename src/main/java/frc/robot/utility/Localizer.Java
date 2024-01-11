@@ -18,9 +18,9 @@ public class Localizer {
     public Vector2D localPosition;
     public double globalOrientation;
     public double  localOrientation;
-    public bool on_blue_side;
+    public boolean on_blue_side;
 
-    public Localizer(double inputX, double inputY, double inputlocalOrientation. double inputLocalOrientation) {
+    public Localizer(double inputX, double inputY, double inputlocalOrientation, double inputLocalOrientation) {
         throw new UnsupportedOperationException();
     }
 
@@ -42,7 +42,7 @@ public class Localizer {
      * Adds the vector to the current local position to update it
      */
     public void updateLocalPosition(Vector2D vec) {
-        this.localPosition += theta;
+        this.localPosition.add(vec);
     }
 
     
@@ -64,14 +64,14 @@ public class Localizer {
      * Adds the vector to the current local position to update it
      */
     public void updateGlobalPosition(Vector2D vec) {
-        this.globalPosition += theta;
+        this.globalPosition.add(vec);
     }
 
     /**
      * Sets the local orientation to a new orientation
      */
     public void setLocalOrientation(double theta) {
-        this.localOrientation = vec;
+        this.localOrientation = theta;
     }
 
     /**
@@ -92,7 +92,7 @@ public class Localizer {
      * Sets the global orientation to a new orientation
      */
     public void setGlobalOrientation(double theta) {
-        this.globalOrientation = vec;
+        this.globalOrientation = theta;
     }
 
     /**
@@ -114,7 +114,7 @@ public class Localizer {
      * Decide whether you will use the IDs specified in rule book via int or using the enum AprilTag
      */
     public void updateWithAprilTag(AprilTag tag, Vector3D relative_position, double angle) {
-        
+        throw new UnsupportedOperationException();
     }
 
 }

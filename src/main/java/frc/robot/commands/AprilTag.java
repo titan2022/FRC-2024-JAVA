@@ -22,7 +22,7 @@ public enum AprilTag implements FieldObject {
     BLUE_SPEAKER_SOUTH(8), BLUE_SPEAKER_NORTH(7),
     RED_AMP(5), BLUE_AMP(6),
     RED_STAGE_SOUTH(11), RED_STAGE_NORTH(12), RED_STAGE_WEST(13),
-    BLUE_STAGE_SOUTH(16), BLUE_STAGE_NORTH(15), BLUE_STAGE_EAST(14),
+    BLUE_STAGE_SOUTH(16), BLUE_STAGE_NORTH(15), BLUE_STAGE_EAST(14);
 
     private int id;
     private String name;
@@ -36,6 +36,7 @@ public enum AprilTag implements FieldObject {
         this.name = name;
     }
 
+    @Override
     public String getName(String name) {
         return this.name;
     }
@@ -44,6 +45,7 @@ public enum AprilTag implements FieldObject {
         this.position = position;
     }
 
+    @Override
     public Vector2D getPosition() {
         return this.position;
     }

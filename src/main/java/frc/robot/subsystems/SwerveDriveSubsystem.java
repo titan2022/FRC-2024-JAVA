@@ -17,15 +17,17 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.utility.Localizer;
+import frc.robot.utility.Vector2D;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 
 // WPI_TalonFX is deprecated and will be removed in 2025
 // However, we are not able to get Phoenix v6 to work and do 
 // not want to refactor during competition season
 @SuppressWarnings({"deprecation", "removal"})
-public class SwerveDriveSubsystem implements DriveSubsystem
-{
+public class SwerveDriveSubsystem implements DriveSubsystem {
   // Physical parameters
   public static final double ROBOT_TRACK_WIDTH = 18.5 * IN; // 0.672; // meters (30 in)
   public static final double ROBOT_LENGTH = 18.5 * IN; // 0.672; // meter 
@@ -80,6 +82,8 @@ public class SwerveDriveSubsystem implements DriveSubsystem
     public static final int BACK_RIGHT = 3;
   }
 
+  private Localizer localizer;
+
   // Physical Hardware
   private final WPI_TalonFX[] motors = new WPI_TalonFX[]{
     new WPI_TalonFX(LEFT_FRONT_MOTOR_PORT),
@@ -119,6 +123,8 @@ public class SwerveDriveSubsystem implements DriveSubsystem
     @Override
     public void setVelocity(Translation2d velocity) {
       updateVelocity(velocity);
+      Vector2D deltaX = new Vector2D(getVelocity().rotateBy(new Rotation2d(rotationalLock.getRate())).div(50));
+      localizer.updateLocalPosition(deltaX);
     }
 
     @Override
@@ -131,6 +137,8 @@ public class SwerveDriveSubsystem implements DriveSubsystem
     @Override
     public void setRotation(double omega) {
       updateRotation(omega);
+      localizer.updateLocalOrientation(getRate());
+      // localizer.updateGlobalOrientation(getRate());
     }
 
     @Override
@@ -146,8 +154,9 @@ public class SwerveDriveSubsystem implements DriveSubsystem
    * @param mainConfig Requires PID configuration in slot 0
    * @param rotatorConfig Requires PID configuration in slot 0
    */
-  public SwerveDriveSubsystem(TalonFXConfiguration mainConfig, TalonFXConfiguration rotatorConfig)
+  public SwerveDriveSubsystem(TalonFXConfiguration mainConfig, TalonFXConfiguration rotatorConfig, Localizer local)
   {
+    this.localizer = local;
     setFactoryMotorConfig();
 
     if(mainConfig != null)
@@ -236,9 +245,9 @@ public class SwerveDriveSubsystem implements DriveSubsystem
     for(int i=0; i<4; i++)
       rotators[i].configRemoteFeedbackFilter(encoders[i], 0);
   }
-  public SwerveDriveSubsystem() {
-    this(null, null);
-  }
+  // public SwerveDriveSubsystem() {
+  //   this(null, null);
+  // }
 
   private void setFactoryMotorConfig() {
     for(WPI_TalonFX motor : motors)
