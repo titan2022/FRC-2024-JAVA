@@ -7,13 +7,13 @@ package frc.robot.commands;
 import frc.robot.utility.Localizer;
 import frc.robot.subsystems.TranslationalDrivebase;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 
 /**
  * Creates a translation command in meters to move
  * relative to the front of the robot
  */
-public class RelativeTranslationTimedCommand extends CommandBase {
+public class RelativeTranslationTimedCommand extends Command {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final TranslationalDrivebase transDriveBase;
   private final Translation2d deltaPosition;

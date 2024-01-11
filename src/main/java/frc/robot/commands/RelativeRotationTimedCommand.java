@@ -7,19 +7,40 @@ package frc.robot.commands;
 import frc.robot.subsystems.RotationalDrivebase;
 import frc.robot.utility.Localizer;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 
 /**
  * Creates a rotation command in radians which 
  * goes counter clockwise with the front of the 
  * robot being 0
  */
-public class RelativeRotationTimedCommand extends CommandBase {
+public class RelativeRotationTimedCommand extends Command {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final RotationalDrivebase rotDriveBase;
-  private final Rotation2d angle;
+  private final double targetAngle;
+  private final double speed_radpers; // rad/s
   private final double speed;
   private final double tolerance;
+  private double curAngle;
+  private boolean isFinished;
+
+  /**
+   * Creates a rotation command relative to the front of the robot
+   * @param subsystem Drivebase
+   * @param localizer The localizer which tracks the position and orientation of the robot
+   * @param angle The angle of rotation as a Rotation2d counterclockwise relative to the front of the robot
+   * @param speed Speed at which to execute the rotation
+   */
+  public RelativeRotationTimedCommand(RotationalDrivebase subsystem, Rotation2d angle, double speed) {
+    // Use addRequirements() here to declare subsystem dependencies.
+    addRequirements(subsystem);
+    this.rotDriveBase = subsystem;
+    this.targetAngle = angle.getRadians();
+    this.curAngle = 0;
+    this.speed_radpers = speed;
+    this.speed = speed/50;
+    this.tolerance = 1; // 1 radian
+  }
 
   /**
    * Creates a rotation command relative to the front of the robot
@@ -28,26 +49,43 @@ public class RelativeRotationTimedCommand extends CommandBase {
    * @param angle The angle of rotation in radians counterclockwise relative to the front of the robot
    * @param speed Speed at which to execute the rotation
    */
-  public RelativeRotationTimedCommand(RotationalDrivebase subsystem, Rotation2d angle, double speed) {
+  public RelativeRotationTimedCommand(RotationalDrivebase subsystem, Localizer localizer, double angle, double speed) {
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(subsystem);
+    this.rotDriveBase = subsystem;
+    this.targetAngle = angle;
+    this.curAngle = 0;
+    this.speed_radpers = speed;
+    this.speed = speed/50;
+    this.tolerance = 1; // 1 radian
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    rotDriveBase.setRotation(speed);
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
+  // Run every 20ms
   @Override
-  public void execute() {}
+  public void execute() {
+    curAngle += speed;
+    if(curAngle >= targetAngle - tolerance && curAngle <= targetAngle + tolerance) {
+      this.isFinished = true;
+      rotDriveBase.setRotation(0);
+    }
+  }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    rotDriveBase.setRotation(0);
+  }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return this.isFinished;
   }
 }

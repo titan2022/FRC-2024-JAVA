@@ -37,7 +37,7 @@ public enum AprilTag implements FieldObject {
     }
 
     @Override
-    public String getName(String name) {
+    public String getName() {
         return this.name;
     }
 
