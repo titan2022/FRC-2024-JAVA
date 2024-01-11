@@ -20,11 +20,9 @@ public class RelativeRotationLocalCommand extends Command {
   private final Localizer localizer;
   private final double targetAngle;
   private final double speed_radpers; // rad/s
-  private final double speed;
   private final double tolerance;
   private double initialAngle;
   private double curAngle;
-  private boolean isFinished;
 
   /**
    * Creates a rotation command relative to the front of the robot
@@ -49,7 +47,7 @@ public class RelativeRotationLocalCommand extends Command {
   @Override
   public void initialize() {
     initialAngle = localizer.getLocalOrientation();
-    rotDriveBase.setRotation(speed);
+    rotDriveBase.setRotation(speed_radpers);
   }
 
   // Called every time the scheduler runs while the command is scheduled.

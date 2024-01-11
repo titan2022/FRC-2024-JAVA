@@ -134,6 +134,7 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
     }
   };
   private final RotationalDrivebase rotationalLock = new RotationalDrivebase() {
+
     @Override
     public void setRotation(double omega) {
       updateRotation(omega);

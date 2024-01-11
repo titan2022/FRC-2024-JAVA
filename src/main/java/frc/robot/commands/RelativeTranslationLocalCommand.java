@@ -19,7 +19,7 @@ public class RelativeTranslationLocalCommand extends Command {
   private final Localizer localizer;
   private final Translation2d deltaPosition;
   private final double speed;
-  private final double tolerance;
+  private final double tolerance = 0.1;
 
   /**
    * Creates a new ExampleCommand.
@@ -38,11 +38,14 @@ public class RelativeTranslationLocalCommand extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    transDriveBase.setVelocity()
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {
+
+  }
 
   // Called once the command ends or is interrupted.
   @Override
