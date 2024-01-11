@@ -6,11 +6,11 @@ import frc.robot.utility.Vector2D;
 /**
  * The april tags will be used to redefine the global positions of the robot
  * https://firstfrc.blob.core.windows.net/frc2024/Manual/2024GameManual.pdf#page=37
- * Page 37 talks about the IDs of the april tags 
- * If you wish you can define an enumeration for the apriltags IDs that the camera will send to the roboRio
- * for the sake of convienience 
+ * Page 37 talks about the IDs of the april tags
+ * If you wish you can define an enumeration for the apriltags IDs that the
+ * camera will send to the roboRio
+ * for the sake of convienience
  */
-
 
 public enum AprilTag implements FieldObject {
     // SOUTH is towards the SCORING TABLE

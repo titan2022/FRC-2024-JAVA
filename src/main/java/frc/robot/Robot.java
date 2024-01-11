@@ -24,12 +24,13 @@ import static frc.robot.utility.Constants.getSwerveDriveTalonRotaryConfig;
 public class Robot extends TimedRobot {
     private WPI_Pigeon2 pigeon = new WPI_Pigeon2(40);
     private Localizer localizer = new Localizer(0, 0);
-    private SwerveDriveSubsystem drive = new SwerveDriveSubsystem(getSwerveDriveTalonDriveConfig(), getSwerveDriveTalonRotaryConfig(), localizer);
+    private SwerveDriveSubsystem drive = new SwerveDriveSubsystem(getSwerveDriveTalonDriveConfig(),
+            getSwerveDriveTalonRotaryConfig(), localizer);
     private final XboxController xbox = new XboxController(0);
-    
+
     @Override
     public void robotInit() {
-        
+
     }
 
     @Override
@@ -42,37 +43,47 @@ public class Robot extends TimedRobot {
         drive.brake();
     }
 
-      /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
-  @Override
-  public void autonomousInit() {
-    // CommandScheduler.getInstance().schedule(
-    //   new RelativeTranslationLocalCommand(drive.getTranslational(), localizer, new Translation2d(0, 1), 0.25)
-    // );
-    // CommandScheduler.getInstance().schedule(
-    //   new RelativeTranslationTimedCommand(drive.getTranslational(), new Translation2d(0, 1), 0.25)
-    // );
-    // CommandScheduler.getInstance().schedule(
-    //   new RelativeRotationLocalCommand(drive.getRotational(), localizer, new Rotation2d(Math.PI), Math.PI / 8)
-    // );
-    // CommandScheduler.getInstance().schedule(
-    //   new RelativeRotationTimedCommand(drive.getRotational(), new Rotation2d(Math.PI), Math.PI / 8)
-    // );
-  }
+    /**
+     * This autonomous runs the autonomous command selected by your
+     * {@link RobotContainer} class.
+     */
+    @Override
+    public void autonomousInit() {
+        // CommandScheduler.getInstance().schedule(
+        // new RelativeTranslationLocalCommand(drive.getTranslational(), localizer, new
+        // Translation2d(0, 1), 0.25)
+        // );
+        // CommandScheduler.getInstance().schedule(
+        // new RelativeTranslationTimedCommand(drive.getTranslational(), new
+        // Translation2d(0, 1), 0.25)
+        // );
+        // CommandScheduler.getInstance().schedule(
+        // new RelativeRotationLocalCommand(drive.getRotational(), localizer, new
+        // Rotation2d(Math.PI), Math.PI / 8)
+        // );
+        // CommandScheduler.getInstance().schedule(
+        // new RelativeRotationTimedCommand(drive.getRotational(), new
+        // Rotation2d(Math.PI), Math.PI / 8)
+        // );
+    }
 
-  /** This function is called periodically during autonomous. */
-  @Override
-  public void autonomousPeriodic() {}
+    /** This function is called periodically during autonomous. */
+    @Override
+    public void autonomousPeriodic() {
+    }
 
     @Override
     public void teleopInit() {
         drive.brake();
 
-        drive.getTranslational().setDefaultCommand(new XBoxTranslationalCommand(drive.getTranslational(), xbox, pigeon, 1));
-        drive.getRotational().setDefaultCommand(new XBoxRotationalCommand(drive.getRotational(), xbox, 3 * Math.PI, pigeon));
+        drive.getTranslational()
+                .setDefaultCommand(new XBoxTranslationalCommand(drive.getTranslational(), xbox, pigeon, 1));
+        drive.getRotational()
+                .setDefaultCommand(new XBoxRotationalCommand(drive.getRotational(), xbox, 3 * Math.PI, pigeon));
     }
 
     @Override
     public void teleopPeriodic() {
-        
+
     }
 }

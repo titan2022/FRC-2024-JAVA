@@ -10,12 +10,12 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 
 /**
- * Creates a rotation command in radians which 
- * goes counter clockwise with the front of the 
+ * Creates a rotation command in radians which
+ * goes counter clockwise with the front of the
  * robot being 0
  */
 public class RelativeRotationLocalCommand extends Command {
-  @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
+  @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
   private final RotationalDrivebase rotDriveBase;
   private final Localizer localizer;
   private final double targetAngle;
@@ -26,12 +26,16 @@ public class RelativeRotationLocalCommand extends Command {
 
   /**
    * Creates a rotation command relative to the front of the robot
+   * 
    * @param subsystem Drivebase
-   * @param localizer The localizer which tracks the position and orientation of the robot
-   * @param angle The angle of rotation in radians counterclockwise relative to the front of the robot
-   * @param speed Speed at which to execute the rotation
+   * @param localizer The localizer which tracks the position and orientation of
+   *                  the robot
+   * @param angle     The angle of rotation in radians counterclockwise relative
+   *                  to the front of the robot
+   * @param speed     Speed at which to execute the rotation
    */
-  public RelativeRotationLocalCommand(RotationalDrivebase subsystem, Localizer localizer, Rotation2d angle, double speed) {
+  public RelativeRotationLocalCommand(RotationalDrivebase subsystem, Localizer localizer, Rotation2d angle,
+      double speed) {
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(subsystem);
     this.rotDriveBase = subsystem;
@@ -39,7 +43,7 @@ public class RelativeRotationLocalCommand extends Command {
     this.targetAngle = angle.getRadians();
     this.curAngle = 0;
     this.speed_radpers = speed;
-    this.speed = speed/50;
+    this.speed = speed / 50;
     this.tolerance = 1; // 1 radian
   }
 
@@ -65,7 +69,7 @@ public class RelativeRotationLocalCommand extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    if(curAngle >= targetAngle - tolerance && curAngle <= targetAngle + tolerance) {
+    if (curAngle >= targetAngle - tolerance && curAngle <= targetAngle + tolerance) {
       return true;
     } else {
       return false;

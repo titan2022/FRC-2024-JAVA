@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj2.command.Command;
  * relative to the front of the robot
  */
 public class RelativeTranslationLocalCommand extends Command {
-  @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
+  @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
   private final TranslationalDrivebase transDriveBase;
   private final Localizer localizer;
   private final Translation2d deltaPosition;
@@ -28,7 +28,8 @@ public class RelativeTranslationLocalCommand extends Command {
    *
    * @param subsystem The subsystem used by this command.
    */
-  public RelativeTranslationLocalCommand(TranslationalDrivebase transDriveBase, Localizer localizer, Translation2d deltaPosition, double speed) {
+  public RelativeTranslationLocalCommand(TranslationalDrivebase transDriveBase, Localizer localizer,
+      Translation2d deltaPosition, double speed) {
     this.transDriveBase = transDriveBase;
     this.localizer = localizer;
     this.deltaPosition = deltaPosition;
