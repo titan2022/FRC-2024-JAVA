@@ -48,14 +48,14 @@ public class RelativeRotationLocalCommand extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    initialAngle = localizer.getGlobalOrientation();
+    initialAngle = localizer.getLocalOrientation();
     rotDriveBase.setRotation(speed);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    curAngle = localizer.getGlobalOrientation() - initialAngle;
+    curAngle = localizer.getLocalOrientation() - initialAngle;
   }
 
   // Called once the command ends or is interrupted.
