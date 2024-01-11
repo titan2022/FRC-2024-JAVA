@@ -6,8 +6,13 @@ public class Vector2D extends Translation2d {
     private double x;
     private double y;
 
-    public double x() { return this.x; }
-    public double y() { return this.y; }
+    public double x() {
+        return this.x;
+    }
+
+    public double y() {
+        return this.y;
+    }
 
     public Vector2D() {
         this.x = 0;
@@ -39,15 +44,16 @@ public class Vector2D extends Translation2d {
     }
 
     public double getMagnitude() {
-        return Math.sqrt(this.x*this.x + this.y*this.y);
+        return Math.sqrt(this.x * this.x + this.y * this.y);
     }
 
     public double getMagnitude2D() {
-        return Math.sqrt(this.x*this.x + this.y*this.y);
+        return Math.sqrt(this.x * this.x + this.y * this.y);
     }
 
     /**
      * Gets the bearing of the vector, where positive y represents north.
+     * 
      * @return the bearing of the vector
      */
     public double getBearing() {
@@ -55,8 +61,9 @@ public class Vector2D extends Translation2d {
     }
 
     /**
-     * Gets the angle of the vector, where 0 represents positive x (east) and 
+     * Gets the angle of the vector, where 0 represents positive x (east) and
      * increasing angles represent counterclockwise.
+     * 
      * @return the angle of the vector
      */
     public double getAngleFromEast() {
@@ -70,9 +77,10 @@ public class Vector2D extends Translation2d {
     public Vector2D subtract(Vector2D other) {
         return new Vector2D(this.x - other.x(), this.y - other.y());
     }
-    
+
     /**
      * Finds the dot product of two vectors
+     * 
      * @param other the other vector
      * @return The dot product of the two vectors
      */
@@ -82,6 +90,7 @@ public class Vector2D extends Translation2d {
 
     /**
      * Finds the angle between two vectors
+     * 
      * @param other the other vector
      * @return The angle between the two vectors in radians
      */
@@ -91,6 +100,7 @@ public class Vector2D extends Translation2d {
 
     /**
      * Casts to Vector3D
+     * 
      * @return Return a Vector3D with z = 0
      */
     public Vector3D get3DVector() {
@@ -99,6 +109,7 @@ public class Vector2D extends Translation2d {
 
     /**
      * Rotates the vector theta radians counterclockwise round the unit circle
+     * 
      * @param theta Angle in radians
      */
     public void rotateVector(double theta) {
@@ -107,6 +118,7 @@ public class Vector2D extends Translation2d {
 
     /**
      * Returns a copy of the current vector
+     * 
      * @return Copy of the current vector
      */
     public Vector2D copy() {
@@ -115,6 +127,7 @@ public class Vector2D extends Translation2d {
 
     /**
      * Returns a new Vector2D using the rotateVector() and copy() methods
+     * 
      * @param theta
      * @return
      */

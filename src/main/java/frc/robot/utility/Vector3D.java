@@ -7,9 +7,17 @@ public class Vector3D extends Translation3d {
     private double y;
     private double z;
 
-    public double x() { return this.x; }
-    public double y() { return this.y; }
-    public double z() { return this.z; }
+    public double x() {
+        return this.x;
+    }
+
+    public double y() {
+        return this.y;
+    }
+
+    public double z() {
+        return this.z;
+    }
 
     public Vector3D() {
         this.x = 0;
@@ -42,15 +50,16 @@ public class Vector3D extends Translation3d {
     }
 
     public double getMagnitude() {
-        return Math.sqrt(this.x*this.x + this.y*this.y + this.z*this.z);
+        return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
     }
 
     public double getMagnitude2D() {
-        return Math.sqrt(this.x*this.x + this.y*this.y);
+        return Math.sqrt(this.x * this.x + this.y * this.y);
     }
 
     /**
      * Gets the bearing of the vector, where positive y represents north.
+     * 
      * @return the bearing of the vector
      */
     public double getBearing() {
@@ -58,8 +67,9 @@ public class Vector3D extends Translation3d {
     }
 
     /**
-     * Gets the angle of the vector, where 0 represents positive x (east) and 
+     * Gets the angle of the vector, where 0 represents positive x (east) and
      * increasing angles represent counterclockwise.
+     * 
      * @return the angle of the vector
      */
     public double getAngleFromEast() {
@@ -73,9 +83,10 @@ public class Vector3D extends Translation3d {
     public Vector3D subtract(Vector3D other) {
         return new Vector3D(this.x - other.x(), this.y - other.y(), this.z - other.z());
     }
-    
+
     /**
      * Finds the dot product of two vectors
+     * 
      * @param other the other vector
      * @return The dot product of the two vectors
      */
@@ -85,6 +96,7 @@ public class Vector3D extends Translation3d {
 
     /**
      * Finds the angle between two vectors
+     * 
      * @param other the other vector
      * @return The angle between the two vectors in radians
      */
@@ -93,7 +105,8 @@ public class Vector3D extends Translation3d {
     }
 
     /**
-     * Returns only the x and y components 
+     * Returns only the x and y components
+     * 
      * @return A vector2D with only the x and y components
      */
     public Vector2D get2DVector() {
