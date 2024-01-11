@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 
+@SuppressWarnings({"deprecation", "removal"})
 public class SwerveDriveSubsystem implements DriveSubsystem
 {
   // Physical parameters
