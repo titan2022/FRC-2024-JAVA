@@ -20,6 +20,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 
+// WPI_TalonFX is deprecated and will be removed in 2025
+// However, we are not able to get Phoenix v6 to work and do 
+// not want to refactor during competition season
 @SuppressWarnings({"deprecation", "removal"})
 public class SwerveDriveSubsystem implements DriveSubsystem
 {
