@@ -10,12 +10,12 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 
 /**
- * Creates a rotation command in radians which 
- * goes counter clockwise with the front of the 
+ * Creates a rotation command in radians which
+ * goes counter clockwise with the front of the
  * robot being 0
  */
 public class RelativeRotationTimedCommand extends Command {
-  @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
+  @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
   private final RotationalDrivebase rotDriveBase;
   private final double targetAngle;
   private final double speed_radpers; // rad/s
@@ -26,28 +26,34 @@ public class RelativeRotationTimedCommand extends Command {
 
   /**
    * Creates a rotation command relative to the front of the robot
+   * 
    * @param subsystem Drivebase
-   * @param localizer The localizer which tracks the position and orientation of the robot
-   * @param angle The angle of rotation as a Rotation2d counterclockwise relative to the front of the robot
-   * @param speed Speed at which to execute the rotation
+   * @param localizer The localizer which tracks the position and orientation of
+   *                  the robot
+   * @param angle     The angle of rotation as a Rotation2d counterclockwise
+   *                  relative to the front of the robot
+   * @param speed     Speed at which to execute the rotation
    */
-  public RelativeRotationTimedCommand(RotationalDrivebase subsystem, Rotation2d angle, double speed) {
+  public RelativeRotationTimedCommand(RotationalDrivebase drivebase, Rotation2d angle, double speed) {
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(subsystem);
-    this.rotDriveBase = subsystem;
+    addRequirements(drivebase);
+    this.rotDriveBase = drivebase;
     this.targetAngle = angle.getRadians();
     this.curAngle = 0;
     this.speed_radpers = speed;
-    this.speed = speed/50;
+    this.speed = speed / 50;
     this.tolerance = 1; // 1 radian
   }
 
   /**
    * Creates a rotation command relative to the front of the robot
+   * 
    * @param subsystem Drivebase
-   * @param localizer The localizer which tracks the position and orientation of the robot
-   * @param angle The angle of rotation in radians counterclockwise relative to the front of the robot
-   * @param speed Speed at which to execute the rotation
+   * @param localizer The localizer which tracks the position and orientation of
+   *                  the robot
+   * @param angle     The angle of rotation in radians counterclockwise relative
+   *                  to the front of the robot
+   * @param speed     Speed at which to execute the rotation
    */
   public RelativeRotationTimedCommand(RotationalDrivebase subsystem, Localizer localizer, double angle, double speed) {
     // Use addRequirements() here to declare subsystem dependencies.
@@ -56,7 +62,7 @@ public class RelativeRotationTimedCommand extends Command {
     this.targetAngle = angle;
     this.curAngle = 0;
     this.speed_radpers = speed;
-    this.speed = speed/50;
+    this.speed = speed / 50;
     this.tolerance = 1; // 1 radian
   }
 
@@ -71,7 +77,7 @@ public class RelativeRotationTimedCommand extends Command {
   @Override
   public void execute() {
     curAngle += speed;
-    if(curAngle >= targetAngle - tolerance && curAngle <= targetAngle + tolerance) {
+    if (curAngle >= targetAngle - tolerance && curAngle <= targetAngle + tolerance) {
       this.isFinished = true;
       rotDriveBase.setRotation(0);
     }

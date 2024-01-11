@@ -14,41 +14,54 @@ import edu.wpi.first.wpilibj2.command.Command;
  * relative to the front of the robot
  */
 public class RelativeTranslationTimedCommand extends Command {
-  @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
-  private final TranslationalDrivebase transDriveBase;
-  private final Translation2d deltaPosition;
-  private final double speed;
-  private final double tolerance;
+  @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
+  private final TranslationalDrivebase drivebase;
+  private final Translation2d movement;
+  private final double total_time;
+  private double cur_time;
 
   /**
    * Creates a new ExampleCommand.
    *
    * @param subsystem The subsystem used by this command.
+   * @param movement  The movement in meters
+   * @param speed     The speed in meters per second
    */
-  public RelativeTranslationTimedCommand(TranslationalDrivebase transDriveBase, Translation2d deltaPosition, double speed) {
-    this.transDriveBase = transDriveBase;
-    this.deltaPosition = deltaPosition;
-    this.speed = speed;
-    // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(transDriveBase);
+  public RelativeTranslationTimedCommand(TranslationalDrivebase drivebase, Translation2d movement,
+      double speed) {
+    this.drivebase = drivebase;
+    this.movement = movement;
+    double net_movement = movement.getNorm();
+    this.total_time = net_movement / speed;
+    this.cur_time = 0;
+    addRequirements(drivebase);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    drivebase.setVelocity(movement.div(total_time));
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {
+    // 20 ms
+    cur_time += 0.02;
+  }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    drivebase.setVelocity(new Translation2d());
+  }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
+    if (cur_time >= total_time) {
+      return true;
+    }
     return false;
   }
 }

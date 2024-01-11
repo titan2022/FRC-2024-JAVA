@@ -4,12 +4,12 @@ import com.ctre.phoenix.sensors.WPI_Pigeon2;
 
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import frc.robot.subsystems.RotationalDrivebase;
 import static frc.robot.utility.Constants.Unit.*;
 
-public class XBoxRotationalCommand extends CommandBase {
+public class XBoxRotationalCommand extends Command {
     private RotationalDrivebase drive;
     private XboxController controller;
     private double maxRate, omega;
