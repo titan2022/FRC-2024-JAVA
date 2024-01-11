@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.commands.*;
 import frc.robot.commands.RelativeTranslationLocalCommand;
@@ -36,6 +37,12 @@ public class Robot extends TimedRobot {
     @Override
     public void robotPeriodic() {
         CommandScheduler.getInstance().run();
+        SmartDashboard.putNumber("Local X", localizer.getLocalPosition().getX());
+        SmartDashboard.putNumber("Local Y", localizer.getLocalPosition().getY());
+        SmartDashboard.putNumber("Local Orientation", new Rotation2d(localizer.getLocalOrientation()).getDegrees());
+        SmartDashboard.putNumber("Global X", localizer.getGlobalPosition().getX());
+        SmartDashboard.putNumber("Global Y", localizer.getGlobalPosition().getY());
+        SmartDashboard.putNumber("Global Orientation", new Rotation2d(localizer.getGlobalOrientation()).getDegrees());
     }
 
     @Override
