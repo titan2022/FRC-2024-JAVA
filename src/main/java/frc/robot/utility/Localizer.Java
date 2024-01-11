@@ -14,9 +14,10 @@ package frc.robot.subsystems;
 
 public class Localizer {
 
-    public Vector2D Position;
-    public double Orientation;
-    public double  relativeOrientation;
+    public Vector2D globalPosition;
+    public Vector2D localPosition;
+    public double globalOrientation;
+    public double  localOrientation;
     public bool on_blue_side;
 
     public Localizer(double inputX, double inputY, double inputlocalOrientation. double inputLocalOrientation) {
