@@ -19,6 +19,10 @@ public class Vector2D extends Translation2d {
         this.y = inputY;
     }
 
+    public Vector2D(Translation2d input) {
+        super(input.getX(), input.getY());
+    }
+
     public void setCoordinates(double inputX, double inputY) {
         this.x = inputX;
         this.y = inputY;

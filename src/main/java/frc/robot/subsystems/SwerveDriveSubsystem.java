@@ -17,17 +17,20 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.utility.Localizer;
+import frc.robot.utility.Vector2D;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 
 // WPI_TalonFX is deprecated and will be removed in 2025
 // However, we are not able to get Phoenix v6 to work and do 
 // not want to refactor during competition season
-@SuppressWarnings({ "deprecation", "removal" })
+@SuppressWarnings({"deprecation", "removal"})
 public class SwerveDriveSubsystem implements DriveSubsystem {
   // Physical parameters
   public static final double ROBOT_TRACK_WIDTH = 18.5 * IN; // 0.672; // meters (30 in)
-  public static final double ROBOT_LENGTH = 18.5 * IN; // 0.672; // meter
+  public static final double ROBOT_LENGTH = 18.5 * IN; // 0.672; // meter 
   public static final double WHEEL_RADIUS = 2 * IN; // 0.0508; // meters (2 in)
   public static final double GEAR_RATIO = 8.16;
   public static final double METERS_PER_TICKS = WHEEL_RADIUS * 2 * Math.PI / FALCON_CPR / GEAR_RATIO;
@@ -35,7 +38,7 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
   // Deadbands
   private static final double WHEEL_DEADBAND = 0.01;
   private static final double ROTATOR_DEADBAND = 0.001;
-
+    
   // CAN ID numbers
   private static final int LEFT_FRONT_MOTOR_PORT = 6;
   private static final int LEFT_BACK_MOTOR_PORT = 4;
@@ -52,17 +55,16 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
   private static final int RIGHT_BACK_ENCODER_ROTATOR_PORT = 37;
 
   // Rotator encoder offsets
-  private static final int FRONT_LEFT_OFFSET = -208 + 1024;// 908-1024+2048; // -95
-  private static final int BACK_LEFT_OFFSET = -747 + 1024;// -840;
-  private static final int FRONT_RIGHT_OFFSET = 192 + 1024;// -182+1024+512+1024+2048; // -1200
-  private static final int BACK_RIGHT_OFFSET = 1925 + 1024;// 1287-512-1024+2048;
-  private static final int[] OFFSETS = new int[] { FRONT_LEFT_OFFSET, BACK_LEFT_OFFSET, FRONT_RIGHT_OFFSET,
-      BACK_RIGHT_OFFSET };
+  private static final int FRONT_LEFT_OFFSET = -208+1024;//908-1024+2048; // -95
+  private static final int BACK_LEFT_OFFSET = -747+1024;//-840;
+  private static final int FRONT_RIGHT_OFFSET = 192+1024;//-182+1024+512+1024+2048; // -1200
+  private static final int BACK_RIGHT_OFFSET = 1925+1024;//1287-512-1024+2048;
+  private static final int[] OFFSETS = new int[]{FRONT_LEFT_OFFSET, BACK_LEFT_OFFSET, FRONT_RIGHT_OFFSET, BACK_RIGHT_OFFSET};
 
   // Motor inversions
   private static final boolean WHEEL_INVERTED = false;
   private static final boolean ROTATOR_INVERTED = true;
-
+ 
   // Sensor inversions
   private static final boolean WHEEL_PHASE = false;
   private static final boolean ROTATOR_PHASE = false;
@@ -80,24 +82,26 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
     public static final int BACK_RIGHT = 3;
   }
 
+  private Localizer localizer;
+
   // Physical Hardware
-  private final WPI_TalonFX[] motors = new WPI_TalonFX[] {
-      new WPI_TalonFX(LEFT_FRONT_MOTOR_PORT),
-      new WPI_TalonFX(LEFT_BACK_MOTOR_PORT),
-      new WPI_TalonFX(RIGHT_FRONT_MOTOR_PORT),
-      new WPI_TalonFX(RIGHT_BACK_MOTOR_PORT)
+  private final WPI_TalonFX[] motors = new WPI_TalonFX[]{
+    new WPI_TalonFX(LEFT_FRONT_MOTOR_PORT),
+    new WPI_TalonFX(LEFT_BACK_MOTOR_PORT),
+    new WPI_TalonFX(RIGHT_FRONT_MOTOR_PORT),
+    new WPI_TalonFX(RIGHT_BACK_MOTOR_PORT)
   };
-  private final WPI_TalonFX[] rotators = new WPI_TalonFX[] {
-      new WPI_TalonFX(LEFT_FRONT_MOTOR_ROTATOR_PORT),
-      new WPI_TalonFX(LEFT_BACK_MOTOR_ROTATOR_PORT),
-      new WPI_TalonFX(RIGHT_FRONT_MOTOR_ROTATOR_PORT),
-      new WPI_TalonFX(RIGHT_BACK_MOTOR_ROTATOR_PORT)
+  private final WPI_TalonFX[] rotators = new WPI_TalonFX[]{
+    new WPI_TalonFX(LEFT_FRONT_MOTOR_ROTATOR_PORT),
+    new WPI_TalonFX(LEFT_BACK_MOTOR_ROTATOR_PORT),
+    new WPI_TalonFX(RIGHT_FRONT_MOTOR_ROTATOR_PORT),
+    new WPI_TalonFX(RIGHT_BACK_MOTOR_ROTATOR_PORT)
   };
-  private final CANCoder[] encoders = new CANCoder[] {
-      new CANCoder(LEFT_FRONT_ENCODER_ROTATOR_PORT),
-      new CANCoder(LEFT_BACK_ENCODER_ROTATOR_PORT),
-      new CANCoder(RIGHT_FRONT_ENCODER_ROTATOR_PORT),
-      new CANCoder(RIGHT_BACK_ENCODER_ROTATOR_PORT)
+  private final CANCoder[] encoders = new CANCoder[]{
+    new CANCoder(LEFT_FRONT_ENCODER_ROTATOR_PORT),
+    new CANCoder(LEFT_BACK_ENCODER_ROTATOR_PORT),
+    new CANCoder(RIGHT_FRONT_ENCODER_ROTATOR_PORT),
+    new CANCoder(RIGHT_BACK_ENCODER_ROTATOR_PORT)
   };
 
   // PID slots
@@ -105,14 +109,12 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
   private static final int MAIN_MOTOR_SLOT_IDX = 0;
 
   // Kinematics
-  // Positions describe the position of each wheel relative to the center of the
-  // robot
-  private static final Translation2d leftFrontPosition = new Translation2d(-ROBOT_TRACK_WIDTH / 2, ROBOT_LENGTH / 2);
-  private static final Translation2d leftBackPosition = new Translation2d(-ROBOT_TRACK_WIDTH / 2, -ROBOT_LENGTH / 2);
-  private static final Translation2d rightFrontPosition = new Translation2d(ROBOT_TRACK_WIDTH / 2, ROBOT_LENGTH / 2);
-  private static final Translation2d rightBackPosition = new Translation2d(ROBOT_TRACK_WIDTH / 2, -ROBOT_LENGTH / 2);
-  public static final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(leftFrontPosition, leftBackPosition,
-      rightFrontPosition, rightBackPosition);
+  // Positions describe the position of each wheel relative to the center of the robot
+  private static final Translation2d leftFrontPosition = new Translation2d(-ROBOT_TRACK_WIDTH/2, ROBOT_LENGTH/2);
+  private static final Translation2d leftBackPosition = new Translation2d(-ROBOT_TRACK_WIDTH/2, -ROBOT_LENGTH/2);
+  private static final Translation2d rightFrontPosition = new Translation2d(ROBOT_TRACK_WIDTH/2, ROBOT_LENGTH/2);
+  private static final Translation2d rightBackPosition = new Translation2d(ROBOT_TRACK_WIDTH/2, -ROBOT_LENGTH/2);
+  public static final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(leftFrontPosition, leftBackPosition, rightFrontPosition, rightBackPosition);
 
   private ChassisSpeeds lastVelocity = new ChassisSpeeds();
 
@@ -121,6 +123,8 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
     @Override
     public void setVelocity(Translation2d velocity) {
       updateVelocity(velocity);
+      Vector2D deltaX = new Vector2D(getVelocity().rotateBy(new Rotation2d(rotationalLock.getRate())).div(50));
+      localizer.updateLocalPosition(deltaX);
     }
 
     @Override
@@ -133,6 +137,8 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
     @Override
     public void setRotation(double omega) {
       updateRotation(omega);
+      localizer.updateLocalOrientation(getRate());
+      // localizer.updateGlobalOrientation(getRate());
     }
 
     @Override
@@ -145,27 +151,30 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
   /**
    * Creates the swerve drive subsystem
    * 
-   * @param mainConfig    Requires PID configuration in slot 0
+   * @param mainConfig Requires PID configuration in slot 0
    * @param rotatorConfig Requires PID configuration in slot 0
    */
-  public SwerveDriveSubsystem(TalonFXConfiguration mainConfig, TalonFXConfiguration rotatorConfig) {
+  public SwerveDriveSubsystem(TalonFXConfiguration mainConfig, TalonFXConfiguration rotatorConfig, Localizer local)
+  {
+    this.localizer = local;
     setFactoryMotorConfig();
 
-    if (mainConfig != null) {
+    if(mainConfig != null)
+    {
       motors[0].configAllSettings(mainConfig);
     }
-    if (rotatorConfig != null) {
+    if(rotatorConfig != null){
       rotators[0].configAllSettings(rotatorConfig);
     }
-
+    
     mainConfig = new TalonFXConfiguration();
     rotatorConfig = new TalonFXConfiguration();
     motors[0].getAllConfigs(mainConfig);
     rotators[0].getAllConfigs(rotatorConfig);
 
     // Current limits
-    // rotatorConfig.supplyCurrLimit = supplyCurrentLimit;
-    // mainConfig.supplyCurrLimit = supplyCurrentLimit;
+    //rotatorConfig.supplyCurrLimit = supplyCurrentLimit;
+    //mainConfig.supplyCurrLimit = supplyCurrentLimit;
     rotatorConfig.supplyCurrLimit.currentLimit = 12;
     rotatorConfig.supplyCurrLimit.enable = true;
     rotatorConfig.supplyCurrLimit.triggerThresholdCurrent = 12;
@@ -174,7 +183,7 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
     mainConfig.supplyCurrLimit.enable = true;
     mainConfig.supplyCurrLimit.triggerThresholdCurrent = 20;
     mainConfig.supplyCurrLimit.triggerThresholdTime = 0.00;
-    // mainConfig.closedloopRamp = 0.5;
+    //mainConfig.closedloopRamp = 0.5;
     SmartDashboard.putNumber("cur lim", 20);
 
     // Deadbands
@@ -182,7 +191,7 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
     mainConfig.neutralDeadband = WHEEL_DEADBAND;
 
     // Apply configurations
-    for (WPI_TalonFX motor : motors) {
+    for(WPI_TalonFX motor : motors){
       motor.configAllSettings(mainConfig);
       motor.setInverted(WHEEL_INVERTED);
       motor.setSensorPhase(WHEEL_PHASE);
@@ -205,7 +214,7 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
       motor.setStatusFramePeriod(StatusFrameEnhanced.Status_14_Turn_PIDF1, 5000);
       motor.setStatusFramePeriod(StatusFrameEnhanced.Status_15_FirmwareApiStatus, 5000);
     }
-    for (WPI_TalonFX rotator : rotators) {
+    for(WPI_TalonFX rotator : rotators){
       rotator.configAllSettings(rotatorConfig);
       rotator.setInverted(ROTATOR_INVERTED);
       rotator.setSensorPhase(ROTATOR_PHASE);
@@ -228,36 +237,33 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
       rotator.setStatusFramePeriod(StatusFrameEnhanced.Status_14_Turn_PIDF1, 5000);
       rotator.setStatusFramePeriod(StatusFrameEnhanced.Status_15_FirmwareApiStatus, 5000);
     }
-    for (CANCoder encoder : encoders) {
+    for(CANCoder encoder : encoders){
       encoder.configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition, 0);
       encoder.setStatusFramePeriod(CANCoderStatusFrame.SensorData, 5000);
       encoder.setStatusFramePeriod(CANCoderStatusFrame.VbatAndFaults, 5000);
     }
-    for (int i = 0; i < 4; i++)
+    for(int i=0; i<4; i++)
       rotators[i].configRemoteFeedbackFilter(encoders[i], 0);
   }
-
-  public SwerveDriveSubsystem() {
-    this(null, null);
-  }
+  // public SwerveDriveSubsystem() {
+  //   this(null, null);
+  // }
 
   private void setFactoryMotorConfig() {
-    for (WPI_TalonFX motor : motors)
+    for(WPI_TalonFX motor : motors)
       motor.configFactoryDefault();
-    for (WPI_TalonFX rotator : rotators)
+    for(WPI_TalonFX rotator : rotators)
       rotator.configFactoryDefault();
   }
 
   private double curLim = 20;
-
   public void setCurLimit(double limit) {
     SupplyCurrentLimitConfiguration currentLimit = new SupplyCurrentLimitConfiguration(true, limit, limit, 0.05);
-    for (WPI_TalonFX motor : motors)
+    for(WPI_TalonFX motor : motors)
       motor.configSupplyCurrentLimit(currentLimit);
     curLim = limit;
     SmartDashboard.putNumber("cur lim", curLim);
   }
-
   public double getCurLimit() {
     return curLim;
   }
@@ -267,35 +273,37 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
    * 
    * @return Maximum drive speed in meters per second.
    */
-  public double getMaxSpeed() {
+  public double getMaxSpeed()
+  {
     return MAX_WHEEL_SPEED;
   }
 
   private void applyModuleState(SwerveModuleState state, int module) {
-    double velTicks = state.speedMetersPerSecond / (10 * METERS_PER_TICKS);
-    if (velTicks == 0) {
+    double velTicks = state.speedMetersPerSecond / (10*METERS_PER_TICKS);
+    if(velTicks == 0){
       motors[module].set(ControlMode.Velocity, 0);
-      // SmartDashboard.putNumber("set vel " + module, 0);
+      //SmartDashboard.putNumber("set vel " + module, 0);
       return;
     }
     double currTicks = getRotatorEncoderCount(module);
-    double targetTicks = CANCODER_CPR / 2 - state.angle.getRadians() * RAD / CANCODER_TICKS;
+    double targetTicks = CANCODER_CPR/2 - state.angle.getRadians() * RAD / CANCODER_TICKS;
     double deltaTicks = (targetTicks - currTicks) % CANCODER_CPR;
-    if (deltaTicks >= CANCODER_CPR / 2)
+    if(deltaTicks >= CANCODER_CPR / 2)
       deltaTicks -= CANCODER_CPR;
-    else if (deltaTicks <= -CANCODER_CPR / 2)
+    else if(deltaTicks <= -CANCODER_CPR / 2)
       deltaTicks += CANCODER_CPR;
-    if (deltaTicks >= CANCODER_CPR / 4) {
+    if(deltaTicks >= CANCODER_CPR / 4){
       deltaTicks -= CANCODER_CPR / 2;
       velTicks *= -1;
-    } else if (deltaTicks <= -CANCODER_CPR / 4) {
+    }
+    else if(deltaTicks <= -CANCODER_CPR / 4){
       deltaTicks += CANCODER_CPR / 2;
       velTicks *= -1;
     }
-    // SmartDashboard.putNumber("set vel " + module, velTicks);
-    // SmartDashboard.putNumber("set rot " + module, currTicks + deltaTicks);
-    // SmartDashboard.putNumber("cur rot " + module, currTicks);
-    // SmartDashboard.putNumber("delta " + module, deltaTicks);
+    //SmartDashboard.putNumber("set vel " + module, velTicks);
+    //SmartDashboard.putNumber("set rot " + module, currTicks + deltaTicks);
+    //SmartDashboard.putNumber("cur rot " + module, currTicks);
+    //SmartDashboard.putNumber("delta " + module, deltaTicks);
     motors[module].set(ControlMode.Velocity, velTicks);
     rotators[module].set(ControlMode.Position, currTicks + deltaTicks + OFFSETS[module]);
   }
@@ -310,25 +318,22 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
    * @param rightOutputValue right side output value for ControlMode
    */
   private void setVelocities(ChassisSpeeds inputChassisSpeeds) {
-    // SmartDashboard.putNumber("last x", inputChassisSpeeds.vxMetersPerSecond);
-    // SmartDashboard.putNumber("last y", inputChassisSpeeds.vyMetersPerSecond);
-    // SmartDashboard.putNumber("last omega",
-    // inputChassisSpeeds.omegaRadiansPerSecond);
+    //SmartDashboard.putNumber("last x", inputChassisSpeeds.vxMetersPerSecond);
+    //SmartDashboard.putNumber("last y", inputChassisSpeeds.vyMetersPerSecond);
+    //SmartDashboard.putNumber("last omega", inputChassisSpeeds.omegaRadiansPerSecond);
     SwerveModuleState[] modules = kinematics.toSwerveModuleStates(inputChassisSpeeds);
     SwerveDriveKinematics.desaturateWheelSpeeds(modules, MAX_WHEEL_SPEED);
-    for (int i = 0; i < 4; i++) {
+    for(int i=0; i<4; i++){
       applyModuleState(modules[i], i);
-      // SmartDashboard.putNumber("tgt vel " + i, modules[0].speedMetersPerSecond);
-      // SmartDashboard.putNumber("tgt deg " + i, modules[0].angle.getDegrees());
+      //SmartDashboard.putNumber("tgt vel " + i, modules[0].speedMetersPerSecond);
+      //SmartDashboard.putNumber("tgt deg " + i, modules[0].angle.getDegrees());
     }
   }
-
   private void updateVelocity(Translation2d velocity) {
     lastVelocity.vxMetersPerSecond = velocity.getX();
     lastVelocity.vyMetersPerSecond = velocity.getY();
     setVelocities(lastVelocity);
   }
-
   private void updateRotation(double omega) {
     lastVelocity.omegaRadiansPerSecond = omega;
     setVelocities(lastVelocity);
@@ -336,8 +341,7 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
 
   /**
    * Estimates robot velocity from wheel speeds.
-   * 
-   * @return The estimated robot velocity.
+   * @return  The estimated robot velocity.
    */
   public ChassisSpeeds getVelocities() {
     SwerveModuleState[] states = getSwerveModuleStates();
@@ -352,7 +356,8 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
    * @param useLeft - Whether to use the left primary motor.
    * @return Encoder count for specified primary motor.
    */
-  public double getRotatorEncoderCount(int module) {
+  public double getRotatorEncoderCount(int module)
+  {
     return rotators[module].getSelectedSensorPosition() - OFFSETS[module];
   }
 
@@ -363,16 +368,17 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
    * @return Angle of rotator motor in radians
    */
   public double getRotatorEncoderPosition(int module) {
-    return (CANCODER_CPR / 2 - getRotatorEncoderCount(module)) * CANCODER_TICKS / RAD;
+    return (CANCODER_CPR/2 - getRotatorEncoderCount(module)) * CANCODER_TICKS / RAD;
   }
 
-  public double getEncoderVelocity(int module) {
+  public double getEncoderVelocity(int module)
+  {
     return motors[module].getSelectedSensorVelocity() * METERS_PER_TICKS * 10;
   }
 
   public SwerveModuleState[] getSwerveModuleStates() {
     SwerveModuleState[] states = new SwerveModuleState[4];
-    for (int i = 0; i < 4; i++)
+    for(int i=0; i<4; i++)
       states[i] = new SwerveModuleState(getEncoderVelocity(i), new Rotation2d(getRotatorEncoderPosition(i)));
     return states;
   }
@@ -389,13 +395,13 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
 
   @Override
   public void coast() {
-    for (WPI_TalonFX rotator : rotators)
+    for(WPI_TalonFX rotator : rotators)
       rotator.setNeutralMode(NeutralMode.Coast);
   }
 
   @Override
   public void brake() {
-    for (WPI_TalonFX rotator : rotators)
+    for(WPI_TalonFX rotator : rotators)
       rotator.setNeutralMode(NeutralMode.Brake);
   }
 }

@@ -63,14 +63,14 @@ public class Localizer {
      * Adds the vector to the current local position to update it
      */
     public void updateGlobalPosition(Vector2D vec) {
-        this.globalPosition = this.globalPosition.add(vec);
+        this.globalPosition += theta;
     }
 
     /**
      * Sets the local orientation to a new orientation
      */
     public void setLocalOrientation(double theta) {
-        this.localOrientation = theta;
+        this.localOrientation = vec;
     }
 
     /**
@@ -91,7 +91,7 @@ public class Localizer {
      * Sets the global orientation to a new orientation
      */
     public void setGlobalOrientation(double theta) {
-        this.globalOrientation = theta;
+        this.globalOrientation = vec;
     }
 
     /**
