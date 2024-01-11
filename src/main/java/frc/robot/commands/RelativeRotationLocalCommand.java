@@ -18,9 +18,13 @@ public class RelativeRotationLocalCommand extends Command {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
   private final RotationalDrivebase rotDriveBase;
   private final Localizer localizer;
-  private final Rotation2d angle;
+  private final double targetAngle;
+  private final double speed_radpers; // rad/s
   private final double speed;
   private final double tolerance;
+  private double initialAngle;
+  private double curAngle;
+  private boolean isFinished;
 
   /**
    * Creates a rotation command relative to the front of the robot
@@ -32,23 +36,41 @@ public class RelativeRotationLocalCommand extends Command {
   public RelativeRotationLocalCommand(RotationalDrivebase subsystem, Localizer localizer, Rotation2d angle, double speed) {
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(subsystem);
+    this.rotDriveBase = subsystem;
+    this.localizer = localizer;
+    this.targetAngle = angle.getRadians();
+    this.curAngle = 0;
+    this.speed_radpers = speed;
+    this.speed = speed/50;
+    this.tolerance = 1; // 1 radian
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    initialAngle = localizer.getGlobalOrientation();
+    rotDriveBase.setRotation(speed);
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {
+    curAngle = localizer.getGlobalOrientation() - initialAngle;
+    if(curAngle >= targetAngle - tolerance && curAngle <= targetAngle + tolerance) {
+      this.isFinished = true;
+      rotDriveBase.setRotation(0);
+    }
+  }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    rotDriveBase.setRotation(0);
+  }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return this.isFinished;
   }
 }
