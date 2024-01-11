@@ -20,7 +20,7 @@ public class Localizer {
     public double localOrientation;
     public boolean on_blue_side;
 
-    public Localizer(double inputX, double inputY, double inputlocalOrientation. double inputLocalOrientation) {
+    public Localizer(double inputX, double inputY, double inputlocalOrientation, double inputLocalOrientation) {
         throw new UnsupportedOperationException();
     }
 
