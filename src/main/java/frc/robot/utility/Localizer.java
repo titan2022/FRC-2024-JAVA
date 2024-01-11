@@ -1,4 +1,3 @@
-
 package frc.robot.utility;
 
 /**
@@ -8,17 +7,18 @@ package frc.robot.utility;
  * Consider the bottom left corner of the source area(pg 24) as the origin
  * X is positive going from left to right
  * Y is position going from bottom to top
- * The global orientation of 0 will be considered along the global x axis from left to right
+ * The global orientation of 0 will be considered along the global x axis from
+ * left to right
  * Basically, imagine the field as a unit circle and you should be good
  */
 
-
 public class Localizer {
+
     public Vector2D globalPosition;
     public Vector2D localPosition;
     public double globalOrientation;
-    public double  localOrientation;
-    public bool on_blue_side;
+    public double localOrientation;
+    public boolean on_blue_side;
 
     public Localizer(double inputX, double inputY, double inputlocalOrientation. double inputLocalOrientation) {
         throw new UnsupportedOperationException();
@@ -45,7 +45,6 @@ public class Localizer {
         this.localPosition += theta;
     }
 
-    
     /**
      * Sets the local position to a new position
      */
@@ -110,11 +109,13 @@ public class Localizer {
     }
 
     /**
-     * Updates the global position and orientation of the robot based upon the detected april tag
-     * Decide whether you will use the IDs specified in rule book via int or using the enum AprilTag
+     * Updates the global position and orientation of the robot based upon the
+     * detected april tag
+     * Decide whether you will use the IDs specified in rule book via int or using
+     * the enum AprilTag
      */
     public void updateWithAprilTag(AprilTag tag, Vector3D relative_position, double angle) {
-        
+
     }
 
 }
