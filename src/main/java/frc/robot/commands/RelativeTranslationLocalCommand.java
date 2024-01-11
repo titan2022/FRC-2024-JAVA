@@ -6,6 +6,7 @@ package frc.robot.commands;
 
 import frc.robot.utility.Localizer;
 import frc.robot.subsystems.TranslationalDrivebase;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 
@@ -20,6 +21,7 @@ public class RelativeTranslationLocalCommand extends Command {
   private final Translation2d deltaPosition;
   private final double speed;
   private final double tolerance = 0.1;
+  private Translation2d finalPosition;
 
   /**
    * Creates a new ExampleCommand.
@@ -38,7 +40,11 @@ public class RelativeTranslationLocalCommand extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    transDriveBase.setVelocity()
+    Translation2d displacementVector = deltaPosition.rotateBy(new Rotation2d(localizer.getLocalOrientation()));
+    finalPosition = localizer.getLocalPosition().plus(displacementVector);
+    Translation2d normalizedVector = deltaPosition.div(deltaPosition.getNorm());
+    normalizedVector.times(speed);
+    transDriveBase.setVelocity(normalizedVector);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -49,11 +55,17 @@ public class RelativeTranslationLocalCommand extends Command {
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    transDriveBase.setVelocity(new Translation2d(0, 0));
+  }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    if (localizer.getLocalPosition().getDistance(finalPosition) < tolerance) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }
