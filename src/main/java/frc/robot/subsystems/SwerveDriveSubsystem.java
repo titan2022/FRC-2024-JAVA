@@ -328,7 +328,6 @@ public class SwerveDriveSubsystem implements DriveSubsystem
 
   /**
    * Estimates robot velocity from wheel speeds.
-   * 
    * @return  The estimated robot velocity.
    */
   public ChassisSpeeds getVelocities() {
