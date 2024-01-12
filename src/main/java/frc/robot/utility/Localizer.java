@@ -1,4 +1,5 @@
 package frc.robot.utility;
+import edu.wpi.first.math.geometry.Translation2d;
 
 /**
  * A localizer class for the 2024 Crescendo arena
@@ -14,57 +15,57 @@ package frc.robot.utility;
 
 public class Localizer {
 
-    public Vector2D globalPosition = new Vector2D();
-    public Vector2D localPosition = new Vector2D();
+    public Translation2d globalPosition = new Translation2d();
+    public Translation2d localPosition = new Translation2d();
     public double globalOrientation = 0;
     public double localOrientation = 0;
     public boolean on_blue_side = false;
 
     public Localizer(double inputX, double inputY, double inputlocalOrientation) {
-        localPosition = new Vector2D(inputX, inputY);
+        localPosition = new Translation2d(inputX, inputY);
         localOrientation = inputlocalOrientation;
     }
 
     /**
      * Sets the local position to a new position
      */
-    public void setLocalPosition(Vector2D vec) {
+    public void setLocalPosition(Translation2d vec) {
         this.localPosition = vec;
     }
 
     /**
      * Gets the current local position
      */
-    public Vector2D getLocalPosition() {
+    public Translation2d getLocalPosition() {
         return this.localPosition;
     }
 
     /**
      * Adds the vector to the current local position to update it
      */
-    public void updateLocalPosition(Vector2D vec) {
-        this.localPosition = this.localPosition.add(vec);
+    public void updateLocalPosition(Translation2d vec) {
+        this.localPosition = this.localPosition.plus(vec);
     }
 
     /**
      * Sets the local position to a new position
      */
-    public void setGlobalPosition(Vector2D vec) {
+    public void setGlobalPosition(Translation2d vec) {
         this.globalPosition = vec;
     }
 
     /**
      * Gets the current local position
      */
-    public Vector2D getGlobalPosition() {
+    public Translation2d getGlobalPosition() {
         return this.globalPosition;
     }
 
     /**
      * Adds the vector to the current local position to update it
      */
-    public void updateGlobalPosition(Vector2D vec) {
-        this.globalPosition = this.globalPosition.add(vec);
+    public void updateGlobalPosition(Translation2d vec) {
+        this.globalPosition = this.globalPosition.plus(vec);
     }
 
     /**
