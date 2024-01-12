@@ -18,7 +18,6 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.utility.Localizer;
-import frc.robot.utility.Vector2D;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -126,7 +125,7 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
     @Override
     public void setVelocity(Translation2d velocity) {
       updateVelocity(velocity);
-      Vector2D deltaX = new Vector2D(getVelocity().rotateBy(new Rotation2d(rotationalLock.getRate())).div(50));
+      Translation2d deltaX = getVelocity().rotateBy(new Rotation2d(rotationalLock.getRate())).div(50);
       localizer.updateLocalPosition(deltaX);
     }
 
