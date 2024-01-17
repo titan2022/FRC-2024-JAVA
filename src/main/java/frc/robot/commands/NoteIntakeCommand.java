@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 public class NoteIntakeCommand extends Command {
   @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
 
-  public NoteIntakeCommand() {
+  public NoteIntakeCommand(IntakeSubsystem intake) {
 
   }
 

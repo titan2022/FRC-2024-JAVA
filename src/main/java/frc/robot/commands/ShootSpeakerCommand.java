@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 /** An example command that uses an example subsystem. */
 public class ShootSpeakerCommand extends Command {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
-    public ShootSpeakerCommand() {
+    public ShootSpeakerCommand(Shooter subsystem) {
 
     }
 

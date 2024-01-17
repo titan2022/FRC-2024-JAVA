@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 public class RotationCommand extends Command {
   @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
 
-  public RotationCommand(double angle, double speed) {
+  public RotationCommand(double angle, double speed, RotationalDrivebase driveBase) {
 
   }
 

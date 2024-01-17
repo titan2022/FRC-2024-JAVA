@@ -5,12 +5,13 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.TranslationalDrivebase;
 
 /** An example command that uses an example subsystem. */
 public class TranslationCommand extends Command {
   @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
 
-  public TranslationCommand(double x, double y, double speed) {
+  public TranslationCommand(double x, double y, double speed, TranslationalDrivebase driveBase) {
 
   }
 
