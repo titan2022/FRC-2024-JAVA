@@ -5,6 +5,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.RotationalDrivebase;
 
 /** An example command that uses an example subsystem. */
 public class RotationCommand extends Command {

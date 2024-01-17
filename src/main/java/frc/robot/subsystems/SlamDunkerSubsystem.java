@@ -9,10 +9,11 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class IntakeSubsystem extends SubsystemBase {
-  WPI_TalonFX rotationMotor;
-  WPI_TalonSRX wheelsMotorController;
+public class SlamDunkerSubsystem extends SubsystemBase {
+  WPI_TalonFX rotatorMotorOne;
+  WPI_TalonFX rotatorMotorTwo;
+  WPI_TalonSRX wheelMotorController;
   
-  public IntakeSubsystem() {
+  public SlamDunkerSubsystem() {
   }
 }

@@ -5,14 +5,13 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class IntakeSubsystem extends SubsystemBase {
-  WPI_TalonFX rotationMotor;
-  WPI_TalonSRX wheelsMotorController;
-  
-  public IntakeSubsystem() {
+public class ClimbSubsystem extends SubsystemBase {
+  WPI_TalonFX climbMotorOne;
+  WPI_TalonFX climbMotorTwo;
+
+  public ClimbSubsystem() {
   }
 }
