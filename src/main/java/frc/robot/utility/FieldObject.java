@@ -1,11 +1,15 @@
 package frc.robot.utility;
 
+import edu.wpi.first.math.geometry.Translation2d;
+
 public interface FieldObject {
     public FieldObjectType getType();
 
+    public String getName();
+
     public void setName(String name);
 
-    public Vector2D getPosition();
+    public Translation2d getPosition();
 
-    public void setPosition(Vector2D position);
+    public void setPosition(Translation2d position);
 }
