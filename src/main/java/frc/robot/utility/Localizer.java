@@ -1,123 +1,95 @@
 package frc.robot.utility;
+import com.ctre.phoenix.sensors.WPI_Pigeon2;
+
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import frc.robot.utility.networking.NetworkingServer;
 
 /**
  * A localizer class for the 2024 Crescendo arena
- * The rule book on pg 22 has an image of the arena
- * https://firstfrc.blob.core.windows.net/frc2024/Manual/2024GameManual.pdf
- * Consider the bottom left corner of the source area(pg 24) as the origin
- * X is positive going from left to right
- * Y is position going from bottom to top
- * The global orientation of 0 will be considered along the global x axis from
- * left to right
- * Basically, imagine the field as a unit circle and you should be good
+ * The global zero coordinate is in the bottom left corner as seen on pg. 24
+ * Horizontal axis is positive X
+ * Vertical axis is positive Y
  */
-
 public class Localizer {
+    private NetworkingServer server = new NetworkingServer();
+    private WPI_Pigeon2 pigeon = new WPI_Pigeon2(40);
 
-    public Translation2d globalPosition = new Translation2d();
-    public Translation2d localPosition = new Translation2d();
-    public double globalOrientation = 0;
-    public double localOrientation = 0;
-    public boolean on_blue_side = false;
+    private Translation2d globalPosition = new Translation2d();
+    private Rotation2d globalOrientation = new Rotation2d(0);
+    private boolean onBlueSide = false;
 
-    public Localizer(double inputX, double inputY, double inputlocalOrientation) {
-        localPosition = new Translation2d(inputX, inputY);
-        localOrientation = inputlocalOrientation;
-    }
-
-    /**
-     * Sets the local position to a new position
-     */
-    public void setLocalPosition(Translation2d vec) {
-        this.localPosition = vec;
+    public Localizer() {
+        
     }
 
     /**
      * Gets the current local position
      */
-    public Translation2d getLocalPosition() {
-        return this.localPosition;
-    }
-
-    /**
-     * Adds the vector to the current local position to update it
-     */
-    public void updateLocalPosition(Translation2d vec) {
-        this.localPosition = this.localPosition.plus(vec);
-    }
-
-    /**
-     * Sets the local position to a new position
-     */
-    public void setGlobalPosition(Translation2d vec) {
-        this.globalPosition = vec;
-    }
-
-    /**
-     * Gets the current local position
-     */
-    public Translation2d getGlobalPosition() {
+    public Translation2d getPosition() {
         return this.globalPosition;
     }
 
-    /**
-     * Adds the vector to the current local position to update it
+     /**
+     * Gets the current orientation estimate of the robot.
+     * 
+     * @return The current orientation estimate of the robot, measured
+     *  counterclockwise from the positive x-axis (towards the positive y-axis).
      */
-    public void updateGlobalPosition(Translation2d vec) {
-        this.globalPosition = this.globalPosition.plus(vec);
-    }
-
-    /**
-     * Sets the local orientation to a new orientation
-     */
-    public void setLocalOrientation(double theta) {
-        this.localOrientation = theta;
-    }
-
-    /**
-     * Gets the current local orientation
-     */
-    public double getLocalOrientation() {
-        return this.localOrientation;
-    }
-
-    /**
-     * Adds the angle to the current local orientation to update it
-     */
-    public void updateLocalOrientation(double theta) {
-        this.localOrientation += theta;
-    }
-
-    /**
-     * Sets the global orientation to a new orientation
-     */
-    public void setGlobalOrientation(double theta) {
-        this.globalOrientation = theta;
-    }
-
-    /**
-     * Gets the current global orientation
-     */
-    public double getGlobalOrientation() {
+    public Rotation2d getOrientation() {
         return this.globalOrientation;
     }
 
     /**
-     * Adds the angle to the current global orientation to update it
+     * Gets the current heading estimate of the robot.
+     * 
+     * @return The current heading estimate of the robot, measured clockwise
+     *  from the positive y-axis (towards the positive x-axis).
      */
-    public void updateGlobalOrientation(double theta) {
-        this.globalOrientation += theta;
+    public Rotation2d getHeading() {
+        return new Rotation2d();
+    }
+
+    public boolean getBlueSide() {
+        return onBlueSide;
+    }
+
+    public Translation2d getTagPosition(int id) {
+        return new Translation2d();
+    }
+
+    public Rotation2d getTagRotation(int id) {
+        return new Rotation2d();
+    }
+
+    public Rotation2d getTagHeading(int id) {
+        return new Rotation2d();
+    }
+
+    public Translation2d getNotePosition() {
+        return new Translation2d();
+    }
+
+    public Rotation2d getNoteRotation() {
+        return new Rotation2d();
     }
 
     /**
-     * Updates the global position and orientation of the robot based upon the
-     * detected april tag
-     * Decide whether you will use the IDs specified in rule book via int or using
-     * the enum AprilTag
+     * Updates the state of the localization estimates.
+     * 
+     * @param dt The amount of time past since the last update, in seconds.
      */
-    // public void updateWithAprilTag(AprilTag tag, Vector3D relative_position, double angle) {
+    public synchronized void step(double dt) {
+        
+    }
 
-    // }
-
+    /**
+     * Updates the state of the localization estimates.
+     * 
+     * <p>This method assumes a delay of 0.02 seconds between updates. That is,
+     * this method expects to be called at a frequency of 50Hz.
+     */
+    public synchronized void step() {
+        step(0.02);
+    }
 }

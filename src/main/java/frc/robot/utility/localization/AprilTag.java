@@ -1,7 +1,4 @@
-package frc.robot.commands;
-
-import frc.robot.utility.FieldObject;
-import frc.robot.utility.FieldObjectType;
+package frc.robot.utility.localization;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
