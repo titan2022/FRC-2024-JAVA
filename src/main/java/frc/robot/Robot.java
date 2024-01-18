@@ -21,8 +21,8 @@ import static frc.robot.utility.Constants.getSwerveDriveTalonRotaryConfig;
 
 public class Robot extends TimedRobot {
     private WPI_Pigeon2 pigeon = new WPI_Pigeon2(40);
-    private Localizer localizer = new Localizer(0, 0, 0);
-    private SwerveDriveSubsystem drive = new SwerveDriveSubsystem(getSwerveDriveTalonDriveConfig(), getSwerveDriveTalonRotaryConfig(), localizer);
+    // private Localizer localizer = new Localizer(0, 0, 0);
+    private SwerveDriveSubsystem drive = new SwerveDriveSubsystem(getSwerveDriveTalonDriveConfig(), getSwerveDriveTalonRotaryConfig());
     private final XboxController xbox = new XboxController(0);
 
     @Override
@@ -32,13 +32,13 @@ public class Robot extends TimedRobot {
 
     @Override
     public void robotPeriodic() {
-        CommandScheduler.getInstance().run();
-        SmartDashboard.putNumber("Local X", localizer.getLocalPosition().getX());
-        SmartDashboard.putNumber("Local Y", localizer.getLocalPosition().getY());
-        SmartDashboard.putNumber("Local Orientation", new Rotation2d(localizer.getLocalOrientation()).getDegrees());
-        SmartDashboard.putNumber("Global X", localizer.getGlobalPosition().getX());
-        SmartDashboard.putNumber("Global Y", localizer.getGlobalPosition().getY());
-        SmartDashboard.putNumber("Global Orientation", new Rotation2d(localizer.getGlobalOrientation()).getDegrees());
+        // CommandScheduler.getInstance().run();
+        // SmartDashboard.putNumber("Local X", localizer.getLocalPosition().getX());
+        // SmartDashboard.putNumber("Local Y", localizer.getLocalPosition().getY());
+        // SmartDashboard.putNumber("Local Orientation", new Rotation2d(localizer.getLocalOrientation()).getDegrees());
+        // SmartDashboard.putNumber("Global X", localizer.getGlobalPosition().getX());
+        // SmartDashboard.putNumber("Global Y", localizer.getGlobalPosition().getY());
+        // SmartDashboard.putNumber("Global Orientation", new Rotation2d(localizer.getGlobalOrientation()).getDegrees());
     }
 
     @Override
@@ -52,22 +52,9 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void autonomousInit() {
-        // CommandScheduler.getInstance().schedule(
-        // new RelativeTranslationLocalCommand(drive.getTranslational(), localizer, new
-        // Translation2d(0, 1), 0.25)
-        // );
-        // CommandScheduler.getInstance().schedule(
-        // new RelativeTranslationTimedCommand(drive.gentTranslational(), new
-        // Translation2d(0, 1), 0.25)
-        // );
-        // CommandScheduler.getInstance().schedule(
-        // new RelativeRotationLocalCommand(drive.getRotational(), localizer, new
-        // Rotation2d(Math.PI), Math.PI / 8)
-        // );
-        // CommandScheduler.getInstance().schedule(
-        // new RelativeRotationTimedCommand(drive.getRotational(), new
-        // Rotation2d(Math.PI), Math.PI / 8)
-        // );
+        CommandScheduler.getInstance().schedule(
+            new TranslationCommand(0, 1, 0.25, drive.getTranslational())
+        );
     }
 
     /** This function is called periodically during autonomous. */
@@ -79,10 +66,10 @@ public class Robot extends TimedRobot {
     public void teleopInit() {
         drive.brake();
 
-        drive.getTranslational()
-                .setDefaultCommand(new XBoxTranslationalCommand(drive.getTranslational(), xbox, pigeon, 1));
-        drive.getRotational()
-                .setDefaultCommand(new XBoxRotationalCommand(drive.getRotational(), xbox, 3 * Math.PI, pigeon));
+        // drive.getTranslational()
+        //         .setDefaultCommand(new XBoxTranslationalCommand(drive.getTranslational(), xbox, pigeon, 1));
+        // drive.getRotational()
+        //         .setDefaultCommand(new XBoxRotationalCommand(drive.getRotational(), xbox, 3 * Math.PI, pigeon));
     }
 
     @Override
