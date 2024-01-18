@@ -8,13 +8,15 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import frc.robot.subsystems.RotationalDrivebase;
+import frc.robot.utility.Localizer;
+
 import static frc.robot.utility.Constants.Unit.*;
 
 public class RotationalDriveCommand extends Command {
     private RotationalDrivebase drive;
     private XboxController controller;
     private double maxRate, omega;
-    private WPI_Pigeon2 imu;
+    private Localizer localizer;
 
     /**
      * Controls the rotational velocity of the drivebase with a joystick. 
@@ -23,12 +25,12 @@ public class RotationalDriveCommand extends Command {
      * @param xbox  The joystick controller to use.
      * @param turnRate  The maximum rotational velocity in radians per second.
      */
-    public RotationalDriveCommand(RotationalDrivebase drivebase, XboxController xbox, double turnRate, WPI_Pigeon2 pigeon) {
+    public RotationalDriveCommand(RotationalDrivebase drivebase, XboxController xbox, double turnRate, Localizer localizer) {
         drive = drivebase;
         controller = xbox;
         maxRate = turnRate;
         addRequirements(drivebase);
-        imu = pigeon;
+        this.localizer = localizer;
     }
     /**
      * Controls the rotational velocity of the drivebase with a joystick. 
