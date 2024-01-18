@@ -48,7 +48,7 @@ public class SlamDunkerSubsystem extends SubsystemBase {
    * @param angle Radians
    */
   public void setRotation(Rotation2d angle) {
-    rotatorMotorOne.set(ControlMode.Position, angle.getRadians() * gearRatio / Constants.Unit.FALCON_TICKS);
+    rotatorMotorOne.set(ControlMode.Position, angle.getRadians() * GEAR_RATIO / Constants.Unit.FALCON_TICKS);
   }
 
   /***
@@ -56,6 +56,6 @@ public class SlamDunkerSubsystem extends SubsystemBase {
    * @return Radians
    */
   public Rotation2d getRotation() {
-    return new Rotation2d(rotatorMotorOne.getSelectedSensorPosition(0) / gearRatio * Constants.Unit.FALCON_TICKS);
+    return new Rotation2d(rotatorMotorOne.getSelectedSensorPosition(0) / GEAR_RATIO * Constants.Unit.FALCON_TICKS);
   }
 }
