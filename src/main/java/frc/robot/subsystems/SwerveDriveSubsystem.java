@@ -65,7 +65,7 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
     private static final boolean ROTATOR_PHASE = false;
 
     // Physical limits of motors that create translational motion
-    private static final double MAX_WHEEL_SPEED = 10 * M / S;
+    private static final double MAX_WHEEL_SPEED = 1 * M / S;
 
     public static class Module {
         public static final int FRONT_LEFT = 0;
@@ -115,6 +115,11 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
         @Override
         public void setVelocity(Translation2d velocity) {
             updateVelocity(velocity);
+        }
+
+        @Override 
+        public void addVelocity(Translation2d velocity) {
+            setVelocity(getVelocity().plus(velocity));
         }
 
         @Override

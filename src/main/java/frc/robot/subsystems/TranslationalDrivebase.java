@@ -14,6 +14,7 @@ public interface TranslationalDrivebase extends Subsystem {
      */
     public void setVelocity(Translation2d velocity);
 
+    public void addVelocity(Translation2d velocity);
     /**
      * Returns the current velocity in meters per second.
      * 

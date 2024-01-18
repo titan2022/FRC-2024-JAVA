@@ -12,8 +12,7 @@ import frc.robot.subsystems.RotationalDrivebase;
 /** An example command that uses an example subsystem. */
 public class RotationCommand extends Command {
   private RotationalDrivebase driveBase;
-  private Rotation2d angle;
-  private double speed;
+  private Rotation2d velocity;
   private double time;
   private double startTime;
   private double endTime;
@@ -22,10 +21,9 @@ public class RotationCommand extends Command {
 
   public RotationCommand(double angle, double speed, RotationalDrivebase driveBase) {
     this.driveBase = driveBase;
-    this.angle = Rotation2d.fromDegrees(angle);
-    this.speed = speed;
+    velocity = Rotation2d.fromDegrees(Math.copySign(speed, angle));
 
-    time = this.angle.getDegrees() / speed;
+    time = angle / speed;
 
     addRequirements(driveBase);
   }
@@ -40,7 +38,7 @@ public class RotationCommand extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    driveBase.setRotation(angle.getRadians());
+    driveBase.setRotation(velocity.getRadians());
   }
 
   // Called once the command ends or is interrupted.

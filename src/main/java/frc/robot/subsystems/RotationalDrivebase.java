@@ -12,7 +12,7 @@ public interface RotationalDrivebase extends Subsystem {
      * @param omega The desired rotational velocity in radians per second.
      */
     public void setRotation(double omega);
-
+    
     /**
      * Returns the current rotational velocity in radians per second.
      * 

@@ -23,12 +23,14 @@ public class Robot extends TimedRobot {
 
     @Override
     public void robotInit() {
-
+        // SmartDashboard.putBoolean("Robot Initialized", true);
     }
 
     @Override
     public void robotPeriodic() {
         CommandScheduler.getInstance().run();
+        SmartDashboard.putNumber("X velocity", drive.getTranslational().getVelocity().getX());
+        SmartDashboard.putNumber("Y velocity", drive.getTranslational().getVelocity().getY());
         // localizer.step();
         
         // SmartDashboard.putNumber("Global X", localizer.getPosition().getX());
@@ -44,16 +46,16 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousInit() {
-        
+        // SmartDashboard.putBoolean("Auto Init", true);
         CommandScheduler.getInstance().schedule(
-            new TranslationCommand(0, 1, 0.25, drive.getTranslational())
+            new TranslationCommand(0, 10, 0.1, drive.getTranslational())
         );
     }
 
     /** This function is called periodically during autonomous. */
     @Override
     public void autonomousPeriodic() {
-        drive.getTranslational().setVelocity(new Translation2d(0, 0.5));
+        // drive.getTranslational().setVelocity(new Translation2d(0, 0.5));
     }
 
     @Override
