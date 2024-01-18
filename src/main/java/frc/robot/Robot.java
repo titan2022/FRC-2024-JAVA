@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -28,12 +29,12 @@ public class Robot extends TimedRobot {
     @Override
     public void robotPeriodic() {
         CommandScheduler.getInstance().run();
-        localizer.step();
+        // localizer.step();
         
-        SmartDashboard.putNumber("Global X", localizer.getPosition().getX());
-        SmartDashboard.putNumber("Global Y", localizer.getPosition().getY());
-        SmartDashboard.putNumber("Global Orientation", localizer.getOrientation().getDegrees());
-        SmartDashboard.putNumber("Global Heading", localizer.getHeading().getDegrees());
+        // SmartDashboard.putNumber("Global X", localizer.getPosition().getX());
+        // SmartDashboard.putNumber("Global Y", localizer.getPosition().getY());
+        // SmartDashboard.putNumber("Global Orientation", localizer.getOrientation().getDegrees());
+        // SmartDashboard.putNumber("Global Heading", localizer.getHeading().getDegrees());
     }
 
     @Override
@@ -49,13 +50,17 @@ public class Robot extends TimedRobot {
     /** This function is called periodically during autonomous. */
     @Override
     public void autonomousPeriodic() {
-
+        drive.getTranslational().setVelocity(new Translation2d(0, 0.5));
     }
 
     @Override
     public void teleopInit() {
-        drive.getTranslational().setDefaultCommand(new TranslationalDriveCommand(drive.getTranslational(), xbox, 0.8));
-		drive.getRotational().setDefaultCommand(new RotationalDriveCommand(drive.getRotational(), xbox, 0.8 * Math.PI));
+        drive.getTranslational().setDefaultCommand(new TranslationalDriveCommand(drive.getTranslational(), xbox, localizer, 6));
+		drive.getRotational().setDefaultCommand(new RotationalDriveCommand(drive.getRotational(), xbox, 1.5 * Math.PI, localizer));
+
+        if (xbox.getBButton()) {
+            drive.brake();
+        }
     }
 
     @Override
