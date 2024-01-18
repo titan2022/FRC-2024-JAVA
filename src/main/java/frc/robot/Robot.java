@@ -55,8 +55,8 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopInit() {
-        drive.getTranslational().setDefaultCommand(new TranslationalDriveCommand(drive.getTranslational(), xbox, localizer, 6));
-		drive.getRotational().setDefaultCommand(new RotationalDriveCommand(drive.getRotational(), xbox, 1.5 * Math.PI, localizer));
+        drive.getTranslational().setDefaultCommand(new TranslationalDriveCommand(drive.getTranslational(), localizer, xbox, 6));
+		drive.getRotational().setDefaultCommand(new RotationalDriveCommand(drive.getRotational(), localizer, xbox, 1.5 * Math.PI));
 
         if (xbox.getBButton()) {
             drive.brake();
