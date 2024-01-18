@@ -6,17 +6,20 @@ package frc.robot.subsystems;
 
 import java.nio.channels.UnsupportedAddressTypeException;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.utility.Constants;
 
 /***
  * A slam dunker subsystem which can rotate to release notes into the AMP and takes
  * note from the IntakeSubsystem
  */
 public class SlamDunkerSubsystem extends SubsystemBase {
+  private static final double gearRatio = 1;
   // Motor to handle the rotation of the slam dunker
   WPI_TalonFX rotatorMotorOne;
   // Follows the first motor
@@ -28,12 +31,16 @@ public class SlamDunkerSubsystem extends SubsystemBase {
   public SlamDunkerSubsystem() {
   }
 
-  /***
-   * Sets the velocity of the slam dunker holder wheels
-   * @param velocity Radians per sec
-   */
-  public void setWheelVelocity(Rotation2d velocity) {
+  public void config() {
+    rotatorMotorTwo.follow(rotatorMotorOne);
+  }
 
+  /***
+   * Sets the speed of the wheels
+   * @param speed In percentage from -1 to 1
+   */
+  public void setWheelVelocity(double speed) {
+    wheelMotorController.set(ControlMode.PercentOutput, speed);
   }
 
   /***
@@ -41,7 +48,7 @@ public class SlamDunkerSubsystem extends SubsystemBase {
    * @param angle Radians
    */
   public void setRotation(Rotation2d angle) {
-
+    rotatorMotorOne.set(ControlMode.Position, angle.getRadians() * gearRatio / Constants.Unit.FALCON_TICKS);
   }
 
   /***
@@ -49,6 +56,6 @@ public class SlamDunkerSubsystem extends SubsystemBase {
    * @return Radians
    */
   public Rotation2d getRotation() {
-    throw new UnsupportedOperationException();
+    return new Rotation2d(rotatorMotorOne.getSelectedSensorPosition(0) / gearRatio * Constants.Unit.FALCON_TICKS);
   }
 }
