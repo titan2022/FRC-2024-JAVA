@@ -4,17 +4,20 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.utility.Constants;
 
 /***
  * An over the bumper intake subsystem that can rotate to give the note to either the 
  * ShooterSubsystem or SlamDunkerSubsystem.
  */
 public class IntakeSubsystem extends SubsystemBase {
+  private static final double GEAR_RATIO = 1;
   // Geared up FalconFX which handles the rotation of the intake
   WPI_TalonFX rotationMotor;
   // Simple controller connected to bag motor to control intake of notes
@@ -28,7 +31,7 @@ public class IntakeSubsystem extends SubsystemBase {
    * @param angle Radians
    */
   public void setRotation(Rotation2d angle) {
-
+    rotationMotor.set(ControlMode.Position, angle.getRadians() * GEAR_RATIO / Constants.Unit.FALCON_TICKS);
   }
 
   /***
@@ -36,28 +39,14 @@ public class IntakeSubsystem extends SubsystemBase {
    * @return Radians
    */
   public Rotation2d getRotation() {
-    throw new UnsupportedOperationException();
+    return new Rotation2d(rotationMotor.getSelectedSensorPosition(0) / GEAR_RATIO * Constants.Unit.FALCON_TICKS);
   }
 
   /***
    * Sets the speed of the intake wheels
-   * @param speed Radians per sec
+   * @param speed Percent
    */
-  public void setIntakeVelocity(Rotation2d speed) {
-
-  }
-
-  /***
-   * Traps a held note within the intake subsystem wheels
-   */
-  public void holdNote() {
-
-  }
-
-  /***
-   * Releases the note outwards towards either slam dunker or shooter
-   */
-  public void releaseNote() {
-
+  public void setIntakeVelocity(double speed) {
+    wheelsMotorController.set(ControlMode.PercentOutput, speed);
   }
 }
