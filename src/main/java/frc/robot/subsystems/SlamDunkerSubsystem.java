@@ -19,7 +19,6 @@ import frc.robot.utility.Constants;
  * note from the IntakeSubsystem
  */
 public class SlamDunkerSubsystem extends SubsystemBase {
-  private static final double GEAR_RATIO = 1;
   // Motor to handle the rotation of the slam dunker
   WPI_TalonFX rotatorMotorOne;
   // Follows the first motor
@@ -31,16 +30,12 @@ public class SlamDunkerSubsystem extends SubsystemBase {
   public SlamDunkerSubsystem() {
   }
 
-  public void config() {
-    rotatorMotorTwo.follow(rotatorMotorOne);
-  }
-
   /***
    * Sets the speed of the wheels
    * @param speed In percentage from -1 to 1
    */
   public void setWheelVelocity(double speed) {
-    wheelMotorController.set(ControlMode.PercentOutput, speed);
+
   }
 
   /***
@@ -48,7 +43,7 @@ public class SlamDunkerSubsystem extends SubsystemBase {
    * @param angle Radians
    */
   public void setRotation(Rotation2d angle) {
-    rotatorMotorOne.set(ControlMode.Position, angle.getRadians() * GEAR_RATIO / Constants.Unit.FALCON_TICKS);
+
   }
 
   /***
@@ -56,6 +51,6 @@ public class SlamDunkerSubsystem extends SubsystemBase {
    * @return Radians
    */
   public Rotation2d getRotation() {
-    return new Rotation2d(rotatorMotorOne.getSelectedSensorPosition(0) / GEAR_RATIO * Constants.Unit.FALCON_TICKS);
+    throw new UnsupportedOperationException();
   }
 }
