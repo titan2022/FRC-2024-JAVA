@@ -18,7 +18,8 @@ import frc.robot.utility.Constants;
  * and shoot them into the speaker
  */
 public class ShooterSubsystem extends SubsystemBase {
-  private static final double WHEEL_RADIUS = 1;
+  //10.16cm for the wheel radius
+  private static final double WHEEL_RADIUS = 0.1016;
   private static final double GEAR_RATIO = 1;
   // Motor that controls the rotation of the shooter to shoot int the speaker
   WPI_TalonFX rotatorMotor;
