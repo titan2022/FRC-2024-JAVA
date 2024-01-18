@@ -29,7 +29,7 @@ public class Robot extends TimedRobot {
     @Override
     public void robotPeriodic() {
         CommandScheduler.getInstance().run();
-        // localizer.step();
+        localizer.step();
         
         // SmartDashboard.putNumber("Global X", localizer.getPosition().getX());
         // SmartDashboard.putNumber("Global Y", localizer.getPosition().getY());

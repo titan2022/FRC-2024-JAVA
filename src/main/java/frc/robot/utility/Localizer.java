@@ -13,9 +13,10 @@ import frc.robot.utility.networking.NetworkingServer;
  */
 public class Localizer {
     private NetworkingServer server = new NetworkingServer();
-    private WPI_Pigeon2 pigeon = new WPI_Pigeon2(40);
+    public WPI_Pigeon2 pigeon = new WPI_Pigeon2(40);
 
     private Translation2d globalPosition = new Translation2d();
+    private Rotation2d globalHeading = new Rotation2d(0);
     private Rotation2d globalOrientation = new Rotation2d(0);
     private boolean onBlueSide = false;
 
@@ -37,7 +38,7 @@ public class Localizer {
      *  counterclockwise from the positive x-axis (towards the positive y-axis).
      */
     public Rotation2d getOrientation() {
-        return this.globalOrientation;
+        return globalOrientation;
     }
 
     /**
@@ -47,7 +48,7 @@ public class Localizer {
      *  from the positive y-axis (towards the positive x-axis).
      */
     public Rotation2d getHeading() {
-        return new Rotation2d();
+        return globalHeading;
     }
 
     public boolean getBlueSide() {
@@ -80,7 +81,8 @@ public class Localizer {
      * @param dt The amount of time past since the last update, in seconds.
      */
     public synchronized void step(double dt) {
-        
+        globalHeading = pigeon.getRotation2d();
+        globalOrientation = globalHeading.minus(new Rotation2d(Math.PI / 2));
     }
 
     /**
