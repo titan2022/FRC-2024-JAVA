@@ -19,7 +19,7 @@ import frc.robot.utility.Constants;
  * note from the IntakeSubsystem
  */
 public class SlamDunkerSubsystem extends SubsystemBase {
-  private static final double gearRatio = 1;
+  private static final double GEAR_RATIO = 1;
   // Motor to handle the rotation of the slam dunker
   WPI_TalonFX rotatorMotorOne;
   // Follows the first motor
