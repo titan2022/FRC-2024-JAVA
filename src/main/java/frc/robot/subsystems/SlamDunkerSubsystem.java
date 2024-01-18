@@ -14,22 +14,12 @@ public class SlamDunkerSubsystem {
 
     private WPI_TalonSRX intakeMotor = new WPI_TalonSRX(0);
     private WPI_TalonFX armMotor = new WPI_TalonFX(0);
-
-    private Encoder encoder = new Encoder(null, null);
-
-    void Intake() {
-        double speed = 10;
-
+    
+    public void setIntake(double speed) {
         intakeMotor.set(speed);
     }
 
-    void Score() {
-        double speed = 10;
-
-        intakeMotor.set(speed);
-    }
-
-    void setArm(double speed){
+    public void setArm(double speed){
         armMotor.set(speed);
     }
 }
