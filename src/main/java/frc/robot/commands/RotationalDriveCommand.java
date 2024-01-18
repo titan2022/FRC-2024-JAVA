@@ -62,16 +62,15 @@ public class RotationalDriveCommand extends Command {
     }
     
     private double scaleVelocity(double joy) {
-        return joy * maxRate; //Math.signum(joy) * joy * joy * maxRate;
+        return Math.signum(joy) * joy * joy * maxRate;
     }
 
     @Override
     public void execute() {
-        // double drift = -imu.getRate() * DEG/S - omega
+        double drift = -localizer.pigeon.getRate() * DEG/S - omega;
         double joy = applyDeadband(controller.getRightX(), 0.1);
-        omega = scaleVelocity(joy);
-        SmartDashboard.putNumber("omega", omega * DEG);
-        drive.setRotation(omega); // omega - 0.5 * drift
+        omega = -scaleVelocity(joy);
+        drive.setRotation(omega - 0.5*drift);
     }
 
     @Override
