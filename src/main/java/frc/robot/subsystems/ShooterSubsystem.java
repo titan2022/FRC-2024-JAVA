@@ -4,16 +4,22 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.utility.Constants;
 
 /***
  * A rotating shooter subsystem designed to take notes from the IntakeSubsystem
  * and shoot them into the speaker
  */
 public class ShooterSubsystem extends SubsystemBase {
+  private static final double WHEEL_RADIUS = 1;
+  private static final double GEAR_RATIO = 1;
   // Motor that controls the rotation of the shooter to shoot int the speaker
   WPI_TalonFX rotatorMotor;
   // Controls the speed at which to shoot the note
@@ -28,24 +34,15 @@ public class ShooterSubsystem extends SubsystemBase {
    * @param speed Radians per sec
    */
   public void setShooterVelocity(Rotation2d speed) {
-
+    wheelMotorOne.set(ControlMode.Velocity, speed.getRadians() * WHEEL_RADIUS);
   }
-
-  /***
-   * Sets the velocity of both shooter motors
-   * @param speed Meters per sec
-   */
-  public void setShooterVelocity(double speed) {
-
-  }
-
 
   /***
    * Sets the absolute angle of the shooter rotation pivot
    * @param angle Radians 
    */
   public void setRotation(Rotation2d angle) {
-
+    rotatorMotor.set(ControlMode.Position, angle.getRadians() * GEAR_RATIO / Constants.Unit.FALCON_TICKS);
   }
 
   /***
@@ -53,6 +50,6 @@ public class ShooterSubsystem extends SubsystemBase {
    * @return Radians
    */
   public Rotation2d getRotation() {
-    throw new UnsupportedOperationException();
+    return new Rotation2d(rotatorMotor.getSelectedSensorPosition(0) / GEAR_RATIO * Constants.Unit.FALCON_TICKS);
   }
 }
