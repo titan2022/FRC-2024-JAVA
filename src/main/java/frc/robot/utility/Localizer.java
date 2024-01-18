@@ -25,7 +25,7 @@ public class Localizer {
     }
 
     /**
-     * Gets the current local position
+     * Gets the current global position
      */
     public Translation2d getPosition() {
         return this.globalPosition;
@@ -39,6 +39,10 @@ public class Localizer {
      */
     public Rotation2d getOrientation() {
         return globalOrientation;
+    }
+
+    public double getRate() {
+        return pigeon.getRate();
     }
 
     /**
