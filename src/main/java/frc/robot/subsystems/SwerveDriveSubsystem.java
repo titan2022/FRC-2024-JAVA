@@ -22,10 +22,10 @@ import static frc.robot.utility.Constants.Unit.*;
 
 public class SwerveDriveSubsystem implements DriveSubsystem {
     // Physical parameters
-    public static final double ROBOT_TRACK_WIDTH = 22.5 * IN; // 0.672; // meters (30 in)
-    public static final double ROBOT_LENGTH = 22.5 * IN; // 0.672; // meter
+    public static final double ROBOT_TRACK_WIDTH = 18 * IN; // 0.672; // meters (30 in)
+    public static final double ROBOT_LENGTH = 18 * IN; // 0.672; // meter
     public static final double WHEEL_RADIUS = 2 * IN; // 0.0508; // meters (2 in)
-    public static final double GEAR_RATIO = 8.16;
+    public static final double GEAR_RATIO = 6.12;//8.16;
     public static final double METERS_PER_TICKS = WHEEL_RADIUS * 2 * Math.PI / FALCON_CPR / GEAR_RATIO;
 
     // Deadbands
@@ -34,14 +34,14 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
 
     // CAN ID numbers
     private static final int LEFT_FRONT_MOTOR_PORT = 2;
-    private static final int LEFT_BACK_MOTOR_PORT = 4;
+    private static final int LEFT_BACK_MOTOR_PORT = 34;
     private static final int RIGHT_FRONT_MOTOR_PORT = 6;
-    private static final int RIGHT_BACK_MOTOR_PORT = 23;
+    private static final int RIGHT_BACK_MOTOR_PORT = 11;
 
     private static final int LEFT_FRONT_MOTOR_ROTATOR_PORT = 1;
-    private static final int LEFT_BACK_MOTOR_ROTATOR_PORT = 34;
+    private static final int LEFT_BACK_MOTOR_ROTATOR_PORT = 4;
     private static final int RIGHT_FRONT_MOTOR_ROTATOR_PORT = 5;
-    private static final int RIGHT_BACK_MOTOR_ROTATOR_PORT = 3;
+    private static final int RIGHT_BACK_MOTOR_ROTATOR_PORT = 17;
 
     private static final int LEFT_FRONT_ENCODER_ROTATOR_PORT = 31;
     private static final int LEFT_BACK_ENCODER_ROTATOR_PORT = 33;
@@ -49,10 +49,10 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
     private static final int RIGHT_BACK_ENCODER_ROTATOR_PORT = 37;
 
     // Rotator encoder offsets
-    private static final int FRONT_LEFT_OFFSET = -1889+100;//2207-2048-2048;//-211+512-142+2048;
-    private static final int BACK_LEFT_OFFSET = -1152-1024+400-70;
-    private static final int FRONT_RIGHT_OFFSET = -763-1024+1600-50;
-    private static final int BACK_RIGHT_OFFSET = 1866+1024-53-1900-20;
+    private static final int FRONT_LEFT_OFFSET = -1889+1024+70;//2207-2048-2048;//-211+512-142+2048;
+    private static final int BACK_LEFT_OFFSET = -1152-1024+400-70-300;
+    private static final int FRONT_RIGHT_OFFSET = -763-1024+1600-50+1400;
+    private static final int BACK_RIGHT_OFFSET = -1200;
     private static final int[] OFFSETS = new int[] { FRONT_LEFT_OFFSET, BACK_LEFT_OFFSET, FRONT_RIGHT_OFFSET,
             BACK_RIGHT_OFFSET };
 
