@@ -18,6 +18,9 @@ import frc.robot.utility.Localizer;
 
 import static frc.robot.utility.Constants.getSwerveDriveTalonDriveConfig;
 import static frc.robot.utility.Constants.getSwerveDriveTalonRotaryConfig;
+import frc.robot.commands.RotationCommand;
+import frc.robot.commands.TranslationCommand;
+
 
 public class Robot extends TimedRobot {
     private WPI_Pigeon2 pigeon = new WPI_Pigeon2(40);
@@ -52,22 +55,10 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void autonomousInit() {
-        // CommandScheduler.getInstance().schedule(
-        // new RelativeTranslationLocalCommand(drive.getTranslational(), localizer, new
-        // Translation2d(0, 1), 0.25)
-        // );
-        // CommandScheduler.getInstance().schedule(
-        // new RelativeTranslationTimedCommand(drive.gentTranslational(), new
-        // Translation2d(0, 1), 0.25)
-        // );
-        // CommandScheduler.getInstance().schedule(
-        // new RelativeRotationLocalCommand(drive.getRotational(), localizer, new
-        // Rotation2d(Math.PI), Math.PI / 8)
-        // );
-        // CommandScheduler.getInstance().schedule(
-        // new RelativeRotationTimedCommand(drive.getRotational(), new
-        // Rotation2d(Math.PI), Math.PI / 8)
-        // );
+    
+
+        
+        
     }
 
     /** This function is called periodically during autonomous. */
