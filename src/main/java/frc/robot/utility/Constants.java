@@ -39,14 +39,14 @@ public final class Constants {
 		public static final double IN = 0.0254 * M;
 		public static final double FT = 12 * IN;
 		public static final double RADIANS = 1.0, RAD = RADIANS;
-		public static final double DEG = Math.PI / 180.0 * RAD;
-		public static final double ROT = Math.PI * 2 * RAD;
+		public static final double DEG = Math.PI / 180.0 * RAD; // Degrees to radians
+		public static final double ROT = Math.PI * 2 * RAD; // Rotations to radians
 		public static final double FALCON_CPR = 2048;
 		public static final double CANCODER_CPR = 4096;
 		public static final double QUAD_ENCODER_CPR = 1024;
-		public static final double FALCON_TICKS = ROT / FALCON_CPR;
-		public static final double CANCODER_TICKS = ROT / CANCODER_CPR;
-		public static final double QUAD_ENCODER_TICKS = ROT / QUAD_ENCODER_CPR;
+		public static final double FALCON_TICKS = ROT / FALCON_CPR; // Ticks to radians
+		public static final double CANCODER_TICKS = ROT / CANCODER_CPR; // Ticks to radians
+		public static final double QUAD_ENCODER_TICKS = ROT / QUAD_ENCODER_CPR; // Ticks to radians
 		public static final double SECONDS = 1.0, S = SECONDS;
 		public static final double MIN = 60 * S;
 		public static final double MS = 0.001 * S;

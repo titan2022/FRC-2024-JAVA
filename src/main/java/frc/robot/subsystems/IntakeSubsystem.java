@@ -46,18 +46,4 @@ public class IntakeSubsystem extends SubsystemBase {
   public void setIntakeVelocity(Rotation2d speed) {
 
   }
-
-  /***
-   * Traps a held note within the intake subsystem wheels
-   */
-  public void holdNote() {
-
-  }
-
-  /***
-   * Releases the note outwards towards either slam dunker or shooter
-   */
-  public void releaseNote() {
-
-  }
 }

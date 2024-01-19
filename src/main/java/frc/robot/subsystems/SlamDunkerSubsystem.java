@@ -6,11 +6,13 @@ package frc.robot.subsystems;
 
 import java.nio.channels.UnsupportedAddressTypeException;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.utility.Constants;
 
 /***
  * A slam dunker subsystem which can rotate to release notes into the AMP and takes
@@ -29,10 +31,10 @@ public class SlamDunkerSubsystem extends SubsystemBase {
   }
 
   /***
-   * Sets the velocity of the slam dunker holder wheels
-   * @param velocity Radians per sec
+   * Sets the speed of the wheels
+   * @param speed In percentage from -1 to 1
    */
-  public void setWheelVelocity(Rotation2d velocity) {
+  public void setWheelVelocity(double speed) {
 
   }
 
