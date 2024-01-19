@@ -47,12 +47,6 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousInit() {
-<<<<<<< HEAD
-    
-
-        
-=======
->>>>>>> eeda31a8da28bf776795cd4b2315996e7e71d7de
         
     }
 
