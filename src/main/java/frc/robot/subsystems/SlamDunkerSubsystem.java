@@ -7,8 +7,12 @@ package frc.robot.subsystems;
 import java.nio.channels.UnsupportedAddressTypeException;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
+import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -19,6 +23,10 @@ import frc.robot.utility.Constants;
  * note from the IntakeSubsystem
  */
 public class SlamDunkerSubsystem extends SubsystemBase {
+  private static final boolean ROTATOR_INVERTED = false;
+  private static final boolean WHEEL_INVERTED = false;
+  private static final boolean ROTATOR_SENSOR_PHASE = false;
+  private static final SupplyCurrentLimitConfiguration LIMIT_CONFIG = new SupplyCurrentLimitConfiguration(true, 12, 12, 0 );
   // Motor to handle the rotation of the slam dunker
   WPI_TalonFX rotatorMotorOne;
   // Follows the first motor
@@ -28,6 +36,26 @@ public class SlamDunkerSubsystem extends SubsystemBase {
   WPI_TalonSRX wheelMotorController;
   
   public SlamDunkerSubsystem() {
+    config();
+  }
+
+  public void config() {
+    rotatorMotorOne.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
+    rotatorMotorOne.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
+    rotatorMotorOne.setSensorPhase(ROTATOR_SENSOR_PHASE);
+    rotatorMotorOne.setInverted(ROTATOR_INVERTED);
+    rotatorMotorOne.configSupplyCurrentLimit(LIMIT_CONFIG);
+    rotatorMotorOne.setNeutralMode(NeutralMode.Brake);
+
+    rotatorMotorTwo.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
+    rotatorMotorTwo.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
+    rotatorMotorTwo.configSupplyCurrentLimit(LIMIT_CONFIG);
+    rotatorMotorOne.setNeutralMode(NeutralMode.Brake);
+    rotatorMotorTwo.follow(rotatorMotorOne);
+
+    wheelMotorController.setInverted(WHEEL_INVERTED);
+    wheelMotorController.setNeutralMode(NeutralMode.Coast);
+    wheelMotorController.configSupplyCurrentLimit(LIMIT_CONFIG);
   }
 
   /***

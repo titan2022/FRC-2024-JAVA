@@ -4,8 +4,12 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
+import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -15,12 +19,30 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
  * ShooterSubsystem or SlamDunkerSubsystem.
  */
 public class IntakeSubsystem extends SubsystemBase {
+  private static final boolean ROTATOR_INVERTED = false;
+  private static final boolean ROTATOR_SENSOR_PHASE = false;
+  private static final boolean WHEEL_INVERTED = false;
+  private static final SupplyCurrentLimitConfiguration LIMIT_CONFIG = new SupplyCurrentLimitConfiguration(true, 12, 12, 0);
   // Geared up FalconFX which handles the rotation of the intake
   WPI_TalonFX rotationMotor;
   // Simple controller connected to bag motor to control intake of notes
   WPI_TalonSRX wheelsMotorController;
   
   public IntakeSubsystem() {
+    config();
+  }
+
+  public void config() {
+    rotationMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
+    rotationMotor.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
+    rotationMotor.setSensorPhase(ROTATOR_INVERTED);
+    rotationMotor.setInverted(ROTATOR_SENSOR_PHASE);
+    rotationMotor.configSupplyCurrentLimit(LIMIT_CONFIG);
+    rotationMotor.setNeutralMode(NeutralMode.Brake);
+
+    wheelsMotorController.setInverted(WHEEL_INVERTED);
+    wheelsMotorController.configSupplyCurrentLimit(LIMIT_CONFIG);
+    rotationMotor.setNeutralMode(NeutralMode.Coast);
   }
 
   /***
