@@ -1,10 +1,18 @@
 package frc.robot.utility;
 
+import java.util.Dictionary;
+import java.util.Hashtable;
+
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
+import frc.robot.utility.networking.NetworkingCall;
 import frc.robot.utility.networking.NetworkingServer;
+import frc.robot.utility.networking.types.NetworkingPose;
+import frc.robot.utility.networking.types.NetworkingTag;
 
 /**
  * Localizer class for the 2024 Crescendo arena
@@ -16,22 +24,50 @@ import frc.robot.utility.networking.NetworkingServer;
  * robot-relative coorditate plane
  */
 public class Localizer {
-    private NetworkingServer server = new NetworkingServer();
+    private NetworkingServer server;
     private WPI_Pigeon2 pigeon = new WPI_Pigeon2(40);
 
     private Rotation2d pigeonOffset = new Rotation2d(0);
+
     private Translation2d globalPosition = new Translation2d();
-    private Rotation2d globalHeading = new Rotation2d(0);
-    private Rotation2d globalOrientation = new Rotation2d(0);
+    private Rotation2d globalHeading = new Rotation2d();
+    private Rotation2d globalOrientation = new Rotation2d();
+    private Translation3d notePosition = new Translation3d();
+    private Rotation3d noteRotation = new Rotation3d();
+    private Dictionary<Integer, NetworkingTag> tags = new Hashtable<>();
     private boolean onBlueSide = false;
 
     /**
      * Localizer constructor
      * 
      * @param withCoprocessor Initiate coprocessor networking server
+     * @param port Coprocessor port
+     */
+    public Localizer(boolean withCoprocessor, int port) {
+        if (withCoprocessor) {
+            server = new NetworkingServer(port);
+        }
+    }
+
+    /**
+     * Localizer constructor
+     * 
+     * @param withCoprocessor Initiate coprocessor networking server with default
+     *                        port
      */
     public Localizer(boolean withCoprocessor) {
+        if (withCoprocessor) {
+            server = new NetworkingServer();
+        }
+    }
 
+    /**
+     * Localizer constructor
+     * 
+     * @param port Coprocessor networking server specified port
+     */
+    public Localizer(int port) {
+        this(true, port);
     }
 
     /**
@@ -47,7 +83,7 @@ public class Localizer {
      * @return Position in meters from bottom left corner
      */
     public Translation2d getPosition() {
-        return this.globalPosition;
+        return globalPosition;
     }
 
     /**
@@ -96,7 +132,7 @@ public class Localizer {
      * @return Top-down (XY) robot position in M
      */
     public Translation2d getTagPosition(int id) {
-        return new Translation2d();
+        return tags.get(id).position.toTranslation2d();
     }
 
     /**
@@ -106,7 +142,7 @@ public class Localizer {
      * @return Relative top-down robot orientation from its X-axis
      */
     public Rotation2d getTagRotation(int id) {
-        return new Rotation2d();
+        return tags.get(id).rotation.toRotation2d();
     }
 
     /**
@@ -117,7 +153,7 @@ public class Localizer {
      * @return Relative top-down robot heading from its Y-axis
      */
     public Rotation2d getTagHeading(int id) {
-        return new Rotation2d();
+        return tags.get(id).rotation.toRotation2d().minus(new Rotation2d(Math.PI / 2)).times(-1);
     }
 
     /**
@@ -126,7 +162,7 @@ public class Localizer {
      * @return Top-down (XY) robot position in M
      */
     public Translation2d getNotePosition() {
-        return new Translation2d();
+        return notePosition.toTranslation2d();
     }
 
     /**
@@ -135,7 +171,7 @@ public class Localizer {
      * @return Relative top-down robot orientation from its X-axis
      */
     public Rotation2d getNoteRotation() {
-        return new Rotation2d();
+        return noteRotation.toRotation2d();
     }
 
     /**
@@ -145,14 +181,27 @@ public class Localizer {
      * @return Relative top-down robot heading from its Y-axis
      */
     public Rotation2d getNoteHeading() {
-        return new Rotation2d();
+        return noteRotation.toRotation2d().minus(new Rotation2d(Math.PI / 2)).times(-1);
     }
 
     /**
      * Updates first frame localization estimates
      */
-    public synchronized void setup() {
+    public void setup() {
         pigeonOffset = pigeon.getRotation2d();
+
+        server.subscribe("pos", (NetworkingCall<Translation3d>)(Translation3d position) -> {
+            globalPosition = position.toTranslation2d();
+        });
+
+        server.subscribe("note",  (NetworkingCall<NetworkingPose>)(NetworkingPose note) -> {
+            notePosition = note.position;
+            noteRotation = note.rotation;
+        });
+
+        server.subscribe("tag", (NetworkingCall<NetworkingTag>)(NetworkingTag tag) -> {
+            tags.put(tag.id, tag);
+        });
     }
 
     /**
