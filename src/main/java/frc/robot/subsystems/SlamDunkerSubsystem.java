@@ -27,6 +27,8 @@ public class SlamDunkerSubsystem extends SubsystemBase {
   private static final boolean WHEEL_INVERTED = false;
   private static final boolean ROTATOR_SENSOR_PHASE = false;
   private static final SupplyCurrentLimitConfiguration LIMIT_CONFIG = new SupplyCurrentLimitConfiguration(true, 12, 12, 0 );
+
+  private static final double GEAR_RATIO = 1;
   // Motor to handle the rotation of the slam dunker
   WPI_TalonFX rotatorMotorOne;
   // Follows the first motor
@@ -58,12 +60,12 @@ public class SlamDunkerSubsystem extends SubsystemBase {
     wheelMotorController.configSupplyCurrentLimit(LIMIT_CONFIG);
   }
 
-  /***
+/***
    * Sets the speed of the wheels
    * @param speed In percentage from -1 to 1
    */
   public void setWheelVelocity(double speed) {
-
+    wheelMotorController.set(ControlMode.PercentOutput, speed);
   }
 
   /***
@@ -71,7 +73,7 @@ public class SlamDunkerSubsystem extends SubsystemBase {
    * @param angle Radians
    */
   public void setRotation(Rotation2d angle) {
-
+    rotatorMotorOne.set(ControlMode.Position, angle.getRadians() * GEAR_RATIO / Constants.Unit.FALCON_TICKS);
   }
 
   /***
@@ -79,6 +81,6 @@ public class SlamDunkerSubsystem extends SubsystemBase {
    * @return Radians
    */
   public Rotation2d getRotation() {
-    throw new UnsupportedOperationException();
+    return new Rotation2d(rotatorMotorOne.getSelectedSensorPosition(0) / GEAR_RATIO * Constants.Unit.FALCON_TICKS);
   }
 }
