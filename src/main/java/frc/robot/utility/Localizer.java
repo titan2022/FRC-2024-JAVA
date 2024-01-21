@@ -190,18 +190,20 @@ public class Localizer {
     public void setup() {
         pigeonOffset = pigeon.getRotation2d();
 
-        server.subscribe("pos", (NetworkingCall<Translation3d>)(Translation3d position) -> {
-            globalPosition = position.toTranslation2d();
-        });
-
-        server.subscribe("note",  (NetworkingCall<NetworkingPose>)(NetworkingPose note) -> {
-            notePosition = note.position;
-            noteRotation = note.rotation;
-        });
-
-        server.subscribe("tag", (NetworkingCall<NetworkingTag>)(NetworkingTag tag) -> {
-            tags.put(tag.id, tag);
-        });
+        if (server != null) {
+            server.subscribe("pos", (NetworkingCall<Translation3d>)(Translation3d position) -> {
+                globalPosition = position.toTranslation2d();
+            });
+    
+            server.subscribe("note",  (NetworkingCall<NetworkingPose>)(NetworkingPose note) -> {
+                notePosition = note.position;
+                noteRotation = note.rotation;
+            });
+    
+            server.subscribe("tag", (NetworkingCall<NetworkingTag>)(NetworkingTag tag) -> {
+                tags.put(tag.id, tag);
+            });
+        }
     }
 
     /**
