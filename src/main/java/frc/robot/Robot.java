@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.commands.*;
+import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.SwerveDriveSubsystem;
 import frc.robot.utility.Localizer;
 
@@ -18,8 +19,15 @@ import static frc.robot.utility.Constants.getSwerveDriveTalonRotaryConfig;
 
 public class Robot extends TimedRobot {
     private SwerveDriveSubsystem drive = new SwerveDriveSubsystem(getSwerveDriveTalonDriveConfig(), getSwerveDriveTalonRotaryConfig());
-	private final XboxController xbox = new XboxController(0);
+    private final XboxController xbox = new XboxController(0);
     private Localizer localizer = new Localizer();
+
+    private final int LEFT_INTAKE_ROTATION_PORT = 0;
+    private final int RIGHT_INTAKE_ROTATION_PORT = 16;
+    private final int INTAKE_ROTATION_SPARK_PORT = 0;
+    private final int INTAKE_SPIN_PORT = 0;
+
+    private IntakeSubsystem intake = new IntakeSubsystem(LEFT_INTAKE_ROTATION_PORT, RIGHT_INTAKE_ROTATION_PORT, INTAKE_ROTATION_SPARK_PORT, INTAKE_SPIN_PORT);
 
     @Override
     public void robotInit() {
@@ -55,12 +63,14 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopInit() {
-        drive.getTranslational().setDefaultCommand(new TranslationalDriveCommand(drive.getTranslational(), xbox, localizer, 6));
-		drive.getRotational().setDefaultCommand(new RotationalDriveCommand(drive.getRotational(), xbox, 1.5 * Math.PI, localizer));
+        // drive.getTranslational().setDefaultCommand(new TranslationalDriveCommand(drive.getTranslational(), xbox, localizer, 6));
+		// drive.getRotational().setDefaultCommand(new RotationalDriveCommand(drive.getRotational(), xbox, 1.5 * Math.PI, localizer));
 
-        if (xbox.getBButton()) {
-            drive.brake();
-        }
+        // if (xbox.getBButton()) {
+        //     drive.brake();
+        // }
+
+
     }
 
     @Override
