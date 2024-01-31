@@ -55,7 +55,8 @@ public class IntakeSubsystem extends SubsystemBase {
    * @return Radians
    */
   public Rotation2d getRotation() {
-    return new Rotation2d(rightRotationMotor.getSelectedSensorPosition(0) / GEAR_RATIO * Constants.Unit.FALCON_TICKS);
+    return Rotation2d.fromRotations(rotationEncoder.getPosition());
+    // return new Rotation2d(rightRotationMotor.getSelectedSensorPosition(0) / GEAR_RATIO * Constants.Unit.FALCON_TICKS);
   }
 
   /***
