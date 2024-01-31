@@ -66,4 +66,13 @@ public class IntakeSubsystem extends SubsystemBase {
   public void setIntakeVelocity(double speed) {
     wheelsMotorController.set(ControlMode.PercentOutput, speed);
   }
+
+  /***
+   * Sets the speed of the intake-subsytem rotation
+   * @param speed Percent
+   */
+  public void setRotationVelocity(double speed) {
+    leftRotationMotor.set(ControlMode.PercentOutput, speed);
+    rightRotationMotor.set(ControlMode.PercentOutput, speed);
+  }
 }
