@@ -58,7 +58,7 @@ public class Robot extends TimedRobot {
     /** This function is called periodically during autonomous. */
     @Override
     public void autonomousPeriodic() {
-        drive.getTranslational().setVelocity(new Translation2d(0, 0.5));
+        // drive.getTranslational().setVelocity(new Translation2d(0, 0.5));
     }
 
     @Override
@@ -66,11 +66,13 @@ public class Robot extends TimedRobot {
         // drive.getTranslational().setDefaultCommand(new TranslationalDriveCommand(drive.getTranslational(), xbox, localizer, 6));
 		// drive.getRotational().setDefaultCommand(new RotationalDriveCommand(drive.getRotational(), xbox, 1.5 * Math.PI, localizer));
 
+        intake.setDefaultCommand(new IntakeTestCommand(intake, xbox, 10, 10));
+
         // if (xbox.getBButton()) {
         //     drive.brake();
         // }
 
-
+        
     }
 
     @Override
