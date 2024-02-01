@@ -25,8 +25,8 @@ public class IntakeTestCommand extends Command {
      * 
      * @param intake  The intake to control.
      * @param xbox  The joystick controller to use.
-     * @param maxRotationVelocity  The maximum velocity of the rotation of the intake subsystem, in percent output.
-     * @param maxIntakeVelocity  The maximum velocity of the rotation of the intake subsystem, in percent output.
+     * @param maxRotationVelocity  The maximum velocity of the rotation of the intake subsystem, in centipercent output (1 is max output).
+     * @param maxIntakeVelocity  The maximum velocity of the rotation of the intake subsystem, in centipercent output (1 is max output).
      */
     public IntakeTestCommand(IntakeSubsystem intake, XboxController xbox, double maxRotationVelocity, double maxIntakeVelocity) {
         this.intake = intake;

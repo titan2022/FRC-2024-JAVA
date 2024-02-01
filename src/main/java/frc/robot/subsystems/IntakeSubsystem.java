@@ -61,7 +61,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
   /***
    * Sets the speed of the intake wheels
-   * @param speed Percent
+   * @param speed centipercent output (1 is full output)
    */
   public void setIntakeVelocity(double speed) {
     wheelsMotorController.set(ControlMode.PercentOutput, speed);
@@ -69,7 +69,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
   /***
    * Sets the speed of the intake-subsytem rotation
-   * @param speed Percent
+   * @param speed centipercent output (1 is full output)
    */
   public void setRotationVelocity(double speed) {
     leftRotationMotor.set(ControlMode.PercentOutput, speed);

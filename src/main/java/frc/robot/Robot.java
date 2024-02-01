@@ -66,7 +66,7 @@ public class Robot extends TimedRobot {
         // drive.getTranslational().setDefaultCommand(new TranslationalDriveCommand(drive.getTranslational(), xbox, localizer, 6));
 		// drive.getRotational().setDefaultCommand(new RotationalDriveCommand(drive.getRotational(), xbox, 1.5 * Math.PI, localizer));
 
-        intake.setDefaultCommand(new IntakeTestCommand(intake, xbox, 10, 10));
+        intake.setDefaultCommand(new IntakeTestCommand(intake, xbox, 0.1, 0.1));
 
         // if (xbox.getBButton()) {
         //     drive.brake();
