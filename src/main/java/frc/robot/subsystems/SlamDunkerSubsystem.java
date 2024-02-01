@@ -30,12 +30,12 @@ public class SlamDunkerSubsystem extends SubsystemBase {
 
   private static final double GEAR_RATIO = 1;
   // Motor to handle the rotation of the slam dunker
-  WPI_TalonFX rotatorMotorOne;
+  private static final WPI_TalonFX rotatorMotorOne = new WPI_TalonFX(10);
   // Follows the first motor
-  WPI_TalonFX rotatorMotorTwo;
+  private static final WPI_TalonFX rotatorMotorTwo = new WPI_TalonFX(12);
   // Connected to simple bag motor which is meant to take note from IntakeSubsystem
   // and release into the amp
-  WPI_TalonSRX wheelMotorController;
+  private static final WPI_TalonSRX wheelMotorController = new WPI_TalonSRX(13);
   
   public SlamDunkerSubsystem() {
     config();
@@ -45,12 +45,13 @@ public class SlamDunkerSubsystem extends SubsystemBase {
     rotatorMotorOne.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
     rotatorMotorOne.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
     rotatorMotorOne.setSensorPhase(ROTATOR_SENSOR_PHASE);
-    rotatorMotorOne.setInverted(ROTATOR_INVERTED);
+    rotatorMotorOne.setInverted(true);
     rotatorMotorOne.configSupplyCurrentLimit(LIMIT_CONFIG);
     rotatorMotorOne.setNeutralMode(NeutralMode.Brake);
 
     rotatorMotorTwo.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
     rotatorMotorTwo.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
+    rotatorMotorTwo.setInverted(false);
     rotatorMotorTwo.configSupplyCurrentLimit(LIMIT_CONFIG);
     rotatorMotorOne.setNeutralMode(NeutralMode.Brake);
     rotatorMotorTwo.follow(rotatorMotorOne);
@@ -58,6 +59,16 @@ public class SlamDunkerSubsystem extends SubsystemBase {
     wheelMotorController.setInverted(WHEEL_INVERTED);
     wheelMotorController.setNeutralMode(NeutralMode.Coast);
     wheelMotorController.configSupplyCurrentLimit(LIMIT_CONFIG);
+  }
+
+  public void testRotation(double percent)
+  {
+    if (Math.abs(percent) > 0.1) {
+      rotatorMotorOne.set(ControlMode.PercentOutput, Math.copySign(0.1, percent));
+    }
+    else {
+      rotatorMotorOne.set(ControlMode.PercentOutput, percent);
+    }
   }
 
 /***

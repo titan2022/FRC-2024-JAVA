@@ -10,6 +10,8 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.commands.*;
+import frc.robot.subsystems.ShooterSubsystem;
+import frc.robot.subsystems.SlamDunkerSubsystem;
 import frc.robot.subsystems.SwerveDriveSubsystem;
 import frc.robot.utility.Localizer;
 
@@ -17,9 +19,10 @@ import static frc.robot.utility.Constants.getSwerveDriveTalonDriveConfig;
 import static frc.robot.utility.Constants.getSwerveDriveTalonRotaryConfig;
 
 public class Robot extends TimedRobot {
-    private SwerveDriveSubsystem drive = new SwerveDriveSubsystem(getSwerveDriveTalonDriveConfig(), getSwerveDriveTalonRotaryConfig());
+    // private SwerveDriveSubsystem drive = new SwerveDriveSubsystem(getSwerveDriveTalonDriveConfig(), getSwerveDriveTalonRotaryConfig());
 	private final XboxController xbox = new XboxController(0);
     private Localizer localizer = new Localizer();
+    private static final SlamDunkerSubsystem slamDunker = new SlamDunkerSubsystem();
 
     @Override
     public void robotInit() {
@@ -30,6 +33,7 @@ public class Robot extends TimedRobot {
     public void robotPeriodic() {
         CommandScheduler.getInstance().run();
         localizer.step();
+        // SmartDashboard.putNumber("Rotation", shooter.getRotation().getDegrees());
         
         // SmartDashboard.putNumber("Global X", localizer.getPosition().getX());
         // SmartDashboard.putNumber("Global Y", localizer.getPosition().getY());
@@ -39,7 +43,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void disabledInit() {
-        drive.brake();
+        // drive.brake();
     }
 
     @Override
@@ -50,21 +54,21 @@ public class Robot extends TimedRobot {
     /** This function is called periodically during autonomous. */
     @Override
     public void autonomousPeriodic() {
-        drive.getTranslational().setVelocity(new Translation2d(0, 0.5));
+        // drive.getTranslational().setVelocity(new Translation2d(0, 0.5));
     }
 
     @Override
     public void teleopInit() {
-        drive.getTranslational().setDefaultCommand(new TranslationalDriveCommand(drive.getTranslational(), localizer, xbox, 6));
-		drive.getRotational().setDefaultCommand(new RotationalDriveCommand(drive.getRotational(), localizer, xbox, 1.5 * Math.PI));
+        // drive.getTranslational().setDefaultCommand(new TranslationalDriveCommand(drive.getTranslational(), localizer, xbox, 6));
+		// drive.getRotational().setDefaultCommand(new RotationalDriveCommand(drive.getRotational(), localizer, xbox, 1.5 * Math.PI));
 
-        if (xbox.getBButton()) {
-            drive.brake();
-        }
+        // if (xbox.getBButton()) {
+        //     drive.brake();
+        // }
     }
 
     @Override
     public void teleopPeriodic() {
-
+        slamDunker.testRotation(xbox.getLeftY());
     }
 }

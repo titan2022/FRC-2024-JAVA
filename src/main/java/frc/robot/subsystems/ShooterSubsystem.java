@@ -12,6 +12,7 @@ import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.SensorInitializationStrategy;
+import com.revrobotics.AbsoluteEncoder;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -31,6 +32,7 @@ public class ShooterSubsystem extends SubsystemBase {
   //10.16cm for the wheel radius
   private static final double WHEEL_RADIUS = 0.1016;
   private static final double GEAR_RATIO = 1;
+
   // Motor that controls the rotation of the shooter to shoot int the speaker
   WPI_TalonFX rotatorMotor;
   // Controls the speed at which to shoot the note
