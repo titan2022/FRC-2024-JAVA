@@ -60,7 +60,7 @@ public class IntakeTestCommand extends Command {
         double rightJoyX = applyDeadband(xbox.getRightX(), 0.2);
         double rightJoyY = applyDeadband(-xbox.getRightY(), 0.2);
         intake.setIntakeVelocity(scaleIntakeVelocity(leftJoyY));
-        intake.setRotationVelocity(scaleRotationVelocity(leftJoyY));
+        intake.setRotationVelocity(scaleRotationVelocity(rightJoyY));
     }
 
     @Override
