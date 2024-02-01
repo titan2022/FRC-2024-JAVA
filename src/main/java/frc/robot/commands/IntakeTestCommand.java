@@ -65,13 +65,8 @@ public class IntakeTestCommand extends Command {
 
     @Override
     public void end(boolean interrupted) {
-        intake.setVelocity(new Translation2d(0, 0));
-        if(interrupted)
-            new StartEndCommand(() -> {
-                    xbox.setRumble(RumbleType.kLeftRumble, 0.5);
-                }, () -> {
-                    xbox.setRumble(RumbleType.kLeftRumble, 0);
-                }).withTimeout(0.5).schedule();
+        intake.setIntakeVelocity(0);
+        intake.setRotationVelocity(0);
     }
 
     @Override
