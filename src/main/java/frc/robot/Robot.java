@@ -22,10 +22,10 @@ public class Robot extends TimedRobot {
     private final XboxController xbox = new XboxController(0);
     private Localizer localizer = new Localizer();
 
-    private final int LEFT_INTAKE_ROTATION_PORT =3;
+    private final int LEFT_INTAKE_ROTATION_PORT = 3;
     private final int RIGHT_INTAKE_ROTATION_PORT = 14;
     private final int INTAKE_ROTATION_SPARK_PORT = 0;
-    private final int INTAKE_SPIN_PORT = 0;
+    private final int INTAKE_SPIN_PORT = 15;
 
     private IntakeSubsystem intake = new IntakeSubsystem(LEFT_INTAKE_ROTATION_PORT, RIGHT_INTAKE_ROTATION_PORT, INTAKE_ROTATION_SPARK_PORT, INTAKE_SPIN_PORT);
 
