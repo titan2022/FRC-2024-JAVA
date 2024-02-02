@@ -11,8 +11,6 @@ import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.sensors.SensorInitializationStrategy;
-import com.revrobotics.AbsoluteEncoder;
-import com.revrobotics.SparkAbsoluteEncoder;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -23,17 +21,16 @@ import frc.robot.utility.Constants;
  * ShooterSubsystem or SlamDunkerSubsystem.
  */
 public class IntakeSubsystem extends SubsystemBase {
-  private static final boolean ROTATOR_INVERTED = false;
   private static final boolean ROTATOR_SENSOR_PHASE = false;
   private static final boolean WHEEL_INVERTED = false;
   private static final SupplyCurrentLimitConfiguration LIMIT_CONFIG = new SupplyCurrentLimitConfiguration(true, 12, 12, 0);
 
   private static final double GEAR_RATIO = 1;
   // Geared up FalconFX which handles the rotation of the intake
-  private static final WPI_TalonFX rotationMotorOne = new WPI_TalonFX(0);
-  private static final WPI_TalonFX rotationMotorTwo = new WPI_TalonFX(0);
+  private static final WPI_TalonFX rotationMotorOne = new WPI_TalonFX(3);
+  private static final WPI_TalonFX rotationMotorTwo = new WPI_TalonFX(14);
   // Simple controller connected to bag motor to control intake of notes
-  private static final WPI_TalonSRX wheelsMotorController = new WPI_TalonSRX(0);
+  public static final WPI_TalonSRX wheelsMotorController = new WPI_TalonSRX(15);
   
   public IntakeSubsystem() {
     config();
@@ -42,17 +39,18 @@ public class IntakeSubsystem extends SubsystemBase {
   public void config() {
     rotationMotorOne.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
     rotationMotorOne.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
-    rotationMotorOne.setSensorPhase(ROTATOR_INVERTED);
+    rotationMotorOne.setSensorPhase(true);
     rotationMotorOne.setInverted(ROTATOR_SENSOR_PHASE);
     rotationMotorOne.configSupplyCurrentLimit(LIMIT_CONFIG);
     rotationMotorOne.setNeutralMode(NeutralMode.Brake);
 
     rotationMotorTwo.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
     rotationMotorTwo.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
-    rotationMotorTwo.setSensorPhase(ROTATOR_INVERTED);
+    rotationMotorTwo.setSensorPhase(false);
     rotationMotorTwo.setInverted(ROTATOR_SENSOR_PHASE);
     rotationMotorTwo.configSupplyCurrentLimit(LIMIT_CONFIG);
     rotationMotorTwo.setNeutralMode(NeutralMode.Brake);
+    rotationMotorTwo.follow(rotationMotorOne);
 
     // rotationMotorTwo.follow(rotationMotorOne);
 

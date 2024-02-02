@@ -15,6 +15,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.utility.Constants;
 
@@ -23,13 +24,13 @@ import frc.robot.utility.Constants;
  * note from the IntakeSubsystem
  */
 public class SlamDunkerSubsystem extends SubsystemBase {
-  private static final boolean ROTATOR_INVERTED = false;
   private static final boolean WHEEL_INVERTED = false;
   private static final boolean ROTATOR_SENSOR_PHASE = false;
   private static final SupplyCurrentLimitConfiguration LIMIT_CONFIG = new SupplyCurrentLimitConfiguration(true, 12, 12, 0 );
 
   private static final double GEAR_RATIO = 1;
   // Motor to handle the rotation of the slam dunker
+  public static final DutyCycleEncoder rotationEncoder = new DutyCycleEncoder(0);
   private static final WPI_TalonFX rotatorMotorOne = new WPI_TalonFX(10);
   // Follows the first motor
   private static final WPI_TalonFX rotatorMotorTwo = new WPI_TalonFX(12);
@@ -42,16 +43,18 @@ public class SlamDunkerSubsystem extends SubsystemBase {
   }
 
   public void config() {
+    rotationEncoder.reset();
+
     rotatorMotorOne.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
     rotatorMotorOne.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
     rotatorMotorOne.setSensorPhase(ROTATOR_SENSOR_PHASE);
-    rotatorMotorOne.setInverted(true);
+    rotatorMotorOne.setInverted(false);
     rotatorMotorOne.configSupplyCurrentLimit(LIMIT_CONFIG);
     rotatorMotorOne.setNeutralMode(NeutralMode.Brake);
 
     rotatorMotorTwo.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
     rotatorMotorTwo.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
-    rotatorMotorTwo.setInverted(false);
+    rotatorMotorTwo.setInverted(true);
     rotatorMotorTwo.configSupplyCurrentLimit(LIMIT_CONFIG);
     rotatorMotorOne.setNeutralMode(NeutralMode.Brake);
     rotatorMotorTwo.follow(rotatorMotorOne);
@@ -68,6 +71,16 @@ public class SlamDunkerSubsystem extends SubsystemBase {
     }
     else {
       rotatorMotorOne.set(ControlMode.PercentOutput, percent);
+    }
+  }
+
+    public void testWheelRotation(double percent)
+  {
+    if (Math.abs(percent) > 0.5) {
+      wheelMotorController.set(ControlMode.PercentOutput, Math.copySign(0.5, percent));
+    }
+    else {
+      wheelMotorController.set(ControlMode.PercentOutput, percent);
     }
   }
 
@@ -91,7 +104,7 @@ public class SlamDunkerSubsystem extends SubsystemBase {
    * Gets the angle of the slam dunker rotation pivot point
    * @return Radians
    */
-  public Rotation2d getRotation() {
-    return new Rotation2d(rotatorMotorOne.getSelectedSensorPosition(0) / GEAR_RATIO * Constants.Unit.FALCON_TICKS);
+  public double getRotation() {
+    return rotationEncoder.getAbsolutePosition();
   }
 }
