@@ -76,12 +76,20 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopPeriodic() {
+        // if (xbox.getYButton()) {
+        //     slamDunker.testRotation(-0.1);
+        // } else if (xbox.getAButton()) {
+        //     slamDunker.testRotation(0.1);
+        // } else {
+        //     slamDunker.testRotation(0);
+        // }
+
         if (xbox.getYButton()) {
-            slamDunker.testRotation(-0.1);
+            intake.testRotation(-0.1);
         } else if (xbox.getAButton()) {
-            slamDunker.testRotation(0.1);
+            intake.testRotation(0.1);
         } else {
-            slamDunker.testRotation(0);
+            intake.testRotation(0);
         }
         // SmartDashboard.putBoolean("XButton", xbox.getXButton());
         // if (xbox.getXButton()) {
