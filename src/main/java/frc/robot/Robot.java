@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
@@ -25,6 +26,7 @@ public class Robot extends TimedRobot {
     // private Localizer localizer = new Localizer();
     private static final SlamDunkerSubsystem slamDunker = new SlamDunkerSubsystem();
     private static final IntakeSubsystem intake = new IntakeSubsystem();
+    private static final ShooterSubsystem shooter = new ShooterSubsystem();
     @Override
     public void robotInit() {
         // localizer.setup();
@@ -85,12 +87,20 @@ public class Robot extends TimedRobot {
         // }
 
         if (xbox.getYButton()) {
-            intake.testRotation(-0.1);
+            shooter.setRotation(shooter.getRotation().minus(Rotation2d.fromDegrees(1)));
         } else if (xbox.getAButton()) {
-            intake.testRotation(0.1);
+            shooter.setRotation(shooter.getRotation().plus(Rotation2d.fromDegrees(1)));
         } else {
-            intake.testRotation(0);
+            
         }
+
+        // if (xbox.getYButton()) {
+        //     slamDunker.testRotation(-0.1);
+        // } else if (xbox.getAButton()) {
+        //     slamDunker.testRotation(0.1);
+        // } else {
+        //     slamDunker.testRotation(0);
+        // }
         // SmartDashboard.putBoolean("XButton", xbox.getXButton());
         // if (xbox.getXButton()) {
         //     intake.testWheelMotor(0.2);
