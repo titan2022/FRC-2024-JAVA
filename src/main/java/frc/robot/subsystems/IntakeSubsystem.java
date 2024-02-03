@@ -4,107 +4,105 @@
 
 package frc.robot.subsystems;
 
-import java.nio.channels.UnsupportedAddressTypeException;
+import static frc.robot.utility.Constants.Unit.DEG;
+import static frc.robot.utility.Constants.Unit.FALCON_TICKS;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
-import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
-import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 
-import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.utility.Constants;
 
-/***
- * An over the bumper intake subsystem that can rotate to give the note to either the 
+/**
+ * An over the bumper intake subsystem that can rotate to give the note to
+ * either the
  * ShooterSubsystem or SlamDunkerSubsystem.
  */
 public class IntakeSubsystem extends SubsystemBase {
-  private static final boolean WHEEL_INVERTED = false;
-  private static final boolean ROTATOR_SENSOR_PHASE = false;
-  private static final SupplyCurrentLimitConfiguration LIMIT_CONFIG = new SupplyCurrentLimitConfiguration(true, 12, 12, 0 );
+	private static final double ENCODER_OFFSET = -0.18064158; // Radians
+	private static final double OUT_ANGLE_THRESHOLD = 0; // Radians
 
-  private static final double GEAR_RATIO = 1;
-  // Motor to handle the rotation of the slam dunker
-  public static final DutyCycleEncoder rotationEncoder = new DutyCycleEncoder(1);
-  private static final WPI_TalonFX rotatorMotorOne = new WPI_TalonFX(3);
-  // Follows the first motor
-  private static final WPI_TalonFX rotatorMotorTwo = new WPI_TalonFX(14);
-  // Connected to simple bag motor which is meant to take note from IntakeSubsystem
-  // and release into the amp
-  private static final WPI_TalonSRX wheelMotorController = new WPI_TalonSRX(15);
-  
-  public IntakeSubsystem() {
-    config();
-  }
+	private boolean intakeState = false;
+	private double currentPosition = 0;
+	private double targetPosition = 0;
 
-  public void config() {
-    rotationEncoder.reset();
+	private WPI_TalonFX leftRotationMotor = new WPI_TalonFX(3);
+	private WPI_TalonFX rightRotationMotor = new WPI_TalonFX(14);
+	private WPI_TalonSRX intakeMotor = new WPI_TalonSRX(34);
 
-    rotatorMotorOne.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
-    rotatorMotorOne.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
-    rotatorMotorOne.setSensorPhase(ROTATOR_SENSOR_PHASE);
-    rotatorMotorOne.setInverted(false);
-    rotatorMotorOne.configSupplyCurrentLimit(LIMIT_CONFIG);
-    rotatorMotorOne.setNeutralMode(NeutralMode.Brake);
+	private DutyCycleEncoder rotationEncoder = new DutyCycleEncoder(1);
 
-    rotatorMotorTwo.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
-    rotatorMotorTwo.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
-    rotatorMotorTwo.setInverted(true);
-    rotatorMotorTwo.configSupplyCurrentLimit(LIMIT_CONFIG);
-    rotatorMotorOne.setNeutralMode(NeutralMode.Brake);
-    rotatorMotorTwo.follow(rotatorMotorOne);
+	private PIDController pid = new PIDController(1.0, 0.0, 0.0);
 
-    wheelMotorController.setInverted(WHEEL_INVERTED);
-    wheelMotorController.setNeutralMode(NeutralMode.Coast);
-    wheelMotorController.configSupplyCurrentLimit(LIMIT_CONFIG);
-  }
+	public IntakeSubsystem() {
+		rightRotationMotor.follow(leftRotationMotor);
+		rightRotationMotor.setInverted(leftRotationMotor.getInverted());
 
-  public void testRotation(double percent)
-  {
-    if (Math.abs(percent) > 0.1) {
-      rotatorMotorOne.set(ControlMode.PercentOutput, Math.copySign(0.1, percent));
-    }
-    else {
-      rotatorMotorOne.set(ControlMode.PercentOutput, percent);
-    }
-  }
+		intakeMotor.setInverted(true);
+		
+		rotationEncoder.reset();
+	}
 
-    public void testWheelRotation(double percent)
-  {
-    if (Math.abs(percent) > 0.5) {
-      wheelMotorController.set(ControlMode.PercentOutput, Math.copySign(0.5, percent));
-    }
-    else {
-      wheelMotorController.set(ControlMode.PercentOutput, percent);
-    }
-  }
+	private void setRotationVelocity(double angle) {
+		leftRotationMotor.set(ControlMode.Velocity, angle / FALCON_TICKS / 10.0);
+	}
 
-/***
-   * Sets the speed of the wheels
-   * @param speed In percentage from -1 to 1
-   */
-  public void setWheelVelocity(double speed) {
-    wheelMotorController.set(ControlMode.PercentOutput, speed);
-  }
+	/**
+	 * Gets gravitational counter-balancing velocity (setting arm to this should keep it in place)
+	 * 
+	 * @return Motor velocity in Talon ticks per 100ms
+	 */
+	private int getGravityVelocity() {
+		return 0;
+	}
 
-  /***
-   * Sets the angle of the slam dunker rotation pivot point
-   * @param angle Radians
-   */
-  public void setRotation(Rotation2d angle) {
-    rotatorMotorOne.set(ControlMode.Position, angle.getRadians() * GEAR_RATIO / Constants.Unit.FALCON_TICKS);
-  }
+	/**
+	 * Sets target position of intake
+	 * 
+	 * @param angle Angle in degrees (zero is up, CCW is positive)
+	 */
+	public void setTargetPosition(double angle) {
+		targetPosition = angle;
+	}
 
-  /***
-   * Gets the angle of the slam dunker rotation pivot point
-   * @return Radians
-   */
-  public double getRotation() {
-    return rotationEncoder.getAbsolutePosition();
-  }
+	/**
+	 * Get intake arm position
+	 * 
+	 * @return Angle in radians (zero is up, CCW is positive)
+	 */
+	public double getPosition() {
+		return currentPosition;
+	}
+
+	/**
+	 * Returns true if intake is out
+	 * 
+	 * @return Boolean state
+	 */
+	public boolean getIntakeState() {
+		return intakeState;
+	}
+
+	/**
+	 * Sets the speed of the intake wheels
+	 * 
+	 * @param speed Percent speed
+	 */
+	public void setIntakeOutput(double speed) {
+		intakeMotor.set(ControlMode.PercentOutput, speed);
+	}
+
+	@Override
+	public void periodic() {
+		currentPosition = -(rotationEncoder.getAbsolutePosition() - rotationEncoder.getPositionOffset()) * 2 * Math.PI + ENCODER_OFFSET;
+		// intakeState = getPosition() < OUT_ANGLE_THRESHOLD;
+
+		SmartDashboard.putNumber("encoderPos", currentPosition / DEG);
+
+		// double newVelocity = pid.calculate(currentPosition, targetPosition);
+		// setRotationVelocity(Math.max(newVelocity, 0.5));
+	}
 }
