@@ -86,21 +86,21 @@ public class Robot extends TimedRobot {
         //     slamDunker.testRotation(0);
         // }
 
-        if (xbox.getYButton()) {
-            shooter.setRotation(shooter.getRotation().minus(Rotation2d.fromDegrees(1)));
-        } else if (xbox.getAButton()) {
-            shooter.setRotation(shooter.getRotation().plus(Rotation2d.fromDegrees(1)));
-        } else {
-            
-        }
-
         // if (xbox.getYButton()) {
-        //     slamDunker.testRotation(-0.1);
+        //     shooter.setRotation(shooter.getRotation().minus(Rotation2d.fromDegrees(1)));
         // } else if (xbox.getAButton()) {
-        //     slamDunker.testRotation(0.1);
+        //     shooter.setRotation(shooter.getRotation().plus(Rotation2d.fromDegrees(1)));
         // } else {
-        //     slamDunker.testRotation(0);
+            
         // }
+
+        if (xbox.getYButton()) {
+            intake.testRotation(-0.2);
+        } else if (xbox.getAButton()) {
+            intake.testRotation(0.2);
+        } else {
+            intake.testRotation(0);
+        }
         // SmartDashboard.putBoolean("XButton", xbox.getXButton());
         // if (xbox.getXButton()) {
         //     intake.testWheelMotor(0.2);

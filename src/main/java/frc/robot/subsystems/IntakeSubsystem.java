@@ -66,12 +66,13 @@ public class IntakeSubsystem extends SubsystemBase {
 
   public void testRotation(double percent)
   {
-    if (Math.abs(percent) > 0.1) {
-      rotatorMotorOne.set(ControlMode.PercentOutput, Math.copySign(0.1, percent));
-    }
-    else {
-      rotatorMotorOne.set(ControlMode.PercentOutput, percent);
-    }
+    rotatorMotorOne.set(ControlMode.PercentOutput, percent);
+    // if (Math.abs(percent) > 0.1) {
+    //   rotatorMotorOne.set(ControlMode.PercentOutput, Math.copySign(0.1, percent));
+    // }
+    // else {
+    //   rotatorMotorOne.set(ControlMode.PercentOutput, percent);
+    // }
   }
 
     public void testWheelRotation(double percent)
