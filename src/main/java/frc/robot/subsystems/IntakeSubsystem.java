@@ -29,7 +29,7 @@ public class IntakeSubsystem extends SubsystemBase {
 	
 	private static final double INTAKE_VELOCITY = 0.5;
 
-	private static final double MAX_VELOCITY = 1.0; // Maximum arm velocity in radians per second
+	private static final double MAX_VELOCITY = 10.0 * DEG; // Maximum arm velocity in radians per second
 
 	private PIDController armPID = new PIDController(1.0, 0.0, 0.0);
 
@@ -95,7 +95,7 @@ public class IntakeSubsystem extends SubsystemBase {
 	/**
 	 * Sets target position of intake
 	 * 
-	 * @param angle Angle in degrees (zero is up, CCW is positive)
+	 * @param angle Angle in radians (zero is up, CCW is positive)
 	 */
 	public void setTargetPosition(double angle) {
 		targetPosition = angle;
@@ -149,7 +149,8 @@ public class IntakeSubsystem extends SubsystemBase {
 	@Override
 	public void periodic() {
 		currentPosition = -(rotationEncoder.getAbsolutePosition() - rotationEncoder.getPositionOffset()) * 2 * Math.PI + ENCODER_OFFSET;
-		SmartDashboard.putNumber("Intake Encoder", currentPosition / DEG);
+		SmartDashboard.putNumber("Intake Pos", currentPosition / DEG);
+		SmartDashboard.putNumber("Target Pos", targetPosition / DEG);
 
 		double newVelocity = armPID.calculate(currentPosition, targetPosition);
 		setRotationVelocity(Math.copySign(Math.min(Math.abs(newVelocity), MAX_VELOCITY), newVelocity));

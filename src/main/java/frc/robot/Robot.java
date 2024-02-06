@@ -18,12 +18,13 @@ import frc.robot.utility.Localizer;
 
 import static frc.robot.utility.Constants.getSwerveDriveTalonDriveConfig;
 import static frc.robot.utility.Constants.getSwerveDriveTalonRotaryConfig;
+import static frc.robot.utility.Constants.Unit.*;
 
 public class Robot extends TimedRobot {
     // private SwerveDriveSubsystem drive = new SwerveDriveSubsystem(getSwerveDriveTalonDriveConfig(), getSwerveDriveTalonRotaryConfig());
 	private final XboxController xbox = new XboxController(0);
     // private Localizer localizer = new Localizer();
-    private static final SlamDunkerSubsystem slamDunker = new SlamDunkerSubsystem();
+    // private static final SlamDunkerSubsystem slamDunker = new SlamDunkerSubsystem();
     private static final IntakeSubsystem intake = new IntakeSubsystem();
     @Override
     public void robotInit() {
@@ -33,11 +34,11 @@ public class Robot extends TimedRobot {
     @Override
     public void robotPeriodic() {
         CommandScheduler.getInstance().run();
-        SmartDashboard.putNumber("Xbox Right Y", xbox.getRightY());
-        SmartDashboard.putNumber("Rotator Absolute Position", slamDunker.getRotation());
-        SmartDashboard.putNumber("Rotator Ticks per Rotation", slamDunker.rotationEncoder.getDistancePerRotation());
-        SmartDashboard.putNumber("Rotator Distance", slamDunker.rotationEncoder.getDistance());
-        // localizer.step();
+        // SmartDashboard.putNumber("Xbox Right Y", xbox.getRightY());
+        // SmartDashboard.putNumber("Rotator Absolute Position", slamDunker.getRotation());
+        // SmartDashboard.putNumber("Rotator Ticks per Rotation", slamDunker.rotationEncoder.getDistancePerRotation());
+        // SmartDashboard.putNumber("Rotator Distance", slamDunker.rotationEncoder.getDistance());
+        // // localizer.step();
 
         // SmartDashboard.putNumber("Rotation", shooter.getRotation().getDegrees());
         
@@ -84,13 +85,13 @@ public class Robot extends TimedRobot {
         //     slamDunker.testRotation(0);
         // }
 
-        if (xbox.getYButton()) {
-            intake.testRotation(-0.1);
-        } else if (xbox.getAButton()) {
-            intake.testRotation(0.1);
-        } else {
-            intake.testRotation(0);
-        }
+        // if (xbox.getYButton()) {
+        //     intake.testRotation(-0.1);
+        // } else if (xbox.getAButton()) {
+        //     intake.testRotation(0.1);
+        // } else {
+        //     intake.testRotation(0);
+        // }
         // SmartDashboard.putBoolean("XButton", xbox.getXButton());
         // if (xbox.getXButton()) {
         //     intake.testWheelMotor(0.2);
@@ -108,5 +109,7 @@ public class Robot extends TimedRobot {
 
         // slamDunker.testWheelRotation(0.2);
         // intake.testWheelMotor(0.2);
+
+        intake.setTargetPosition(xbox.getRightX() * 90 * DEG);
     }
 }
