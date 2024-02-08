@@ -20,9 +20,9 @@ import static frc.robot.utility.Constants.getSwerveDriveTalonDriveConfig;
 import static frc.robot.utility.Constants.getSwerveDriveTalonRotaryConfig;
 
 public class Robot extends TimedRobot {
-    // private SwerveDriveSubsystem drive = new SwerveDriveSubsystem(getSwerveDriveTalonDriveConfig(), getSwerveDriveTalonRotaryConfig());
+    private SwerveDriveSubsystem drive = new SwerveDriveSubsystem(getSwerveDriveTalonDriveConfig(), getSwerveDriveTalonRotaryConfig());
 	private final XboxController xbox = new XboxController(0);
-    // private Localizer localizer = new Localizer();
+    private Localizer localizer = new Localizer();
     private static final SlamDunkerSubsystem slamDunker = new SlamDunkerSubsystem();
     private static final IntakeSubsystem intake = new IntakeSubsystem();
     @Override
@@ -33,6 +33,7 @@ public class Robot extends TimedRobot {
     @Override
     public void robotPeriodic() {
         CommandScheduler.getInstance().run();
+
         SmartDashboard.putNumber("Xbox Right Y", xbox.getRightY());
         SmartDashboard.putNumber("Rotator Absolute Position", slamDunker.getRotation());
         SmartDashboard.putNumber("Rotator Ticks per Rotation", slamDunker.rotationEncoder.getDistancePerRotation());

@@ -4,15 +4,18 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.RotationalDrivebase;
 
 /** An example command that uses an example subsystem. */
-public class RotationCommand extends Command {
+public class RotationCommand extends Command implements VariantCommand{
   @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
+  protected boolean onBlueSide = true;
+  protected Rotation2d angularVelocity;
 
   public RotationCommand(double angle, double speed, RotationalDrivebase driveBase) {
-
+    
   }
 
   // Called when the command is initially scheduled.
@@ -34,5 +37,16 @@ public class RotationCommand extends Command {
   @Override
   public boolean isFinished() {
     return false;
+  }
+
+  @Override
+  public boolean onBlueSide() {
+    return onBlueSide;
+  }
+
+  @Override
+  public void changeColorSide() {
+    angularVelocity = new Rotation2d(-angularVelocity.getRadians());
+    onBlueSide = !onBlueSide;
   }
 }

@@ -35,7 +35,7 @@ public class Localizer {
     private Translation3d notePosition = new Translation3d();
     private Rotation3d noteRotation = new Rotation3d();
     private Dictionary<Integer, NetworkingTag> tags = new Hashtable<>();
-    private boolean onBlueSide = false;
+    private boolean onBlueSide = true;
 
     /**
      * Localizer constructor
@@ -226,4 +226,5 @@ public class Localizer {
     public synchronized void step() {
         step(0.02);
     }
+
 }
