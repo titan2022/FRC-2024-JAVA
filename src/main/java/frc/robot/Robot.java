@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
@@ -27,10 +28,16 @@ public class Robot extends TimedRobot {
     // private SwerveDriveSubsystem drive = new SwerveDriveSubsystem(getSwerveDriveTalonDriveConfig(), getSwerveDriveTalonRotaryConfig());
 	//private final XboxController xbox = new XboxController(0);
     // private Localizer localizer = new Localizer();
+<<<<<<< HEAD
     // private static final SlamDunkerSubsystem slamDunker = new SlamDunkerSubsystem();
     // private static final IntakeSubsystem intake = new IntakeSubsystem();
     WPI_TalonFX motorLeft = new WPI_TalonFX(19);
     WPI_TalonFX motorRight = new WPI_TalonFX(21);
+=======
+    private static final SlamDunkerSubsystem slamDunker = new SlamDunkerSubsystem();
+    private static final IntakeSubsystem intake = new IntakeSubsystem();
+    private static final ShooterSubsystem shooter = new ShooterSubsystem();
+>>>>>>> e6df283c568c46e3bde2d51e0869e04ec63cf89c
     @Override
     public void robotInit() {
         // motorLeft.follow(motorRight);
@@ -91,12 +98,37 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopPeriodic() {
         // if (xbox.getYButton()) {
+<<<<<<< HEAD
         //     drive.getTranslational().setVelocity(new Translation2d(0, SmartDashboard.getNumber("Desired Y Velocity", 0)));
         // } else if (xbox.getBButton()) {
         //     drive.getTranslational().setVelocity(new Translation2d(0, -SmartDashboard.getNumber("Desired Y Velocity", 0)));
         // } else {
         //     drive.getTranslational().setVelocity(new Translation2d(0, 0));
         // }
+=======
+        //     slamDunker.testRotation(-0.1);
+        // } else if (xbox.getAButton()) {
+        //     slamDunker.testRotation(0.1);
+        // } else {
+        //     slamDunker.testRotation(0);
+        // }
+
+        // if (xbox.getYButton()) {
+        //     shooter.setRotation(shooter.getRotation().minus(Rotation2d.fromDegrees(1)));
+        // } else if (xbox.getAButton()) {
+        //     shooter.setRotation(shooter.getRotation().plus(Rotation2d.fromDegrees(1)));
+        // } else {
+            
+        // }
+
+        if (xbox.getYButton()) {
+            intake.testRotation(-0.2);
+        } else if (xbox.getAButton()) {
+            intake.testRotation(0.2);
+        } else {
+            intake.testRotation(0);
+        }
+>>>>>>> e6df283c568c46e3bde2d51e0869e04ec63cf89c
         // SmartDashboard.putBoolean("XButton", xbox.getXButton());
         // if (xbox.getXButton()) {
         //     intake.testWheelMotor(0.2);

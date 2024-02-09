@@ -21,6 +21,7 @@ import frc.robot.utility.Constants;
  * A rotating shooter subsystem designed to take notes from the IntakeSubsystem
  * and shoot them into the speaker
  */
+@SuppressWarnings({"deprecation", "removal"})
 public class ShooterSubsystem extends SubsystemBase {
   private static final boolean WHEEL_INVERTED = false;
   private static final boolean WHEEL_SENSOR_PHASE = false;
@@ -37,8 +38,10 @@ public class ShooterSubsystem extends SubsystemBase {
   // Controls the speed at which to shoot the note
   WPI_TalonFX wheelMotorOne;
   // Follows the other motor except in opposite direction
-  WPI_TalonFX wheelMotorTwo;
+  // WPI_TalonFX wheelMotorTwo;
   public ShooterSubsystem() {
+    rotatorMotor = new WPI_TalonFX(19);
+    wheelMotorOne = new WPI_TalonFX(16);
     config();
   }
 
@@ -50,11 +53,11 @@ public class ShooterSubsystem extends SubsystemBase {
     wheelMotorOne.configSupplyCurrentLimit(LIMIT_CONFIG);
     wheelMotorOne.setNeutralMode(NeutralMode.Coast);
 
-    wheelMotorTwo.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
-    wheelMotorTwo.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
-    wheelMotorTwo.configSupplyCurrentLimit(LIMIT_CONFIG);
-    wheelMotorTwo.setNeutralMode(NeutralMode.Coast);
-    wheelMotorTwo.follow(wheelMotorOne);
+    // wheelMotorTwo.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
+    // wheelMotorTwo.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
+    // wheelMotorTwo.configSupplyCurrentLimit(LIMIT_CONFIG);
+    // wheelMotorTwo.setNeutralMode(NeutralMode.Coast);
+    // wheelMotorTwo.follow(wheelMotorOne);
 
     rotatorMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
     rotatorMotor.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
