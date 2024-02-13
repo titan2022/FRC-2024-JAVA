@@ -4,90 +4,78 @@
 
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
-import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
-import com.ctre.phoenix.sensors.SensorInitializationStrategy;
+import static frc.robot.utility.Constants.Unit.FALCON_TICKS;
 
-import edu.wpi.first.math.geometry.Rotation2d;
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.utility.Constants;
 
 /***
- * A rotating shooter subsystem designed to take notes from the IntakeSubsystem
+ * A linkage shooter subsystem designed to take notes from the IntakeSubsystem
  * and shoot them into the speaker
  */
-@SuppressWarnings({"deprecation", "removal"})
 public class ShooterSubsystem extends SubsystemBase {
-  private static final boolean WHEEL_INVERTED = false;
-  private static final boolean WHEEL_SENSOR_PHASE = false;
-  private static final boolean ROTATOR_INVERTED = false;
-  private static final boolean ROTATOR_SENSOR_PHASE = false;
-  private static final SupplyCurrentLimitConfiguration LIMIT_CONFIG = new SupplyCurrentLimitConfiguration(true, 12, 12, 0);
+	private static final double MAX_ANGLE = 0;
+	private static final double MIN_ANGLE = 0;
 
-  //10.16cm for the wheel radius
-  private static final double WHEEL_RADIUS = 0.1016;
-  private static final double GEAR_RATIO = 1;
+	private double linkageEncoderValue = 0;
+	private double targetRotation = 0;
+	
+	private PIDController linkagePID = new PIDController(1, 0, 0);
+	private PIDController shooterPID = new PIDController(1, 0, 0);
 
-  // Motor that controls the rotation of the shooter to shoot int the speaker
-  WPI_TalonFX rotatorMotor;
-  // Controls the speed at which to shoot the note
-  WPI_TalonFX wheelMotorOne;
-  // Follows the other motor except in opposite direction
-  // WPI_TalonFX wheelMotorTwo;
-  public ShooterSubsystem() {
-    rotatorMotor = new WPI_TalonFX(19);
-    wheelMotorOne = new WPI_TalonFX(16);
-    config();
-  }
+	private WPI_TalonFX linkageMotor = new WPI_TalonFX(0);
+	private WPI_TalonFX bottomShooterMotor = new WPI_TalonFX(0);
+	private WPI_TalonFX topShooterMotor = new WPI_TalonFX(0);
 
-  public void config() {
-    wheelMotorOne.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
-    wheelMotorOne.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
-    wheelMotorOne.setSensorPhase(WHEEL_SENSOR_PHASE);
-    wheelMotorOne.setInverted(WHEEL_INVERTED);
-    wheelMotorOne.configSupplyCurrentLimit(LIMIT_CONFIG);
-    wheelMotorOne.setNeutralMode(NeutralMode.Coast);
+	public ShooterSubsystem() {
+		bottomShooterMotor.follow(topShooterMotor);
+		bottomShooterMotor.setInverted(true);
 
-    // wheelMotorTwo.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
-    // wheelMotorTwo.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
-    // wheelMotorTwo.configSupplyCurrentLimit(LIMIT_CONFIG);
-    // wheelMotorTwo.setNeutralMode(NeutralMode.Coast);
-    // wheelMotorTwo.follow(wheelMotorOne);
+		linkageMotor.setSelectedSensorPosition(0);
+		topShooterMotor.setSelectedSensorPosition(0);
+	}
 
-    rotatorMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
-    rotatorMotor.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
-    rotatorMotor.setSensorPhase(ROTATOR_SENSOR_PHASE);
-    rotatorMotor.setInverted(ROTATOR_INVERTED);
-    rotatorMotor.configSupplyCurrentLimit(LIMIT_CONFIG);
-    rotatorMotor.setNeutralMode(NeutralMode.Brake);
-  }
+	/**
+	 * Sets linkage rotation velocity
+	 * 
+	 * @param velocity in radians per second
+	 */
+	private void setRotationVelocity(double velocity) {
+		linkageMotor.set(ControlMode.Velocity, velocity / FALCON_TICKS / 10.0);
+	}
 
-  /***
-   * Sets the velocity of both the shooter motors 
-   * @param speed Radians per sec
-   */
-  public void setShooterVelocity(Rotation2d speed) {
-    wheelMotorOne.set(ControlMode.Velocity, speed.getRadians() * WHEEL_RADIUS);
-  }
+	/**
+	 * Gets shooter rotation angle
+	 * 
+	 * @return Angle in radians (zero is ground, positive is up)
+	 */
+	public double getRotation() {
+		return linkageEncoderValue; // TODO
+	}
 
-  /***
-   * Sets the absolute angle of the shooter rotation pivot
-   * @param angle Radians 
-   */
-  public void setRotation(Rotation2d angle) {
-    rotatorMotor.set(ControlMode.Position, angle.getRadians() * GEAR_RATIO / Constants.Unit.FALCON_TICKS);
-  }
+	/**
+	 * Sets target angle of the intake
+	 * 
+	 * @param angle in radians (zero is ground, positive is up)
+	 */
+	public void setRotation(double angle) {
+		targetRotation = angle; // TODO
+	}
 
-  /***
-   * Gets the rotation of the rotation pivot
-   * @return Radians
-   */
-  public Rotation2d getRotation() {
-    return new Rotation2d(rotatorMotor.getSelectedSensorPosition(0) / GEAR_RATIO * Constants.Unit.FALCON_TICKS);
-  }
+	public void shoot(double velocity) {
+		double currentVelocity = topShooterMotor.getSelectedSensorVelocity();
+		double newVelocity = shooterPID.calculate(currentVelocity, velocity);
+		topShooterMotor.set(ControlMode.Velocity, newVelocity);
+	}
+
+	@Override
+	public void periodic() {
+		linkageEncoderValue = linkageMotor.getSelectedSensorPosition();
+
+		double linkageVelocity = linkagePID.calculate(getRotation(), targetRotation); // TODO
+		setRotationVelocity(linkageVelocity);
+	}
 }
