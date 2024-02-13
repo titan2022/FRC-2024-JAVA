@@ -25,25 +25,21 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
 public class Robot extends TimedRobot {
-    // private SwerveDriveSubsystem drive = new SwerveDriveSubsystem(getSwerveDriveTalonDriveConfig(), getSwerveDriveTalonRotaryConfig());
-	//private final XboxController xbox = new XboxController(0);
+    private SwerveDriveSubsystem drive = new SwerveDriveSubsystem(getSwerveDriveTalonDriveConfig(), getSwerveDriveTalonRotaryConfig());
+	private final XboxController xbox = new XboxController(0);
     // private Localizer localizer = new Localizer();
-<<<<<<< HEAD
     // private static final SlamDunkerSubsystem slamDunker = new SlamDunkerSubsystem();
     // private static final IntakeSubsystem intake = new IntakeSubsystem();
-    WPI_TalonFX motorLeft = new WPI_TalonFX(19);
-    WPI_TalonFX motorRight = new WPI_TalonFX(21);
-=======
-    private static final SlamDunkerSubsystem slamDunker = new SlamDunkerSubsystem();
-    private static final IntakeSubsystem intake = new IntakeSubsystem();
-    private static final ShooterSubsystem shooter = new ShooterSubsystem();
->>>>>>> e6df283c568c46e3bde2d51e0869e04ec63cf89c
+    // WPI_TalonFX motorLeft = new WPI_TalonFX(19);
+    // WPI_TalonFX motorRight = new WPI_TalonFX(21);
     @Override
     public void robotInit() {
         // motorLeft.follow(motorRight);
-        motorLeft.setInverted(true);
-        SmartDashboard.putNumber("Rotations Per Sec", 0);
-        //SmartDashboard.putNumber("Desired Y Velocity", 0);
+        // motorLeft.setInverted(true);
+        // SmartDashboard.putNumber("Rotations Per Sec", 0);
+        SmartDashboard.putNumber("Desired X Velocity", 0);
+        SmartDashboard.putNumber("Desired Y Velocity", 0);
+        
         // localizer.setup();
     }
 
@@ -78,9 +74,9 @@ public class Robot extends TimedRobot {
     /** This function is called periodically during autonomous. */
     @Override
     public void autonomousPeriodic() {
-        double rotationsPerSec = SmartDashboard.getNumber("Rotations Per Sec", 0);
-        motorRight.set(ControlMode.Velocity, FALCON_CPR * rotationsPerSec / 10);
-        motorLeft.set(ControlMode.Velocity, FALCON_CPR * rotationsPerSec / 10);
+        // double rotationsPerSec = SmartDashboard.getNumber("Rotations Per Sec", 0);
+        // motorRight.set(ControlMode.Velocity, FALCON_CPR * rotationsPerSec / 10);
+        // motorLeft.set(ControlMode.Velocity, FALCON_CPR * rotationsPerSec / 10);
         // slamDunker.testRotation(0.1);
         // drive.getTranslational().setVelocity(new Translation2d(0, 0.5));
     }
@@ -97,38 +93,18 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopPeriodic() {
-        // if (xbox.getYButton()) {
-<<<<<<< HEAD
-        //     drive.getTranslational().setVelocity(new Translation2d(0, SmartDashboard.getNumber("Desired Y Velocity", 0)));
-        // } else if (xbox.getBButton()) {
-        //     drive.getTranslational().setVelocity(new Translation2d(0, -SmartDashboard.getNumber("Desired Y Velocity", 0)));
-        // } else {
-        //     drive.getTranslational().setVelocity(new Translation2d(0, 0));
-        // }
-=======
-        //     slamDunker.testRotation(-0.1);
-        // } else if (xbox.getAButton()) {
-        //     slamDunker.testRotation(0.1);
-        // } else {
-        //     slamDunker.testRotation(0);
-        // }
-
-        // if (xbox.getYButton()) {
-        //     shooter.setRotation(shooter.getRotation().minus(Rotation2d.fromDegrees(1)));
-        // } else if (xbox.getAButton()) {
-        //     shooter.setRotation(shooter.getRotation().plus(Rotation2d.fromDegrees(1)));
-        // } else {
-            
-        // }
-
         if (xbox.getYButton()) {
-            intake.testRotation(-0.2);
+            drive.getTranslational().setVelocity(new Translation2d(0, SmartDashboard.getNumber("Desired Y Velocity", 0)));
         } else if (xbox.getAButton()) {
-            intake.testRotation(0.2);
+            drive.getTranslational().setVelocity(new Translation2d(0, -SmartDashboard.getNumber("Desired Y Velocity", 0)));
+        } else if (xbox.getXButton()) {
+            drive.getTranslational().setVelocity(new Translation2d(SmartDashboard.getNumber("Desired X Velocity", 0), 0));
+        } else if(xbox.getBButton()) {
+            drive.getTranslational().setVelocity(new Translation2d(-SmartDashboard.getNumber("Desired X Velocity", 0), 0));
         } else {
-            intake.testRotation(0);
+            drive.getTranslational().setVelocity(new Translation2d(0, 0));
         }
->>>>>>> e6df283c568c46e3bde2d51e0869e04ec63cf89c
+
         // SmartDashboard.putBoolean("XButton", xbox.getXButton());
         // if (xbox.getXButton()) {
         //     intake.testWheelMotor(0.2);
