@@ -68,7 +68,10 @@ public class RotationalDriveCommand extends Command {
 
     @Override
     public void execute() {
-        double drift = -localizer.getRate() * DEG / S - omega;
+        double drift = 0.0;
+        if (localizer != null) {
+            drift = -localizer.getRate() * DEG / S - omega;
+        }
         double joy = applyDeadband(xbox.getRightX(), 0.1);
         omega = -scaleVelocity(joy);
         drive.setRotation(omega - 0.5 * drift);
