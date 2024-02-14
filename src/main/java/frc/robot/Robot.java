@@ -38,7 +38,7 @@ public class Robot extends TimedRobot {
         // motorLeft.setInverted(true);
         // SmartDashboard.putNumber("Rotations Per Sec", 0);
         SmartDashboard.putNumber("Desired X Velocity", 0);
-        SmartDashboard.putNumber("Desired Y Velocity", 0);
+        SmartDashboard.putNumber("Desired Y Velocity", 0.1);
         
         // localizer.setup();
     }
@@ -46,7 +46,8 @@ public class Robot extends TimedRobot {
     @Override
     public void robotPeriodic() {
         // CommandScheduler.getInstance().run();
-        //SmartDashboard.putNumber("Current Y Velocity", drive.getTranslational().getVelocity().getY());
+        SmartDashboard.putNumber("Current X Velocity", drive.getTranslational().getVelocity().getX());
+        SmartDashboard.putNumber("Current Y Velocity", drive.getTranslational().getVelocity().getY());
         // SmartDashboard.putNumber("Xbox Right Y", xbox.getRightY());
         // SmartDashboard.putNumber("Rotator Absolute Position", slamDunker.getRotation());
         // SmartDashboard.putNumber("Rotator Ticks per Rotation", slamDunker.rotationEncoder.getDistancePerRotation());
@@ -96,11 +97,11 @@ public class Robot extends TimedRobot {
         if (xbox.getYButton()) {
             drive.getTranslational().setVelocity(new Translation2d(0, SmartDashboard.getNumber("Desired Y Velocity", 0)));
         } else if (xbox.getAButton()) {
-            drive.getTranslational().setVelocity(new Translation2d(0, -SmartDashboard.getNumber("Desired Y Velocity", 0)));
+            drive.getTranslational().setVelocity(new Translation2d(0, -1 * SmartDashboard.getNumber("Desired Y Velocity", 0)));
         } else if (xbox.getXButton()) {
             drive.getTranslational().setVelocity(new Translation2d(SmartDashboard.getNumber("Desired X Velocity", 0), 0));
         } else if(xbox.getBButton()) {
-            drive.getTranslational().setVelocity(new Translation2d(-SmartDashboard.getNumber("Desired X Velocity", 0), 0));
+            drive.getTranslational().setVelocity(new Translation2d(-1 * SmartDashboard.getNumber("Desired X Velocity", 0), 0));
         } else {
             drive.getTranslational().setVelocity(new Translation2d(0, 0));
         }

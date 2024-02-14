@@ -111,6 +111,12 @@ public final class Constants {
 	public static final double MAX_ACCELERATION = 5 * (Unit.M / Unit.S / Unit.S);
 	public static final double MAX_ANGULAR_ACCELERATION = 1 * (Unit.ROT / Unit.S / Unit.S);
 
+	public static class FeedForward 
+	{
+		public static double kS = 0.015;
+		public static double kV = 0.175;
+		public static double kA = 0;
+	}
 	/**
 	 * Contains a velocity based PID configuration.
 	 * 
@@ -119,9 +125,13 @@ public final class Constants {
 	public static TalonFXConfiguration getSwerveDriveTalonDriveConfig() {
 		TalonFXConfiguration talon = new TalonFXConfiguration();
 		// Add configs here:
-		talon.slot0.kP = 0.12;
+		// talon.slot0.kP = 0.12;
+		// talon.slot0.kI = 0;
+		// talon.slot0.kD = 2.5;
+		// talon.slot0.kF = 0;
+		talon.slot0.kP = 0.1;
 		talon.slot0.kI = 0;
-		talon.slot0.kD = 2.5;
+		talon.slot0.kD = 0;
 		talon.slot0.kF = 0;
 		talon.slot0.integralZone = 900;
 		talon.slot0.allowableClosedloopError = 20;
