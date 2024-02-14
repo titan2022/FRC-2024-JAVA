@@ -4,15 +4,21 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.RotationalDrivebase;
 
 /** An example command that uses an example subsystem. */
 public class RotationCommand extends Command {
   @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
+  private RotationalDriveCommand driveBase;
+  private Rotation2d rotation;
+  
 
-  public RotationCommand(double angle, double speed, RotationalDrivebase driveBase) {
+  public RotationCommand(Rotation2d rotation, RotationalDrivebase driveBase) {
+    this.rotation = rotation;
 
+    addRequirements(driveBase);
   }
 
   // Called when the command is initially scheduled.
