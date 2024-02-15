@@ -37,8 +37,12 @@ public class Robot extends TimedRobot {
         // motorLeft.follow(motorRight);
         // motorLeft.setInverted(true);
         // SmartDashboard.putNumber("Rotations Per Sec", 0);
-        SmartDashboard.putNumber("Desired X Velocity", 0);
+        SmartDashboard.putNumber("Desired X Velocity", 0.1);
         SmartDashboard.putNumber("Desired Y Velocity", 0.1);
+        SmartDashboard.putNumber("Front Left", 0);
+        SmartDashboard.putNumber("Back Left", 0);
+        SmartDashboard.putNumber("Front Right", 0);
+        SmartDashboard.putNumber("Back Right", 0);
         
         // localizer.setup();
     }
@@ -100,8 +104,8 @@ public class Robot extends TimedRobot {
             drive.getTranslational().setVelocity(new Translation2d(0, -1 * SmartDashboard.getNumber("Desired Y Velocity", 0)));
         } else if (xbox.getXButton()) {
             drive.getTranslational().setVelocity(new Translation2d(SmartDashboard.getNumber("Desired X Velocity", 0), 0));
-        } else if(xbox.getBButton()) {
-            drive.getTranslational().setVelocity(new Translation2d(-1 * SmartDashboard.getNumber("Desired X Velocity", 0), 0));
+        } else if (xbox.getBButton()) {
+            drive.setRotatorTest();
         } else {
             drive.getTranslational().setVelocity(new Translation2d(0, 0));
         }

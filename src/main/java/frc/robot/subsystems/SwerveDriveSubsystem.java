@@ -33,7 +33,7 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
 
     // Deadbands
     private static final double WHEEL_DEADBAND = 0.01;
-    private static final double ROTATOR_DEADBAND = 0.001;
+    private static final double ROTATOR_DEADBAND = 0.0001;
 
     // CAN ID numbers
     private static final int LEFT_FRONT_MOTOR_PORT = 40;//
@@ -52,12 +52,12 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
     private static final int RIGHT_BACK_ENCODER_ROTATOR_PORT = 52;
 
     // Rotator encoder offsets
-// private static final int FRONT_LEFT_OFFSET = -1024 - 238;//-238;
-    private static final int FRONT_LEFT_OFFSET = -1024 - 200;//-238;
-    private static final int BACK_LEFT_OFFSET = -3085 - 1024;
-    // private static final int FRONT_RIGHT_OFFSET = -1913 + 1024;
-    private static final int FRONT_RIGHT_OFFSET = -1810 + 1024;
-    private static final int BACK_RIGHT_OFFSET = -1865 + 1024;
+    private static final int FRONT_LEFT_OFFSET = -1024 - 190;//-238;
+    private static final int BACK_LEFT_OFFSET = -3120 - 1024;
+    private static final int FRONT_RIGHT_OFFSET = -1930 + 1024;
+    // private static final int BACK_RIGHT_OFFSET = -1860 + 1024;
+    private static final int BACK_RIGHT_OFFSET = -1835 + 1024;
+
     private static final int[] OFFSETS = new int[] { FRONT_LEFT_OFFSET, BACK_LEFT_OFFSET, FRONT_RIGHT_OFFSET,BACK_RIGHT_OFFSET };
 
     // Motor inversions
@@ -417,5 +417,17 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
     public void brake() {
         for (WPI_TalonFX rotator : rotators)
             rotator.setNeutralMode(NeutralMode.Brake);
+    }
+
+    public void setRotatorTest() {
+        int[] adjustments = {
+            (int) SmartDashboard.getNumber("Front Left", 0),
+            (int) SmartDashboard.getNumber("Back Left", 0),
+            (int) SmartDashboard.getNumber("Front Right", 0), 
+            (int) SmartDashboard.getNumber("Back Right", 0)
+        };
+        for (int i = 0; i < 4; ++i) {
+            rotators[i].set(ControlMode.Position, OFFSETS[i] + adjustments[i]);
+        }
     }
 }
