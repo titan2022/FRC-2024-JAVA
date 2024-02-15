@@ -120,7 +120,9 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
     private final TranslationalDrivebase translationalLock = new TranslationalDrivebase() {
         @Override
         public void setVelocity(Translation2d velocity) {
-            updateVelocity(velocity);
+            lastVelocity.vxMetersPerSecond = velocity.getX();
+            lastVelocity.vyMetersPerSecond = velocity.getY();
+            setVelocities(lastVelocity);
         }
 
         @Override
@@ -131,14 +133,15 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
     };
     private final RotationalDrivebase rotationalLock = new RotationalDrivebase() {
         @Override
-        public void setRotation(double omega) {
-            updateRotation(omega);
+        public void setRotationalVelocity(Rotation2d omega) {
+            lastVelocity.omegaRadiansPerSecond = omega.getRadians();
+            setVelocities(lastVelocity);
         }
 
         @Override
-        public double getRate() {
+        public Rotation2d getRotationalVelocity() {
             ChassisSpeeds speeds = getVelocities();
-            return speeds.omegaRadiansPerSecond;
+            return Rotation2d.fromRadians(speeds.omegaRadiansPerSecond);
         }
     };
 
@@ -341,15 +344,14 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
         }
     }
 
-    private void updateVelocity(Translation2d velocity) {
-        lastVelocity.vxMetersPerSecond = velocity.getX();
-        lastVelocity.vyMetersPerSecond = velocity.getY();
-        setVelocities(lastVelocity);
-    }
-
-    private void updateRotation(double omega) {
-        lastVelocity.omegaRadiansPerSecond = omega;
-        setVelocities(lastVelocity);
+    private void setSwerveStates(SwerveModuleState state) {
+        if (state.speedMetersPerSecond > MAX_WHEEL_SPEED)
+            state.speedMetersPerSecond = MAX_WHEEL_SPEED;
+        for (int i = 0; i < 4; i++) {
+            // SwerveModuleState optimized = SwerveModuleState.optimize(modules[i], new Rotation2d(encoders[i].getAbsolutePosition()));
+            // applyModuleState(optimized, i);
+            applyModuleState(state, i);
+        }
     }
 
     /**
