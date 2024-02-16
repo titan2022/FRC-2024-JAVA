@@ -15,14 +15,19 @@ public class RotationCommand extends Command {
   @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
   public static final Rotation2d deadBand = Rotation2d.fromDegrees(2.5);
   private RotationalDrivebase drivebase;
+  private Localizer localizer;
   private Rotation2d omega;
-  private double time;
-  private double endTime;
+  private Rotation2d theta;
+  private Rotation2d targetAngle;
+  // private double time;
+  // private double endTime;
 
-  public RotationCommand(Rotation2d theta, Rotation2d omega, RotationalDrivebase driveBase) {
+  public RotationCommand(Rotation2d theta, Rotation2d omega, RotationalDrivebase driveBase, Localizer localizer) {
     this.drivebase = driveBase;
+    this.localizer = localizer;
+    this.theta = theta;
     this.omega = new Rotation2d(Math.copySign(omega.getRadians(), theta.getRadians()));
-    time = theta.getRadians() / this.omega.getRadians();
+    // time = theta.getRadians() / this.omega.getRadians();
 
     addRequirements(driveBase);
   }
@@ -30,7 +35,7 @@ public class RotationCommand extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    endTime = Timer.getFPGATimestamp() + time;
+    targetAngle = localizer.getHeading().plus(theta);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -48,7 +53,7 @@ public class RotationCommand extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    if (Timer.getFPGATimestamp() > endTime)
+    if (Math.abs(targetAngle.getDegrees() - localizer.getHeading().getDegrees()) < deadBand.getDegrees())
       return true;
     else
       return false;
