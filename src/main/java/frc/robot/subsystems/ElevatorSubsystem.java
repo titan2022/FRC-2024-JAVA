@@ -8,10 +8,10 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class ClimbSubsystem extends SubsystemBase {
+public class ElevatorSubsystem extends SubsystemBase {
   WPI_TalonFX climbMotorOne;
   WPI_TalonFX climbMotorTwo;
 
-  public ClimbSubsystem() {
+  public ElevatorSubsystem() {
   }
 }
