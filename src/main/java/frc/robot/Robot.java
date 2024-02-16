@@ -27,7 +27,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 public class Robot extends TimedRobot {
     private SwerveDriveSubsystem drive = new SwerveDriveSubsystem(getSwerveDriveTalonDriveConfig(), getSwerveDriveTalonRotaryConfig());
 	private final XboxController xbox = new XboxController(0);
-    // private Localizer localizer = new Localizer();
+    private Localizer localizer = new Localizer();
     // private static final SlamDunkerSubsystem slamDunker = new SlamDunkerSubsystem();
     // private static final IntakeSubsystem intake = new IntakeSubsystem();
     // WPI_TalonFX motorLeft = new WPI_TalonFX(19);
@@ -37,10 +37,14 @@ public class Robot extends TimedRobot {
         // motorLeft.follow(motorRight);
         // motorLeft.setInverted(true);
         // SmartDashboard.putNumber("Rotations Per Sec", 0);
-        SmartDashboard.putNumber("Desired X Velocity", 0);
-        SmartDashboard.putNumber("Desired Y Velocity", 0.1);
+        SmartDashboard.putNumber("X Position", 0);
+        SmartDashboard.putNumber("Y Position", 0);
+        SmartDashboard.putNumber("Rotation", 0);
+
+        // SmartDashboard.putNumber("Desired X Velocity", 0);
+        // SmartDashboard.putNumber("Desired Y Velocity", 0.1);
         
-        // localizer.setup();
+        localizer.setup();
     }
 
     @Override
@@ -48,11 +52,12 @@ public class Robot extends TimedRobot {
         CommandScheduler.getInstance().run();
         SmartDashboard.putNumber("Current X Velocity", drive.getTranslational().getVelocity().getX());
         SmartDashboard.putNumber("Current Y Velocity", drive.getTranslational().getVelocity().getY());
+        SmartDashboard.putNumber("Angle", localizer.getOrientation().getDegrees());
         // SmartDashboard.putNumber("Xbox Right Y", xbox.getRightY());
         // SmartDashboard.putNumber("Rotator Absolute Position", slamDunker.getRotation());
         // SmartDashboard.putNumber("Rotator Ticks per Rotation", slamDunker.rotationEncoder.getDistancePerRotation());
         // SmartDashboard.putNumber("Rotator Distance", slamDunker.rotationEncoder.getDistance());
-        // localizer.step();
+        localizer.step();
 
         // SmartDashboard.putNumber("Rotation", shooter.getRotation().getDegrees());
         
@@ -69,7 +74,8 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousInit() {
-        CommandScheduler.getInstance().schedule(new TranslationCommand(new Translation2d(0, 5), 0.25, drive.getTranslational()));
+        CommandScheduler.getInstance().schedule(
+            new TranslationCommand(new Translation2d(SmartDashboard.getNumber("X Position", 0), SmartDashboard.getNumber("Y Position", 0)), 0.25, drive.getTranslational()));
     }
 
     /** This function is called periodically during autonomous. */
@@ -84,7 +90,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopInit() {
-        CommandScheduler.getInstance().schedule(new RotationCommand(Rotation2d.fromDegrees(90), Rotation2d.fromDegrees(45), drive.getRotational()));
+        CommandScheduler.getInstance().schedule(new RotationCommand(Rotation2d.fromDegrees(SmartDashboard.getNumber("Rotation", 0)), Rotation2d.fromDegrees(20), drive.getRotational()));
         // drive.getTranslational().setDefaultCommand(new TranslationalDriveCommand(drive.getTranslational(), localizer, xbox, 6));
 		// drive.getRotational().setDefaultCommand(new RotationalDriveCommand(drive.getRotational(), localizer, xbox, 1.5 * Math.PI));
 

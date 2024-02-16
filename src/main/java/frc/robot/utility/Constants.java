@@ -113,7 +113,7 @@ public final class Constants {
 
 	public static class FeedForward 
 	{
-		public static double kS = 0.015;
+		public static double kS = 0.0175;
 		public static double kV = 0.175;
 		public static double kA = 0;
 	}
