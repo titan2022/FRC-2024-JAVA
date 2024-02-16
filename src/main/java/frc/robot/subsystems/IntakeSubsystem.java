@@ -4,14 +4,24 @@
 
 package frc.robot.subsystems;
 
+import java.nio.channels.UnsupportedAddressTypeException;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
+import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+<<<<<<< HEAD
 import com.revrobotics.CANSparkBase;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkAbsoluteEncoder;
+=======
+import com.ctre.phoenix.sensors.SensorInitializationStrategy;
+>>>>>>> subsystems-testing
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.utility.Constants;
 
@@ -21,58 +31,26 @@ import frc.robot.utility.Constants;
  */
 @SuppressWarnings({"deprecated", "removal"})
 public class IntakeSubsystem extends SubsystemBase {
+  private static final SupplyCurrentLimitConfiguration LIMIT_CONFIG = new SupplyCurrentLimitConfiguration(true, 12, 12, 0 );
+
   private static final double GEAR_RATIO = 1;
-  // Geared up FalconFX which handles the rotation of the intake
-  WPI_TalonFX leftRotationMotor;
-  WPI_TalonFX rightRotationMotor;
-  CANSparkMax rotationEncoderSpark;
-  SparkAbsoluteEncoder rotationEncoder;
-  // Simple controller connected to bag motor to control intake of notes
-  WPI_TalonSRX wheelsMotorController;
+  private static final WPI_TalonSRX wheelMotorController = new WPI_TalonSRX(15);
   
-  public IntakeSubsystem(int leftRotationPort, int rightRotationPort, int sparkPort, int spinPort) {
-    leftRotationMotor = new WPI_TalonFX(leftRotationPort);
-    rightRotationMotor = new WPI_TalonFX(rightRotationPort);
-    rotationEncoderSpark = new CANSparkMax(sparkPort, CANSparkBase.MotorType.kBrushless);
-    rotationEncoder = rotationEncoderSpark.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle);
-
-    wheelsMotorController = new WPI_TalonSRX(spinPort);
-
-    leftRotationMotor.setInverted(true);
+  public IntakeSubsystem() {
+    config();
   }
 
-  /***
-   * Sets the absolute angle of rotation pivot point 
-   * @param angle Radians
-   */
-  public void setRotation(Rotation2d angle) {
-    leftRotationMotor.set(ControlMode.Position, angle.getRadians() * GEAR_RATIO / Constants.Unit.FALCON_TICKS);
-    rightRotationMotor.set(ControlMode.Position, angle.getRadians() * GEAR_RATIO / Constants.Unit.FALCON_TICKS);
+  public void config() {
+    wheelMotorController.setInverted(WHEEL_INVERTED);
+    wheelMotorController.setNeutralMode(NeutralMode.Coast);
+    wheelMotorController.configSupplyCurrentLimit(LIMIT_CONFIG);
   }
 
-  /***
-   * Gets the rotation of the intake in degrees
-   * @return Radians
+/***
+   * Sets the speed of the wheels
+   * @param speed In percentage from -1 to 1
    */
-  public Rotation2d getRotation() {
-    return Rotation2d.fromRotations(rotationEncoder.getPosition());
-    // return new Rotation2d(rightRotationMotor.getSelectedSensorPosition(0) / GEAR_RATIO * Constants.Unit.FALCON_TICKS);
-  }
-
-  /***
-   * Sets the speed of the intake wheels
-   * @param speed centipercent output (1 is full output)
-   */
-  public void setIntakeVelocity(double speed) {
-    wheelsMotorController.set(ControlMode.PercentOutput, speed);
-  }
-
-  /***
-   * Sets the speed of the intake-subsytem rotation
-   * @param speed centipercent output (1 is full output)
-   */
-  public void setRotationVelocity(double speed) {
-    leftRotationMotor.set(ControlMode.PercentOutput, speed);
-    rightRotationMotor.set(ControlMode.PercentOutput, speed);
+  public void setWheelVelocity(double speed) {
+    wheelMotorController.set(ControlMode.PercentOutput, speed);
   }
 }

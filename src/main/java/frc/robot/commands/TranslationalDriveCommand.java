@@ -1,7 +1,5 @@
 package frc.robot.commands;
 
-import com.ctre.phoenix.sensors.WPI_Pigeon2;
-
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.XboxController;
@@ -12,123 +10,119 @@ import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import frc.robot.subsystems.TranslationalDrivebase;
 import frc.robot.utility.Localizer;
 
-import static frc.robot.utility.Constants.Unit.*;
-
 public class TranslationalDriveCommand extends Command {
     private TranslationalDrivebase drive;
     private XboxController xbox;
     private Localizer localizer;
     private double maxVel;
     private boolean isFieldOriented = false;
+    private Rotation2d phiOffset = new Rotation2d(0);
 
     /**
      * Creates a new TranlationalDriveCommand with optional field orientation.
      * 
-     * @param drivebase  The drivebase to control.
-     * @param xbox  The joystick controller to use.
-     * @param localizer  The gyroscope to use for orientation correction.
+     * @param drivebase The drivebase to control.
+     * @param localizer The localizer to use for orientation correction.
+     * @param xbox      The joystick controller to use.
      * @param velocity  The translational velocity represented by moving the
-     *  translational joystick all the way towards a cardinal direction, in
-     *  meters per second.
+     *                  translational joystick all the way towards a cardinal
+     *                  direction, in
+     *                  meters per second.
      */
-    public TranslationalDriveCommand(TranslationalDrivebase drive, XboxController xbox, Localizer localizer, double velocity) {
+    public TranslationalDriveCommand(TranslationalDrivebase drive, Localizer localizer, XboxController xbox,
+            double maxVel) {
         this.drive = drive;
-        this.xbox = xbox;
         this.localizer = localizer;
-        maxVel = velocity;
+        this.xbox = xbox;
+        this.maxVel = maxVel;
         addRequirements(drive);
     }
+
     /**
      * Creates a new TranlationalDriveCommand using intrinsic orientation.
      * 
-     * @param drivebase  The drivebase to control.
-     * @param xbox  The joystick controller to use.
+     * @param drivebase The drivebase to control.
+     * @param xbox      The joystick controller to use.
      * @param velocity  The translational velocity represented by moving the
-     *  translational joystick all the way towards a cardinal direction, in
-     *  meters per second.
+     *                  translational joystick all the way towards a cardinal
+     *                  direction, in
+     *                  meters per second.
      */
     public TranslationalDriveCommand(TranslationalDrivebase drivebase, XboxController xbox, double velocity) {
-        this(drivebase, xbox, null, velocity);
+        this(drivebase, null, xbox, velocity);
     }
+
     /**
      * Creates a new TranlationalDriveCommand with optional field orientation.
      * 
      * The maximum velocity in a cardinal direction defaults to 5 meters per second.
      * 
-     * @param drivebase  The drivebase to control.
-     * @param xbox  The joystick controller to use.
-     * @param localizer  The gyroscope to use for orientation correction.
+     * @param drivebase The drivebase to control.
+     * @param localizer The localizer to use for orientation correction.
+     * @param xbox      The joystick controller to use.
      */
-    public TranslationalDriveCommand(TranslationalDrivebase drivebase, XboxController xbox, Localizer localizer) {
-        this(drivebase, xbox, localizer, 10.);
+    public TranslationalDriveCommand(TranslationalDrivebase drivebase, Localizer localizer, XboxController xbox) {
+        this(drivebase, localizer, xbox, 6.0);
     }
+
     /**
      * Creates a new TranlationalDriveCommand using intrinsic orientation.
      * 
      * The maximum velocity in a cardinal direction defaults to 5 meters per second.
      * 
-     * @param drivebase  The drivebase to control.
-     * @param xbox  The joystick controller to use.
+     * @param drivebase The drivebase to control.
+     * @param xbox      The joystick controller to use.
      */
     public TranslationalDriveCommand(TranslationalDrivebase drivebase, XboxController xbox) {
-        this(drivebase, xbox, null, 5.);
+        this(drivebase, null, xbox, 6.0);
     }
 
     @Override
     public void initialize() {
-        
+
     }
 
     private static double applyDeadband(double joy, double deadband) {
         return Math.abs(joy) < deadband ? 0 : joy;
     }
-    
+
     private double scaleVelocity(double joy) {
-        return joy * maxVel; //Math.signum(joy) * joy * joy * maxVel;
+        return Math.signum(joy) * joy * joy * maxVel;
     }
 
     @Override
     public void execute() {
-        // if(xbox.getYButtonPressed()){
-        //     maxVel = maxVel == 10 ? 1 : 10;
-        //     SmartDashboard.putNumber("maxVel", maxVel);
-        // }
-        // if(xbox.getBButtonPressed()){
-        //     isFieldOriented = !isFieldOriented;
-        //     SmartDashboard.putBoolean("isFieldOriented", isFieldOriented);
-        // }
-        // if(xbox.getAButtonPressed())
-        //     phiOffset = gyro.getRotation2d().minus(new Rotation2d(Math.PI/2));
-        double joyX = applyDeadband(xbox.getLeftX(), 0.2);
-        double joyY = applyDeadband(-xbox.getLeftY(), 0.2);
-        double dpadX = xbox.getPOV() == -1 ? 0 : Math.sin(xbox.getPOV() * DEG / RAD);
-        double dpadY = xbox.getPOV() == -1 ? 0 : Math.cos(xbox.getPOV() * DEG / RAD);
-        //SmartDashboard.putNumber("joyX", joyX);
-        //SmartDashboard.putNumber("joyY", joyY);
-        Translation2d velocity = new Translation2d(
-            scaleVelocity(joyX), //  + 0.5 * dpadX
-            scaleVelocity(joyY)); //  + 0.5 * dpadY
-        //SmartDashboard.putNumber("fieldX", velocity.getX());
-        //SmartDashboard.putNumber("fieldY", velocity.getY());
-        // if(isFieldOriented){
-        //     Rotation2d heading = new Rotation2d(Math.PI/2).minus(gyro.getRotation2d().minus(phiOffset));
-        //     //SmartDashboard.putNumber("heading", heading.getDegrees());
-        //     velocity = velocity.rotateBy(heading);
-        // }
-        SmartDashboard.putNumber("robotX", velocity.getX());
-        SmartDashboard.putNumber("robotY", velocity.getY());
+        if (xbox.getBButtonPressed() && localizer != null) {
+            isFieldOriented = !isFieldOriented;
+            SmartDashboard.putBoolean("isFieldOriented", isFieldOriented);
+        }
+
+        if (xbox.getAButtonPressed()) {
+            phiOffset = localizer.getOrientation();
+        }
+
+        double joyX = applyDeadband(xbox.getLeftX(), 0.15);
+        double joyY = applyDeadband(-xbox.getLeftY(), 0.15);
+        Translation2d velocity = new Translation2d(scaleVelocity(joyX), scaleVelocity(joyY));
+
+        if (isFieldOriented) {
+            Rotation2d heading = new Rotation2d(Math.PI / 2).minus(localizer.getHeading().minus(phiOffset));
+            velocity = velocity.rotateBy(heading);
+        }
+
         drive.setVelocity(velocity);
     }
 
     @Override
     public void end(boolean interrupted) {
         drive.setVelocity(new Translation2d(0, 0));
-        if(interrupted)
+        if (interrupted) {
             new StartEndCommand(() -> {
-                    xbox.setRumble(RumbleType.kLeftRumble, 0.5);
-                }, () -> {
-                    xbox.setRumble(RumbleType.kLeftRumble, 0);
-                }).withTimeout(0.5).schedule();
+                xbox.setRumble(RumbleType.kLeftRumble, 0.5);
+            }, () -> {
+                xbox.setRumble(RumbleType.kLeftRumble, 0);
+            }).withTimeout(0.5).schedule();
+        }
     }
 
     @Override
