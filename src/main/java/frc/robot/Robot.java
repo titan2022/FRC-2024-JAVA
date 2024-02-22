@@ -52,7 +52,7 @@ public class Robot extends TimedRobot {
         CommandScheduler.getInstance().run();
         SmartDashboard.putNumber("Current X Velocity", drive.getTranslational().getVelocity().getX());
         SmartDashboard.putNumber("Current Y Velocity", drive.getTranslational().getVelocity().getY());
-        SmartDashboard.putNumber("Angle", localizer.getOrientation().getDegrees());
+        SmartDashboard.putNumber("Angle", localizer.getHeading().getDegrees());
         // SmartDashboard.putNumber("Xbox Right Y", xbox.getRightY());
         // SmartDashboard.putNumber("Rotator Absolute Position", slamDunker.getRotation());
         // SmartDashboard.putNumber("Rotator Ticks per Rotation", slamDunker.rotationEncoder.getDistancePerRotation());
@@ -90,7 +90,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopInit() {
-        CommandScheduler.getInstance().schedule(new RotationCommand(Rotation2d.fromDegrees(SmartDashboard.getNumber("Rotation", 0)), Rotation2d.fromDegrees(20), drive.getRotational()));
+        CommandScheduler.getInstance().schedule(new RotationCommand(Rotation2d.fromDegrees(SmartDashboard.getNumber("Rotation", 0)), Rotation2d.fromDegrees(20), drive.getRotational(), localizer));
         // drive.getTranslational().setDefaultCommand(new TranslationalDriveCommand(drive.getTranslational(), localizer, xbox, 6));
 		// drive.getRotational().setDefaultCommand(new RotationalDriveCommand(drive.getRotational(), localizer, xbox, 1.5 * Math.PI));
 

@@ -13,7 +13,7 @@ import frc.robot.utility.Localizer;
 /** An example command that uses an example subsystem. */
 public class RotationCommand extends Command {
   @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
-  public static final Rotation2d deadBand = Rotation2d.fromDegrees(2.5);
+  public static final Rotation2d deadBand = Rotation2d.fromDegrees(1);
   private RotationalDrivebase drivebase;
   private Localizer localizer;
   private Rotation2d omega;
@@ -36,6 +36,7 @@ public class RotationCommand extends Command {
   @Override
   public void initialize() {
     targetAngle = localizer.getHeading().plus(theta);
+
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -53,9 +54,11 @@ public class RotationCommand extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    if (Math.abs(targetAngle.getDegrees() - localizer.getHeading().getDegrees()) < deadBand.getDegrees())
+    if (theta.getRadians() > 0 && targetAngle.minus(localizer.getHeading()).getRadians() <= deadBand.getRadians())
       return true;
-    else
+    else if (theta.getRadians() <= 0 && targetAngle.minus(localizer.getHeading()).getRadians() >= deadBand.getRadians())
+      return true;
+    else 
       return false;
   }
 }
