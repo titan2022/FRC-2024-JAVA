@@ -14,13 +14,14 @@ import frc.robot.utility.Localizer;
 /** An example command that uses an example subsystem. */
 public class MoveToNoteCommand extends ParallelDeadlineGroup {
   @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
+  public static final double speed = 1;
   private IntakeSubsystem intake;
   private TranslationalDrivebase driveBase;
   private Localizer localizer;
 
 
   public MoveToNoteCommand(IntakeSubsystem intake, TranslationalDrivebase driveBase, Localizer localizer) {
-    super(new TranslationCommand(new Translation2d(), 0, driveBase), new NoteIntakeCommand(intake)); 
+    super(new TranslationCommand(new Translation2d(), 1, driveBase), new NoteIntakeCommand(intake)); 
 
     addRequirements(intake, driveBase);
   }
