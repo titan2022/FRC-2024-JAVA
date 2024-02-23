@@ -95,7 +95,7 @@ public class Robot extends TimedRobot {
         CommandScheduler.getInstance().schedule(
 
            // new ShooterSpeakerCommand(),
-           new RotationCommand(Rotation2d.fromDegrees(SmartDashboard.getNumber("Rotation", 0)), Rotation2d.fromDegrees(20), drive.getRotational()),
+           new RotationCommand(Rotation2d.fromDegrees(SmartDashboard.getNumber("Rotation", 0)), Rotation2d.fromDegrees(-20), drive.getRotational()),
            new NoteIntakeCommand(),
            new TranslationCommand(new Translation2d(SmartDashboard.getNumber("X Position", 0), SmartDashboard.getNumber("Y Position", 0)), 0.25, drive.getTranslational()),
            new NoteIntakeCommand(),
