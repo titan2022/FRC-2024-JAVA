@@ -4,6 +4,7 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -19,7 +20,7 @@ public class MoveToNoteCommand extends ParallelDeadlineGroup {
 
 
   public MoveToNoteCommand(IntakeSubsystem intake, TranslationalDrivebase driveBase, Localizer localizer) {
-    super(new TranslationCommand(0, 0, 0, driveBase), new NoteIntakeCommand(intake)); 
+    super(new TranslationCommand(new Translation2d(), 0, driveBase), new NoteIntakeCommand(intake)); 
 
     addRequirements(intake, driveBase);
   }

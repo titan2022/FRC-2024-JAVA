@@ -40,14 +40,14 @@ public class Robot extends TimedRobot {
         // motorLeft.follow(motorRight);
         // motorLeft.setInverted(true);
         // SmartDashboard.putNumber("Rotations Per Sec", 0);
-        // SmartDashboard.putNumber("Desired X Velocity", 0.1);
+        SmartDashboard.putNumber("X Position", 0);
+        SmartDashboard.putNumber("Y Position", 0);
+        SmartDashboard.putNumber("Rotation", 0);
+
+        // SmartDashboard.putNumber("Desired X Velocity", 0);
         // SmartDashboard.putNumber("Desired Y Velocity", 0.1);
-        // SmartDashboard.putNumber("Front Left", 0);
-        // SmartDashboard.putNumber("Back Left", 0);
-        // SmartDashboard.putNumber("Front Right", 0);
-        // SmartDashboard.putNumber("Back Right", 0);
         
-        // localizer.setup();
+
     }
 
     @Override
@@ -76,20 +76,24 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousInit() {
-        
+        intake.setWheelSpeed(SmartDashboard.getNumber("Intake Speed", 0));
+        CommandScheduler.getInstance().schedule(
+            new TranslationCommand(new Translation2d(SmartDashboard.getNumber("X Position", 0), SmartDashboard.getNumber("Y Position", 0)), 0.5, drive.getTranslational()));
     }
 
     /** This function is called periodically during autonomous. */
     @Override
     public void autonomousPeriodic() {
         // drive.getTranslational().setVelocity(new Translation2d(0, 0.5));
+        if (xbox.getYButton())
+            intake.setWheelSpeed(SmartDashboard.getNumber("Intake Speed", 0));
+        else if (xbox.getAButton())
+            intake.stop();
 
     }
 
     @Override
     public void teleopInit() {
-        intake.setWheelSpeed(SmartDashboard.getNumber("Intake Speed", 0));
-        CommandScheduler.getInstance().schedule(new TranslationCommand(0, 1, 0.5, drive.getTranslational()));
         // drive.getTranslational().setDefaultCommand(new TranslationalDriveCommand(drive.getTranslational(), xbox, localizer, 6));
 		// drive.getRotational().setDefaultCommand(new RotationalDriveCommand(drive.getRotational(), xbox, 1.5 * Math.PI, localizer));
     }
