@@ -53,8 +53,10 @@ public class Robot extends TimedRobot {
     @Override
     public void robotPeriodic() {
         // CommandScheduler.getInstance().run();
-        // SmartDashboard.putNumber("Current X Velocity", drive.getTranslational().getVelocity().getX());
-        // SmartDashboard.putNumber("Current Y Velocity", drive.getTranslational().getVelocity().getY());
+        SmartDashboard.putNumber("Current X Velocity", drive.getTranslational().getVelocity().getX());
+        SmartDashboard.putNumber("Current Y Velocity", drive.getTranslational().getVelocity().getY());
+        SmartDashboard.putNumber("Current X Velocity", drive.getTranslational().getVelocity().getX());
+        SmartDashboard.putNumber("Current Y Velocity", drive.getTranslational().getVelocity().getY());
         // SmartDashboard.putNumber("Xbox Right Y", xbox.getRightY());
         // SmartDashboard.putNumber("Rotator Absolute Position", slamDunker.getRotation());
         // SmartDashboard.putNumber("Rotator Ticks per Rotation", slamDunker.rotationEncoder.getDistancePerRotation());
@@ -76,9 +78,8 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousInit() {
-        intake.setWheelSpeed(SmartDashboard.getNumber("Intake Speed", 0));
-        CommandScheduler.getInstance().schedule(
-            new TranslationCommand(new Translation2d(SmartDashboard.getNumber("X Position", 0), SmartDashboard.getNumber("Y Position", 0)), 0.5, drive.getTranslational()));
+        // intake.setWheelSpeed(SmartDashboard.getNumber("Intake Speed", 0));
+        CommandScheduler.getInstance().schedule(new TranslationCommand(new Translation2d(SmartDashboard.getNumber("X Position", 0), SmartDashboard.getNumber("Y Position", 0)), 0.5, drive.getTranslational()));
     }
 
     /** This function is called periodically during autonomous. */
