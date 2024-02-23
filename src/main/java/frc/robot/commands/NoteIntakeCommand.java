@@ -11,30 +11,27 @@ import frc.robot.subsystems.TranslationalDrivebase;
 import frc.robot.utility.Localizer;
 
 /** An example command that uses an example subsystem. */
-public class NoteIntakeCommand extends SequentialCommandGroup {
+public class NoteIntakeCommand extends Command {
   @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
   private IntakeSubsystem intake;
-  private TranslationalDrivebase driveBase;
-  private Localizer localizer;
 
 
-  public NoteIntakeCommand(IntakeSubsystem intake, TranslationalDrivebase driveBase, Localizer localizer) {
+  public NoteIntakeCommand(IntakeSubsystem intake) {
     this.intake = intake;
-    this.driveBase = driveBase;
-    this.localizer = localizer;
 
-    addRequirements(driveBase, intake);
+    addRequirements(intake);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    intake.intake();
+
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    intake.setWheelSpeed(0.5);
   }
 
   // Called once the command ends or is interrupted.
