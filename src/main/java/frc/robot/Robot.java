@@ -36,6 +36,7 @@ public class Robot extends TimedRobot {
     // WPI_TalonFX motorRight = new WPI_TalonFX(21);
     @Override
     public void robotInit() {
+        SmartDashboard.putNumber("Intake Speed", 0.75);
         // motorLeft.follow(motorRight);
         // motorLeft.setInverted(true);
         // SmartDashboard.putNumber("Rotations Per Sec", 0);
@@ -87,6 +88,8 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopInit() {
+        intake.setWheelSpeed(SmartDashboard.getNumber("Intake Speed", 0));
+        CommandScheduler.getInstance().schedule(new TranslationCommand(0, 1, 0.5, drive.getTranslational()));
         // drive.getTranslational().setDefaultCommand(new TranslationalDriveCommand(drive.getTranslational(), xbox, localizer, 6));
 		// drive.getRotational().setDefaultCommand(new RotationalDriveCommand(drive.getRotational(), xbox, 1.5 * Math.PI, localizer));
     }
@@ -94,7 +97,9 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopPeriodic() {
         if (xbox.getYButton())
-            intake.toggle();
+            intake.setWheelSpeed(SmartDashboard.getNumber("Intake Speed", 0));
+        else if (xbox.getAButton())
+            intake.stop();
         // if (xbox.getYButton()) {
         //     drive.getTranslational().setVelocity(new Translation2d(0, SmartDashboard.getNumber("Desired Y Velocity", 0)));
         // } else if (xbox.getAButton()) {

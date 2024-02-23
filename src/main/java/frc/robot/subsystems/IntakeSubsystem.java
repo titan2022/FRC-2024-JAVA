@@ -27,7 +27,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
   public void config() {
     wheelMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
-    wheelMotor.setInverted(false);
+    wheelMotor.setInverted(true);
     wheelMotor.setNeutralMode(NeutralMode.Coast);
     wheelMotor.configSupplyCurrentLimit(LIMIT_CONFIG);
   }
