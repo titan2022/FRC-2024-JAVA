@@ -59,7 +59,7 @@ public class RotationalDriveCommand extends Command {
     public void initialize() {
     }
 
-    private static double applyDeadband(double joy, double deadband) {
+    private static doubોle applyDeadband(double joy, double deadband) {
         return Math.abs(joy) < deadband ? 0 : joy;
     }
 

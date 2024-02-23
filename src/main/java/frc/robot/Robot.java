@@ -27,7 +27,9 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 public class Robot extends TimedRobot {
     private SwerveDriveSubsystem drive = new SwerveDriveSubsystem(getSwerveDriveTalonDriveConfig(), getSwerveDriveTalonRotaryConfig());
 	private final XboxController xbox = new XboxController(0);
+    private IntakeSubsystem intake = new IntakeSubsystem();
     private Localizer localizer = new Localizer();
+
     // private static final SlamDunkerSubsystem slamDunker = new SlamDunkerSubsystem();
     // private static final IntakeSubsystem intake = new IntakeSubsystem();
     // WPI_TalonFX motorLeft = new WPI_TalonFX(19);
@@ -45,6 +47,8 @@ public class Robot extends TimedRobot {
         // SmartDashboard.putNumber("Desired Y Velocity", 0.1);
         
         localizer.setup();
+
+        SmartDasboard.putNumber("Initial Angle", 0)
     }
 
     @Override
@@ -52,7 +56,8 @@ public class Robot extends TimedRobot {
         CommandScheduler.getInstance().run();
         SmartDashboard.putNumber("Current X Velocity", drive.getTranslational().getVelocity().getX());
         SmartDashboard.putNumber("Current Y Velocity", drive.getTranslational().getVelocity().getY());
-        SmartDashboard.putNumber("Angle", localizer.getOrientation().getDegrees());
+        SmartDasboard.putNumber("Current Angle", localizer.getOrientation().getDegrees());
+        SmartDashboard.putNumber("Change in Angle", (SmartDashboard.getNumber("Initial Angle") - localizer.getOrientation().getDegrees()));
         // SmartDashboard.putNumber("Xbox Right Y", xbox.getRightY());
         // SmartDashboard.putNumber("Rotator Absolute Position", slamDunker.getRotation());
         // SmartDashboard.putNumber("Rotator Ticks per Rotation", slamDunker.rotationEncoder.getDistancePerRotation());
@@ -91,16 +96,20 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopInit() {
         CommandScheduler.getInstance().schedule(new RotationCommand(Rotation2d.fromDegrees(SmartDashboard.getNumber("Rotation", 0)), Rotation2d.fromDegrees(20), drive.getRotational()));
+        
+
         // drive.getTranslational().setDefaultCommand(new TranslationalDriveCommand(drive.getTranslational(), localizer, xbox, 6));
 		// drive.getRotational().setDefaultCommand(new RotationalDriveCommand(drive.getRotational(), localizer, xbox, 1.5 * Math.PI));
 
-        // if (xbox.getBButton()) {
-        //     drive.brake();
-        // }
+         if (xbox.getBButton()) {
+            intake.toggle()
+         }
     }
 
     @Override
     public void teleopPeriodic() {
+
+
         // if (xbox.getYButton()) {
         //     drive.getTranslational().setVelocity(new Translation2d(0, SmartDashboard.getNumber("Desired Y Velocity", 0)));
         // } else if (xbox.getAButton()) {

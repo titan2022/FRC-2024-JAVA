@@ -10,6 +10,10 @@ import frc.robot.subsystems.IntakeSubsystem;
 /** An example command that uses an example subsystem. */
 public class NoteIntakeCommand extends Command {
   @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
+  private IntakeSubsystem intake;
+  private XboxController xbox;
+  private double maxRotationVelocity;
+  private double maxIntakeVelocity;
 
   public NoteIntakeCommand(IntakeSubsystem intake) {
 
@@ -18,6 +22,7 @@ public class NoteIntakeCommand extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+
   }
 
   // Called every time the scheduler runs while the command is scheduled.

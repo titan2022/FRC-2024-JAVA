@@ -25,6 +25,7 @@ import frc.robot.utility.Constants;
  */
 public class IntakeSubsystem extends SubsystemBase {
   private static final boolean WHEEL_INVERTED = false;
+  private static final boolean INTAKERUNNING = false;
   private static final boolean ROTATOR_SENSOR_PHASE = false;
   private static final SupplyCurrentLimitConfiguration LIMIT_CONFIG = new SupplyCurrentLimitConfiguration(true, 12, 12, 0 );
 
@@ -107,5 +108,14 @@ public class IntakeSubsystem extends SubsystemBase {
    */
   public double getRotation() {
     return rotationEncoder.getAbsolutePosition();
+  }
+
+  public void toggle() {
+    if(intake.getVelocity <= 0.01) {
+      intake();
+    }
+    else {
+      stop();
+    }
   }
 }

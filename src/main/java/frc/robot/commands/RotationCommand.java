@@ -16,9 +16,10 @@ public class RotationCommand extends Command {
   public static final Rotation2d deadBand = Rotation2d.fromDegrees(2.5);
   private RotationalDrivebase drivebase;
   private Rotation2d omega;
+  private Localizer localizer;
   private double time;
   private double endTime;
-
+  
   public RotationCommand(Rotation2d theta, Rotation2d omega, RotationalDrivebase driveBase) {
     this.drivebase = driveBase;
     this.omega = new Rotation2d(Math.copySign(omega.getRadians(), theta.getRadians()));
