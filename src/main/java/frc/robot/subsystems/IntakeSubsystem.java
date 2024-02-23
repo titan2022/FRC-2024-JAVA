@@ -19,7 +19,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 @SuppressWarnings({"deprecated", "removal"})
 public class IntakeSubsystem extends SubsystemBase {
   private static final SupplyCurrentLimitConfiguration LIMIT_CONFIG = new SupplyCurrentLimitConfiguration(true, 12, 12, 0 );
-  private static final WPI_TalonFX wheelMotor = new WPI_TalonFX(0);
+  private static final WPI_TalonFX wheelMotor = new WPI_TalonFX(3);
   
   public IntakeSubsystem() {
     config();

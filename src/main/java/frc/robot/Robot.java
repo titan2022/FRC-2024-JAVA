@@ -9,7 +9,9 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.*;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
@@ -26,6 +28,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 public class Robot extends TimedRobot {
     private SwerveDriveSubsystem drive = new SwerveDriveSubsystem(getSwerveDriveTalonDriveConfig(), getSwerveDriveTalonRotaryConfig());
 	private final XboxController xbox = new XboxController(0);
+    private IntakeSubsystem intake = new IntakeSubsystem();
     // private Localizer localizer = new Localizer();
     // private static final SlamDunkerSubsystem slamDunker = new SlamDunkerSubsystem();
     // private static final IntakeSubsystem intake = new IntakeSubsystem();
@@ -36,12 +39,12 @@ public class Robot extends TimedRobot {
         // motorLeft.follow(motorRight);
         // motorLeft.setInverted(true);
         // SmartDashboard.putNumber("Rotations Per Sec", 0);
-        SmartDashboard.putNumber("Desired X Velocity", 0.1);
-        SmartDashboard.putNumber("Desired Y Velocity", 0.1);
-        SmartDashboard.putNumber("Front Left", 0);
-        SmartDashboard.putNumber("Back Left", 0);
-        SmartDashboard.putNumber("Front Right", 0);
-        SmartDashboard.putNumber("Back Right", 0);
+        // SmartDashboard.putNumber("Desired X Velocity", 0.1);
+        // SmartDashboard.putNumber("Desired Y Velocity", 0.1);
+        // SmartDashboard.putNumber("Front Left", 0);
+        // SmartDashboard.putNumber("Back Left", 0);
+        // SmartDashboard.putNumber("Front Right", 0);
+        // SmartDashboard.putNumber("Back Right", 0);
         
         // localizer.setup();
     }
@@ -49,8 +52,8 @@ public class Robot extends TimedRobot {
     @Override
     public void robotPeriodic() {
         // CommandScheduler.getInstance().run();
-        SmartDashboard.putNumber("Current X Velocity", drive.getTranslational().getVelocity().getX());
-        SmartDashboard.putNumber("Current Y Velocity", drive.getTranslational().getVelocity().getY());
+        // SmartDashboard.putNumber("Current X Velocity", drive.getTranslational().getVelocity().getX());
+        // SmartDashboard.putNumber("Current Y Velocity", drive.getTranslational().getVelocity().getY());
         // SmartDashboard.putNumber("Xbox Right Y", xbox.getRightY());
         // SmartDashboard.putNumber("Rotator Absolute Position", slamDunker.getRotation());
         // SmartDashboard.putNumber("Rotator Ticks per Rotation", slamDunker.rotationEncoder.getDistancePerRotation());
@@ -79,6 +82,7 @@ public class Robot extends TimedRobot {
     @Override
     public void autonomousPeriodic() {
         // drive.getTranslational().setVelocity(new Translation2d(0, 0.5));
+
     }
 
     @Override
@@ -89,6 +93,8 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopPeriodic() {
+        if (xbox.getYButton())
+            intake.toggle();
         // if (xbox.getYButton()) {
         //     drive.getTranslational().setVelocity(new Translation2d(0, SmartDashboard.getNumber("Desired Y Velocity", 0)));
         // } else if (xbox.getAButton()) {
