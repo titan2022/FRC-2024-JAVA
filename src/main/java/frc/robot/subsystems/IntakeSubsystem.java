@@ -7,6 +7,7 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
+import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -25,6 +26,7 @@ public class IntakeSubsystem extends SubsystemBase {
   }
 
   public void config() {
+    wheelMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
     wheelMotor.setInverted(false);
     wheelMotor.setNeutralMode(NeutralMode.Coast);
     wheelMotor.configSupplyCurrentLimit(LIMIT_CONFIG);
@@ -38,6 +40,17 @@ public class IntakeSubsystem extends SubsystemBase {
     wheelMotor.set(ControlMode.PercentOutput, speed);
   }
 
+  public double getWheelSpeed() {
+    return wheelMotor.getSelectedSensorVelocity();
+  }
+
+  public void toggle() {
+    if (Math.abs(getWheelSpeed()) <= 0.01) {
+      intake();
+    } else {
+      stop();
+    }
+  }
 
   /***
    * 

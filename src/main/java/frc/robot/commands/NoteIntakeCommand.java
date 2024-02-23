@@ -5,10 +5,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.IntakeSubsystem;
-import frc.robot.subsystems.TranslationalDrivebase;
-import frc.robot.utility.Localizer;
 
 /** An example command that uses an example subsystem. */
 public class NoteIntakeCommand extends Command {
@@ -31,7 +28,7 @@ public class NoteIntakeCommand extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    intake.setWheelSpeed(0.5);
+    intake.intake();
   }
 
   // Called once the command ends or is interrupted.
