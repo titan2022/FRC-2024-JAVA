@@ -79,8 +79,31 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousInit() {
+
+        /* 
+            PLAN:
+
+            - START ROBOT ALONG SPEAKER ANGLE THING 
+            - SHOOTER INTO SPEAKER 
+            - ROTATE PARALLEL W EDGE 
+            - COLLECT NOTE (TOGGLE INTAKE ON )
+            - BACK 2 AMP 
+            - SHOOTER INTO AMP
+        
+        */ 
+
         CommandScheduler.getInstance().schedule(
-            new TranslationCommand(new Translation2d(SmartDashboard.getNumber("X Position", 0), SmartDashboard.getNumber("Y Position", 0)), 0.25, drive.getTranslational()));
+
+           // new ShooterSpeakerCommand(),
+           new RotationCommand(Rotation2d.fromDegrees(SmartDashboard.getNumber("Rotation", 0)), Rotation2d.fromDegrees(20), drive.getRotational()),
+           new NoteIntakeCommand(),
+           new TranslationCommand(new Translation2d(SmartDashboard.getNumber("X Position", 0), SmartDashboard.getNumber("Y Position", 0)), 0.25, drive.getTranslational()),
+           new NoteIntakeCommand(),
+           new TranslationCommand(new Translation2d(SmartDashboard.getNumber("X Position", 0), SmartDashboard.getNumber("Y Position", 0)), -0.25, drive.getTranslational()),
+           new RotationCommand(Rotation2d.fromDegrees(SmartDashboard.getNumber("Rotation", 0)), Rotation2d.fromDegrees(20), drive.getRotational())
+           // new ShootAMPCommand()
+
+        );
     }
 
     /** This function is called periodically during autonomous. */
