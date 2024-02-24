@@ -111,6 +111,11 @@ public final class Constants {
 	public static final double MAX_ACCELERATION = 5 * (Unit.M / Unit.S / Unit.S);
 	public static final double MAX_ANGULAR_ACCELERATION = 1 * (Unit.ROT / Unit.S / Unit.S);
 
+	public static final class RobotSize {
+		//Units in meters
+		public static final double WIDTH = 1;
+		public static final double LENGTH = 1;
+	}
 	// public static class FeedForward 
 	// {
 	// 	public static final double kS = 0.015;
