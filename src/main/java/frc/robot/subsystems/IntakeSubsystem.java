@@ -9,6 +9,7 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -18,7 +19,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
  */
 @SuppressWarnings({"deprecated", "removal"})
 public class IntakeSubsystem extends SubsystemBase {
-  private static final SupplyCurrentLimitConfiguration LIMIT_CONFIG = new SupplyCurrentLimitConfiguration(true, 12, 12, 0 );
+  // private static final SupplyCurrentLimitConfiguration LIMIT_CONFIG = new SupplyCurrentLimitConfiguration(true, 12, 12, 0 );
   private static final WPI_TalonFX wheelMotor = new WPI_TalonFX(3);
   
   public IntakeSubsystem() {
@@ -27,9 +28,10 @@ public class IntakeSubsystem extends SubsystemBase {
 
   public void config() {
     wheelMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
+    wheelMotor.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
     wheelMotor.setInverted(true);
     wheelMotor.setNeutralMode(NeutralMode.Coast);
-    wheelMotor.configSupplyCurrentLimit(LIMIT_CONFIG);
+    // wheelMotor.configSupplyCurrentLimit(LIMIT_CONFIG);
   }
 
   /***  

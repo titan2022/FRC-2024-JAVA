@@ -29,7 +29,7 @@ public class Robot extends TimedRobot {
     private SwerveDriveSubsystem drive = new SwerveDriveSubsystem(getSwerveDriveTalonDriveConfig(), getSwerveDriveTalonRotaryConfig());
 	private final XboxController xbox = new XboxController(0);
     private IntakeSubsystem intake = new IntakeSubsystem();
-    // private Localizer localizer = new Localizer();
+    private Localizer localizer = new Localizer();
     // private static final SlamDunkerSubsystem slamDunker = new SlamDunkerSubsystem();
     // private static final IntakeSubsystem intake = new IntakeSubsystem();
     // WPI_TalonFX motorLeft = new WPI_TalonFX(19);
@@ -56,8 +56,6 @@ public class Robot extends TimedRobot {
         // CommandScheduler.getInstance().run();
         SmartDashboard.putNumber("Current X Velocity", drive.getTranslational().getVelocity().getX());
         SmartDashboard.putNumber("Current Y Velocity", drive.getTranslational().getVelocity().getY());
-        SmartDashboard.putNumber("Current X Velocity", drive.getTranslational().getVelocity().getX());
-        SmartDashboard.putNumber("Current Y Velocity", drive.getTranslational().getVelocity().getY());
         // SmartDashboard.putNumber("Xbox Right Y", xbox.getRightY());
         // SmartDashboard.putNumber("Rotator Absolute Position", slamDunker.getRotation());
         // SmartDashboard.putNumber("Rotator Ticks per Rotation", slamDunker.rotationEncoder.getDistancePerRotation());
@@ -79,14 +77,16 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousInit() {
-        // intake.setWheelSpeed(SmartDashboard.getNumber("Intake Speed", 0));
-        CommandScheduler.getInstance().schedule(new TranslationCommand(new Translation2d(SmartDashboard.getNumber("X Position", 0), SmartDashboard.getNumber("Y Position", 0)), 0.5, drive.getTranslational()));
+        // CommandScheduler.getInstance().schedule(new TranslationCommand(new Translation2d(SmartDashboard.getNumber("X Position", 0), SmartDashboard.getNumber("Y Position", 0)), 0.5, drive.getTranslational()));
     }
 
     /** This function is called periodically during autonomous. */
     @Override
     public void autonomousPeriodic() {
         // drive.getTranslational().setVelocity(new Translation2d(0, 0.5));
+        SmartDashboard.putBoolean("Y Button", xbox.getYButton());
+        intake.setWheelSpeed(SmartDashboard.getNumber("Intake Speed", 0));
+
         if (xbox.getYButton())
             intake.setWheelSpeed(SmartDashboard.getNumber("Intake Speed", 0));
         else if (xbox.getAButton())
