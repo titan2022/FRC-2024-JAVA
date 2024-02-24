@@ -54,7 +54,6 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
     private static final int FRONT_LEFT_OFFSET = -1024 - 190;//-238;
     private static final int BACK_LEFT_OFFSET = -3120 - 1024;
     private static final int FRONT_RIGHT_OFFSET = -1930 + 1024;
-    // private static final int BACK_RIGHT_OFFSET = -1860 + 1024;
     private static final int BACK_RIGHT_OFFSET = -1835 + 1024;
 
     private static final int[] OFFSETS = new int[] { FRONT_LEFT_OFFSET, BACK_LEFT_OFFSET, FRONT_RIGHT_OFFSET,BACK_RIGHT_OFFSET };
@@ -425,15 +424,15 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
             rotator.setNeutralMode(NeutralMode.Brake);
     }
 
-    public void setRotatorTest() {
-        int[] adjustments = {
-            (int) SmartDashboard.getNumber("Front Left", 0),
-            (int) SmartDashboard.getNumber("Back Left", 0),
-            (int) SmartDashboard.getNumber("Front Right", 0), 
-            (int) SmartDashboard.getNumber("Back Right", 0)
-        };
-        for (int i = 0; i < 4; ++i) {
-            rotators[i].set(ControlMode.Position, OFFSETS[i] + adjustments[i]);
-        }
-    }
+//     public void setRotatorTest() {
+//         int[] adjustments = {
+//             (int) SmartDashboard.getNumber("Front Left", 0),
+//             (int) SmartDashboard.getNumber("Back Left", 0),
+//             (int) SmartDashboard.getNumber("Front Right", 0), 
+//             (int) SmartDashboard.getNumber("Back Right", 0)
+//         };
+//         for (int i = 0; i < 4; ++i) {
+//             rotators[i].set(ControlMode.Position, OFFSETS[i] + adjustments[i]);
+//         }
+//     }
 }

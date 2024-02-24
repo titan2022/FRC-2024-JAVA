@@ -3,7 +3,6 @@ package frc.robot.utility;
 import java.util.Dictionary;
 import java.util.Hashtable;
 
-import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -11,8 +10,9 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.SPI;
 import frc.robot.utility.networking.NetworkingCall;
 import frc.robot.utility.networking.NetworkingServer;
 import frc.robot.utility.networking.types.NetworkingPose;
@@ -29,8 +29,8 @@ import frc.robot.utility.networking.types.NetworkingTag;
  */
 public class Localizer {
     private NetworkingServer server;
-    private WPI_Pigeon2 pigeon = new WPI_Pigeon2(15);
-    private AHRS navxGyro = new AHRS(SPI.Port.kMXP);
+    // private WPI_Pigeon2 pigeon = new WPI_Pigeon2(15);
+    public static final AHRS navxGyro = new AHRS(SPI.Port.kMXP);
 
     private Rotation2d pigeonOffset = new Rotation2d(0);
 
@@ -98,7 +98,7 @@ public class Localizer {
      *         y-axis).
      */
     public Rotation2d getOrientation() {
-        return Rotation2d.fromDegrees(navxGyro.getAngle() + 90);
+        return Rotation2d.fromDegrees(-navxGyro.getAngle() + 90);
     }
 
     /**
@@ -192,6 +192,8 @@ public class Localizer {
      * Updates first frame localization estimates
      */
     public void setup() {
+        // pigeonOffset = pigeon.getRotation2d();
+
         navxGyro.reset();
         navxGyro.resetDisplacement();
 
@@ -219,6 +221,14 @@ public class Localizer {
     public synchronized void step(double dt) {
         // globalHeading = pigeon.getRotation2d().minus(pigeonOffset);
         // globalOrientation = globalHeading.minus(new Rotation2d(Math.PI / 2));
+
+        SmartDashboard.putNumber("acc x", navxGyro.getWorldLinearAccelX());
+        SmartDashboard.putNumber("vel x", navxGyro.getVelocityX());
+        SmartDashboard.putNumber("pos x", navxGyro.getDisplacementX());
+
+        SmartDashboard.putNumber("acc y", navxGyro.getWorldLinearAccelY());
+        SmartDashboard.putNumber("vel y", navxGyro.getVelocityY());
+        SmartDashboard.putNumber("pos y", navxGyro.getDisplacementY());
     }
 
     /**
