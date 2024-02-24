@@ -37,12 +37,13 @@ public class Robot extends TimedRobot {
         // motorLeft.follow(motorRight);
         // motorLeft.setInverted(true);
         // SmartDashboard.putNumber("Rotations Per Sec", 0);
+        SmartDashboard.putNumber("Rotation", 0);
+        
         SmartDashboard.putNumber("X Position", 0);
         SmartDashboard.putNumber("Y Position", 0);
-        SmartDashboard.putNumber("Rotation", 0);
 
-        // SmartDashboard.putNumber("Desired X Velocity", 0);
-        // SmartDashboard.putNumber("Desired Y Velocity", 0.1);
+        SmartDashboard.putNumber("Desired X Velocity", 0.1);
+        SmartDashboard.putNumber("Desired Y Velocity", 0.1);
         
         localizer.setup();
     }
@@ -101,17 +102,17 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopPeriodic() {
-        // if (xbox.getYButton()) {
-        //     drive.getTranslational().setVelocity(new Translation2d(0, SmartDashboard.getNumber("Desired Y Velocity", 0)));
-        // } else if (xbox.getAButton()) {
-        //     drive.getTranslational().setVelocity(new Translation2d(0, -1 * SmartDashboard.getNumber("Desired Y Velocity", 0)));
-        // } else if (xbox.getXButton()) {
-        //     drive.getTranslational().setVelocity(new Translation2d(SmartDashboard.getNumber("Desired X Velocity", 0), 0));
-        // } else if(xbox.getBButton()) {
-        //     drive.getTranslational().setVelocity(new Translation2d(-1 * SmartDashboard.getNumber("Desired X Velocity", 0), 0));
-        // } else {
-        //     drive.getTranslational().setVelocity(new Translation2d(0, 0));
-        // }
+        if (xbox.getYButton()) {
+            drive.getTranslational().setVelocity(new Translation2d(0, SmartDashboard.getNumber("Desired Y Velocity", 0)));
+        } else if (xbox.getAButton()) {
+            drive.getTranslational().setVelocity(new Translation2d(0, -1 * SmartDashboard.getNumber("Desired Y Velocity", 0)));
+        } else if (xbox.getXButton()) {
+            drive.getTranslational().setVelocity(new Translation2d(SmartDashboard.getNumber("Desired X Velocity", 0), 0));
+        } else if(xbox.getBButton()) {
+            drive.getTranslational().setVelocity(new Translation2d(-1 * SmartDashboard.getNumber("Desired X Velocity", 0), 0));
+        } else {
+            drive.getTranslational().setVelocity(new Translation2d(0, 0));
+        }
 
         // SmartDashboard.putBoolean("XButton", xbox.getXButton());
         // if (xbox.getXButton()) {
