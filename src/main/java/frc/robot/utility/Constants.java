@@ -123,12 +123,12 @@ public final class Constants {
 		public static final double WIDTH = 1;
 		public static final double LENGTH = 1;
 	}
-	// public static class FeedForward 
-	// {
-	// 	public static final double kS = 0.015;
-	// 	public static final double kV = 0.18;
-	// 	public static final double kA = 0;
-	// }
+	public static class FeedForward 
+	{
+		public static final double kS = 0.015;
+		public static final double kV = 0.18;
+		public static final double kA = 0;
+	}
 	/**
 	 * Contains a velocity based PID configuration.
 	 * 
@@ -137,9 +137,9 @@ public final class Constants {
 	public static TalonFXConfiguration getSwerveDriveTalonDriveConfig() {
 		TalonFXConfiguration talon = new TalonFXConfiguration();
 		// Add configs here:
-		// talon.slot0.kP = 0.12;
+		// talon.slot0.kP = 0.05;
 		// talon.slot0.kI = 0;
-		// talon.slot0.kD = 2.5;
+		// talon.slot0.kD = 1.0;
 		// talon.slot0.kF = 0;
 		talon.slot0.kP = 0.1;
 		talon.slot0.kI = 0;

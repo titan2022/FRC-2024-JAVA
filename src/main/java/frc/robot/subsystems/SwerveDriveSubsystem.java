@@ -78,8 +78,8 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
 
     public static class FeedForward 
 	{
-		public static final double kS = 0.015;
-		public static final double kV = 0.18;
+		public static final double kS = 0.025;
+		public static final double kV = 0.175;
 		public static final double kA = 0;
 	}
 
@@ -125,8 +125,11 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
     private final TranslationalDrivebase translationalLock = new TranslationalDrivebase() {
         @Override
         public void setVelocity(Translation2d velocity) {
-            lastVelocity.vxMetersPerSecond = velocity.getX();
-            lastVelocity.vyMetersPerSecond = velocity.getY();
+            
+            Translation2d velocityNew = velocity;//getVelocity().plus((velocity.minus(getVelocity())).times(0.8));
+
+            lastVelocity.vxMetersPerSecond = velocityNew.getX();
+            lastVelocity.vyMetersPerSecond = velocityNew.getY();
             setVelocities(lastVelocity);
         }
 
@@ -219,7 +222,7 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
             rotator.setSensorPhase(ROTATOR_PHASE);
             rotator.configSelectedFeedbackSensor(TalonFXFeedbackDevice.RemoteSensor0, 0, 0);
             rotator.selectProfileSlot(ROTATOR_SLOT_IDX, 0);
-            rotator.setNeutralMode(NeutralMode.Brake);
+            rotator.setNeutralMode(NeutralMode.Coast);
             rotator.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 20);
             rotator.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 20);
             rotator.setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, 5000);
@@ -312,7 +315,9 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
         // SmartDashboard.putNumber("cur rot " + module, currTicks);
         // SmartDashboard.putNumber("delta rot" + module, deltaTicks);
         // SmartDashboard.putNumber("target rot " + module, targetTicks);
+        
         motors[module].set(ControlMode.Velocity, velTicks, DemandType.ArbitraryFeedForward, feedForwardTicks);
+        // motors[module].set(ControlMode.Velocity, velTicks);
         rotators[module].set(ControlMode.Position, currTicks + deltaTicks + OFFSETS[module]);
     }
 

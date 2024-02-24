@@ -222,13 +222,13 @@ public class Localizer {
         // globalHeading = pigeon.getRotation2d().minus(pigeonOffset);
         // globalOrientation = globalHeading.minus(new Rotation2d(Math.PI / 2));
 
-        SmartDashboard.putNumber("acc x", navxGyro.getWorldLinearAccelX());
-        SmartDashboard.putNumber("vel x", navxGyro.getVelocityX());
-        SmartDashboard.putNumber("pos x", navxGyro.getDisplacementX());
+        // SmartDashboard.putNumber("acc x", navxGyro.getWorldLinearAccelX());
+        // SmartDashboard.putNumber("vel x", navxGyro.getVelocityX());
+        // SmartDashboard.putNumber("pos x", navxGyro.getDisplacementX());
 
-        SmartDashboard.putNumber("acc y", navxGyro.getWorldLinearAccelY());
-        SmartDashboard.putNumber("vel y", navxGyro.getVelocityY());
-        SmartDashboard.putNumber("pos y", navxGyro.getDisplacementY());
+        // SmartDashboard.putNumber("acc y", navxGyro.getWorldLinearAccelY());
+        // SmartDashboard.putNumber("vel y", navxGyro.getVelocityY());
+        // SmartDashboard.putNumber("pos y", navxGyro.getDisplacementY());
     }
 
     /**
