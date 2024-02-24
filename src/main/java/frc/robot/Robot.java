@@ -28,16 +28,9 @@ public class Robot extends TimedRobot {
     // private SwerveDriveSubsystem drive = new SwerveDriveSubsystem(getSwerveDriveTalonDriveConfig(), getSwerveDriveTalonRotaryConfig());
 	//private final XboxController xbox = new XboxController(0);
     // private Localizer localizer = new Localizer();
-<<<<<<< HEAD
-    // private static final SlamDunkerSubsystem slamDunker = new SlamDunkerSubsystem();
-    // private static final IntakeSubsystem intake = new IntakeSubsystem();
-    WPI_TalonFX motorLeft = new WPI_TalonFX(19);
-    WPI_TalonFX motorRight = new WPI_TalonFX(21);
-=======
     private static final SlamDunkerSubsystem slamDunker = new SlamDunkerSubsystem();
     private static final IntakeSubsystem intake = new IntakeSubsystem();
     private static final ShooterSubsystem shooter = new ShooterSubsystem();
->>>>>>> e6df283c568c46e3bde2d51e0869e04ec63cf89c
     @Override
     public void robotInit() {
         // motorLeft.follow(motorRight);
