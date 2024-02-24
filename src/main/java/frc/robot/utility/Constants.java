@@ -6,6 +6,9 @@ package frc.robot.utility;
 
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
  * numerical or boolean
@@ -110,6 +113,10 @@ public final class Constants {
 	// TODO: Measure max acceleration at full weight
 	public static final double MAX_ACCELERATION = 5 * (Unit.M / Unit.S / Unit.S);
 	public static final double MAX_ANGULAR_ACCELERATION = 1 * (Unit.ROT / Unit.S / Unit.S);
+
+	public static Alliance getColor() {
+		return DriverStation.getAlliance().get();
+	}
 
 	public static final class RobotSize {
 		//Units in meters
