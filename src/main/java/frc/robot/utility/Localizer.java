@@ -4,11 +4,15 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
+import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.utility.networking.NetworkingCall;
 import frc.robot.utility.networking.NetworkingServer;
 import frc.robot.utility.networking.types.NetworkingPose;
@@ -26,6 +30,7 @@ import frc.robot.utility.networking.types.NetworkingTag;
 public class Localizer {
     private NetworkingServer server;
     private WPI_Pigeon2 pigeon = new WPI_Pigeon2(15);
+    private AHRS navxGyro = new AHRS(SPI.Port.kMXP);
 
     private Rotation2d pigeonOffset = new Rotation2d(0);
 
@@ -35,7 +40,6 @@ public class Localizer {
     private Translation3d notePosition = new Translation3d();
     private Rotation3d noteRotation = new Rotation3d();
     private Dictionary<Integer, NetworkingTag> tags = new Hashtable<>();
-    private boolean onBlueSide = false;
 
     /**
      * Localizer constructor
@@ -94,7 +98,7 @@ public class Localizer {
      *         y-axis).
      */
     public Rotation2d getOrientation() {
-        return globalOrientation;
+        return Rotation2d.fromDegrees(navxGyro.getAngle() + 90);
     }
 
     /**
@@ -103,7 +107,7 @@ public class Localizer {
      * @return The current rotational velocity (DEG/S)
      */
     public double getRate() {
-        return pigeon.getRate();
+        return navxGyro.getRate();
     }
 
     /**
@@ -113,7 +117,7 @@ public class Localizer {
      *         from the positive y-axis
      */
     public Rotation2d getHeading() {
-        return globalHeading;
+        return Rotation2d.fromDegrees(navxGyro.getAngle());
     }
 
     /**
@@ -121,8 +125,8 @@ public class Localizer {
      * 
      * @return Boolean whether the robot is on blue side
      */
-    public boolean getBlueSide() {
-        return onBlueSide;
+    public Alliance getColor() {
+        return DriverStation.getAlliance().get();
     }
 
     /**
@@ -188,7 +192,8 @@ public class Localizer {
      * Updates first frame localization estimates
      */
     public void setup() {
-        pigeonOffset = pigeon.getRotation2d();
+        navxGyro.reset();
+        navxGyro.resetDisplacement();
 
         if (server != null) {
             server.subscribe("pos", (NetworkingCall<Translation3d>)(Translation3d position) -> {
@@ -212,8 +217,8 @@ public class Localizer {
      * @param dt The amount of time past since the last update, in seconds
      */
     public synchronized void step(double dt) {
-        globalHeading = pigeon.getRotation2d().minus(pigeonOffset);
-        globalOrientation = globalHeading.minus(new Rotation2d(Math.PI / 2));
+        // globalHeading = pigeon.getRotation2d().minus(pigeonOffset);
+        // globalOrientation = globalHeading.minus(new Rotation2d(Math.PI / 2));
     }
 
     /**
