@@ -10,24 +10,31 @@ import frc.robot.subsystems.IntakeSubsystem;
 /** An example command that uses an example subsystem. */
 public class NoteIntakeCommand extends Command {
   @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
+  private IntakeSubsystem intake;
+
 
   public NoteIntakeCommand(IntakeSubsystem intake) {
+    this.intake = intake;
 
+    addRequirements(intake);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    intake.intake();
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    intake.stop();
   }
 
   // Returns true when the command should end.
