@@ -126,7 +126,13 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
         @Override
         public void setVelocity(Translation2d velocity) {
             
-            Translation2d velocityNew = velocity;//getVelocity().plus((velocity.minus(getVelocity())).times(0.8));
+            Translation2d velocityNew = velocity;
+            // Translation2d velocityNew = getVelocity().plus((velocity.minus(getVelocity())).times(0.8));
+            if (velocity.getNorm() < 0.1 && getVelocity().getNorm() > 0.1) {
+                velocityNew = getVelocity().div(2);
+            } else {
+                velocityNew = velocity;
+            }
 
             lastVelocity.vxMetersPerSecond = velocityNew.getX();
             lastVelocity.vyMetersPerSecond = velocityNew.getY();
@@ -315,7 +321,6 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
         // SmartDashboard.putNumber("cur rot " + module, currTicks);
         // SmartDashboard.putNumber("delta rot" + module, deltaTicks);
         // SmartDashboard.putNumber("target rot " + module, targetTicks);
-        
         motors[module].set(ControlMode.Velocity, velTicks, DemandType.ArbitraryFeedForward, feedForwardTicks);
         // motors[module].set(ControlMode.Velocity, velTicks);
         rotators[module].set(ControlMode.Position, currTicks + deltaTicks + OFFSETS[module]);

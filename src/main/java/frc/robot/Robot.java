@@ -108,7 +108,7 @@ public class Robot extends TimedRobot {
             }
         } else {
             if (xbox.getRightBumper()) {
-                shooter.setIndexer(-0.1);
+                shooter.setIndexer(-0.15);
                 shooter.shoot(-0.4);
             } else if (!xbox.getRightBumper()) {
                 shooter.setIndexer(0);
