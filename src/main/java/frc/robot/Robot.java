@@ -44,11 +44,7 @@ public class Robot extends TimedRobot {
         
         SmartDashboard.putNumber("X Position", 0);
         SmartDashboard.putNumber("Y Position", 0);
-
-        SmartDashboard.putNumber("Desired X Velocity", 0.1);
-        SmartDashboard.putNumber("Desired Y Velocity", 0.1);
-        
-
+        SmartDashboard.putNumber("Speed", 0.5);
     }
 
     @Override
@@ -77,7 +73,8 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousInit() {
-        // CommandScheduler.getInstance().schedule(new TranslationCommand(new Translation2d(SmartDashboard.getNumber("X Position", 0), SmartDashboard.getNumber("Y Position", 0)), 0.5, drive.getTranslational()));
+        CommandScheduler.getInstance().schedule(new TranslationCommand(new Translation2d(SmartDashboard.getNumber("X Position", 0), SmartDashboard.getNumber("Y Position", 0)), SmartDashboard.getNumber("Speed", 0), drive.getTranslational()));
+        // CommandScheduler.getInstance().schedule(new TranslationCommand(new Translation2d(SmartDashboard.getNumber("X Position", 0), SmartDashboard.getNumber("Y Position", 0)), SmartDashboard.getNumber("Speed", 0), drive.getTranslational()));
     }
 
     /** This function is called periodically during autonomous. */
@@ -85,7 +82,6 @@ public class Robot extends TimedRobot {
     public void autonomousPeriodic() {
         // drive.getTranslational().setVelocity(new Translation2d(0, 0.5));
         SmartDashboard.putBoolean("Y Button", xbox.getYButton());
-        intake.setWheelSpeed(SmartDashboard.getNumber("Intake Speed", 0));
 
         if (xbox.getYButton())
             intake.setWheelSpeed(SmartDashboard.getNumber("Intake Speed", 0));
@@ -102,17 +98,20 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopPeriodic() {
-        if (xbox.getYButton()) {
-            drive.getTranslational().setVelocity(new Translation2d(0, SmartDashboard.getNumber("Desired Y Velocity", 0)));
-        } else if (xbox.getAButton()) {
-            drive.getTranslational().setVelocity(new Translation2d(0, -1 * SmartDashboard.getNumber("Desired Y Velocity", 0)));
-        } else if (xbox.getXButton()) {
-            drive.getTranslational().setVelocity(new Translation2d(SmartDashboard.getNumber("Desired X Velocity", 0), 0));
-        } else if(xbox.getBButton()) {
-            drive.getTranslational().setVelocity(new Translation2d(-1 * SmartDashboard.getNumber("Desired X Velocity", 0), 0));
-        } else {
-            drive.getTranslational().setVelocity(new Translation2d(0, 0));
-        }
+        drive.getTranslational().setDefaultCommand(new TranslationalDriveCommand(drive.getTranslational(), localizer, xbox, 1));
+		drive.getRotational().setDefaultCommand(new RotationalDriveCommand(drive.getRotational(), localizer, xbox, Math.PI / 2));
+
+        // if (xbox.getYButton()) {
+        //     drive.getTranslational().setVelocity(new Translation2d(0, SmartDashboard.getNumber("Desired Y Velocity", 0)));
+        // } else if (xbox.getAButton()) {
+        //     drive.getTranslational().setVelocity(new Translation2d(0, -1 * SmartDashboard.getNumber("Desired Y Velocity", 0)));
+        // } else if (xbox.getXButton()) {
+        //     drive.getTranslational().setVelocity(new Translation2d(SmartDashboard.getNumber("Desired X Velocity", 0), 0));
+        // } else if(xbox.getBButton()) {
+        //     drive.getTranslational().setVelocity(new Translation2d(-1 * SmartDashboard.getNumber("Desired X Velocity", 0), 0));
+        // } else {
+        //     drive.getTranslational().setVelocity(new Translation2d(0, 0));
+        // }
 
         // SmartDashboard.putBoolean("XButton", xbox.getXButton());
         // if (xbox.getXButton()) {

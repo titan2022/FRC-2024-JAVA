@@ -16,7 +16,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.utility.Constants.FeedForward;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -77,6 +76,13 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
         public static final int FRONT_RIGHT = 2;
         public static final int BACK_RIGHT = 3;
     }
+
+    public static class FeedForward 
+	{
+		public static final double kS = 0.015;
+		public static final double kV = 0.18;
+		public static final double kA = 0;
+	}
 
     private final SimpleMotorFeedforward motorFeedfoward = new SimpleMotorFeedforward(FeedForward.kS, FeedForward.kV, FeedForward.kA);
 

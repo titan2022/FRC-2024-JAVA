@@ -111,12 +111,12 @@ public final class Constants {
 	public static final double MAX_ACCELERATION = 5 * (Unit.M / Unit.S / Unit.S);
 	public static final double MAX_ANGULAR_ACCELERATION = 1 * (Unit.ROT / Unit.S / Unit.S);
 
-	public static class FeedForward 
-	{
-		public static double kS = 0.015;
-		public static double kV = 0.18;
-		public static double kA = 0;
-	}
+	// public static class FeedForward 
+	// {
+	// 	public static final double kS = 0.015;
+	// 	public static final double kV = 0.18;
+	// 	public static final double kA = 0;
+	// }
 	/**
 	 * Contains a velocity based PID configuration.
 	 * 
