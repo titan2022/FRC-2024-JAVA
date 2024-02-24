@@ -7,9 +7,12 @@ package frc.robot.subsystems;
 import static frc.robot.utility.Constants.Unit.FALCON_TICKS;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
+import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /***
@@ -20,32 +23,30 @@ public class ShooterSubsystem extends SubsystemBase {
 	private static final double MAX_ANGLE = 0;
 	private static final double MIN_ANGLE = 0;
 
-	private double linkageEncoderValue = 0;
-	private double targetRotation = 0;
-	
-	private PIDController linkagePID = new PIDController(1, 0, 0);
-	private PIDController shooterPID = new PIDController(1, 0, 0);
+  //kP, kI, kD, kF
+  public static final double[] shooterPID = {0, 0, 0, 0};
+  public static final double[] rotatorPID = {0, 0, 0, 0};
 
+  public static final double[] shooterFeedForwardParams = {0, 0, 0};
+  public static final double[] rotatorFeedForwardParams = {0, 0, 0};
+
+  SimpleMotorFeedforward shooterFeedForward = new SimpleMotorFeedforward(shooterFeedForwardParams[0], shooterFeedForwardParams[1], shooterFeedForwardParams[2]);
+  ArmFeedforward rotatorFeedforward = new ArmFeedforward(rotatorFeedForwardParams[0], rotatorFeedForwardParams[1], rotatorFeedForwardParams[2]);
+	
 	private WPI_TalonFX linkageMotor = new WPI_TalonFX(0);
-	private WPI_TalonFX bottomShooterMotor = new WPI_TalonFX(0);
-	private WPI_TalonFX topShooterMotor = new WPI_TalonFX(0);
+	private WPI_TalonFX rotatorMotor = new WPI_TalonFX(0);
+	private WPI_TalonFX shooterMotor = new WPI_TalonFX(0);
 
 	public ShooterSubsystem() {
-		bottomShooterMotor.follow(topShooterMotor);
-		bottomShooterMotor.setInverted(true);
+    config();
+	}
+
+  public void config() {
+    rotatorMotor.setInverted(true);
 
 		linkageMotor.setSelectedSensorPosition(0);
-		topShooterMotor.setSelectedSensorPosition(0);
-	}
-
-	/**
-	 * Sets linkage rotation velocity
-	 * 
-	 * @param velocity in radians per second
-	 */
-	private void setRotationVelocity(double velocity) {
-		linkageMotor.set(ControlMode.Velocity, velocity / FALCON_TICKS / 10.0);
-	}
+		shooterMotor.setSelectedSensorPosition(0);
+  }
 
 	/**
 	 * Gets shooter rotation angle
@@ -53,7 +54,7 @@ public class ShooterSubsystem extends SubsystemBase {
 	 * @return Angle in radians (zero is ground, positive is up)
 	 */
 	public double getRotation() {
-		return linkageEncoderValue; // TODO
+		return 0; // TODO
 	}
 
 	/**
@@ -62,20 +63,18 @@ public class ShooterSubsystem extends SubsystemBase {
 	 * @param angle in radians (zero is ground, positive is up)
 	 */
 	public void setRotation(double angle) {
-		targetRotation = angle; // TODO
-	}
+
+  }
 
 	public void shoot(double velocity) {
-		double currentVelocity = topShooterMotor.getSelectedSensorVelocity();
-		double newVelocity = shooterPID.calculate(currentVelocity, velocity);
-		topShooterMotor.set(ControlMode.Velocity, newVelocity);
+		shooterMotor.set(ControlMode.Velocity, velocity);
 	}
 
-	@Override
-	public void periodic() {
-		linkageEncoderValue = linkageMotor.getSelectedSensorPosition();
+  public void setLinkage(double speed) {
+    linkageMotor.set(ControlMode.PercentOutput, speed);
+  }
 
-		double linkageVelocity = linkagePID.calculate(getRotation(), targetRotation); // TODO
-		setRotationVelocity(linkageVelocity);
-	}
+  public void holdLinkage() {
+    linkageMotor.set(ControlMode.PercentOutput, 0);
+  }
 }
