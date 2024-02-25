@@ -76,14 +76,54 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
         public static final int BACK_RIGHT = 3;
     }
 
-    public static class FeedForward 
+    public static class TranslationalFeedForward 
 	{
 		public static final double kS = 0.025;
 		public static final double kV = 0.175;
 		public static final double kA = 0;
 	}
 
-    private final SimpleMotorFeedforward motorFeedfoward = new SimpleMotorFeedforward(FeedForward.kS, FeedForward.kV, FeedForward.kA);
+    /**
+	 * Contains a velocity based PID configuration.
+	 * 
+	 * @return TalonFX Configuration Object
+	 */
+	public static TalonFXConfiguration getSwerveDriveTalonDriveConfig() {
+		TalonFXConfiguration talon = new TalonFXConfiguration();
+		// Add configs here:
+		// talon.slot0.kP = 0.05;
+		// talon.slot0.kI = 0;
+		// talon.slot0.kD = 1.0;
+		// talon.slot0.kF = 0;
+		talon.slot0.kP = 0.1;
+		talon.slot0.kI = 0;
+		talon.slot0.kD = 0;
+		talon.slot0.kF = 0;
+		talon.slot0.integralZone = 900;
+		talon.slot0.allowableClosedloopError = 20;
+		talon.slot0.maxIntegralAccumulator = 254.000000;
+		return talon;
+	}
+
+	/**
+	 * Contains a position based PID configuration
+	 * 
+	 * @return TalonFX Configuration Object
+	 */
+	public static TalonFXConfiguration getSwerveDriveTalonRotaryConfig() {
+		TalonFXConfiguration talon = new TalonFXConfiguration();
+		// Add configs here:
+		talon.slot0.kP = 0.38;
+		talon.slot0.kI = 0;
+		talon.slot0.kD = 2.0;
+		talon.slot0.kF = 0;
+		talon.slot0.integralZone = 75;
+		talon.slot0.allowableClosedloopError = 5;// 217;
+		talon.slot0.maxIntegralAccumulator = 5120;
+		return talon;
+	}
+
+    private final SimpleMotorFeedforward motorFeedfoward = new SimpleMotorFeedforward(TranslationalFeedForward.kS, TranslationalFeedForward.kV, TranslationalFeedForward.kA);
 
     // Physical Hardware
     private final WPI_TalonFX[] motors = new WPI_TalonFX[] {
@@ -126,10 +166,10 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
         @Override
         public void setVelocity(Translation2d velocity) {
             
-            Translation2d velocityNew = velocity;
+            Translation2d velocityNew;
             // Translation2d velocityNew = getVelocity().plus((velocity.minus(getVelocity())).times(0.8));
             if (velocity.getNorm() < 0.1 && getVelocity().getNorm() > 0.1) {
-                velocityNew = getVelocity().div(2);
+                velocityNew = getVelocity().times(0.9);
             } else {
                 velocityNew = velocity;
             }
@@ -165,7 +205,10 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
      * @param mainConfig    Requires PID configuration in slot 0
      * @param rotatorConfig Requires PID configuration in slot 0
      */
-    public SwerveDriveSubsystem(TalonFXConfiguration mainConfig, TalonFXConfiguration rotatorConfig) {
+    public SwerveDriveSubsystem() {
+        TalonFXConfiguration mainConfig = getSwerveDriveTalonDriveConfig();
+        TalonFXConfiguration rotatorConfig = getSwerveDriveTalonRotaryConfig();
+
         setFactoryMotorConfig();
 
         if (mainConfig != null) {
@@ -252,10 +295,6 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
         }
         for (int i = 0; i < 4; i++)
             rotators[i].configRemoteFeedbackFilter(encoders[i], 0);
-    }
-
-    public SwerveDriveSubsystem() {
-        this(null, null);
     }
 
     private void setFactoryMotorConfig() {

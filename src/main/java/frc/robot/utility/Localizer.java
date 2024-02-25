@@ -121,15 +121,6 @@ public class Localizer {
     }
 
     /**
-     * Determines if robot is on blue alliance's side of the field
-     * 
-     * @return Boolean whether the robot is on blue side
-     */
-    public Alliance getColor() {
-        return DriverStation.getAlliance().get();
-    }
-
-    /**
      * Gets robot position relative to specified tag
      * 
      * @param id Apriltag ID

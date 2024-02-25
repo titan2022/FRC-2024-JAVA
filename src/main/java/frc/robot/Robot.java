@@ -3,10 +3,6 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot;
-
-import static frc.robot.utility.Constants.getSwerveDriveTalonDriveConfig;
-import static frc.robot.utility.Constants.getSwerveDriveTalonRotaryConfig;
-
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 
 import edu.wpi.first.math.geometry.Translation2d;
@@ -23,8 +19,7 @@ import frc.robot.subsystems.SwerveDriveSubsystem;
 import frc.robot.utility.Localizer;
 
 public class Robot extends TimedRobot {
-    private SwerveDriveSubsystem drive = new SwerveDriveSubsystem(getSwerveDriveTalonDriveConfig(),
-            getSwerveDriveTalonRotaryConfig());
+    private SwerveDriveSubsystem drive = new SwerveDriveSubsystem();
     private final XboxController xbox = new XboxController(0);
     private IntakeSubsystem intake = new IntakeSubsystem();
     private Localizer localizer = new Localizer();

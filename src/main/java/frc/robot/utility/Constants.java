@@ -119,63 +119,7 @@ public final class Constants {
 	}
 
 	public static final class RobotSize {
-		//Units in meters
 		public static final double WIDTH = 1;
 		public static final double LENGTH = 1;
-	}
-	public static class FeedForward 
-	{
-		public static final double kS = 0.015;
-		public static final double kV = 0.18;
-		public static final double kA = 0;
-	}
-	/**
-	 * Contains a velocity based PID configuration.
-	 * 
-	 * @return TalonFX Configuration Object
-	 */
-	public static TalonFXConfiguration getSwerveDriveTalonDriveConfig() {
-		TalonFXConfiguration talon = new TalonFXConfiguration();
-		// Add configs here:
-		// talon.slot0.kP = 0.05;
-		// talon.slot0.kI = 0;
-		// talon.slot0.kD = 1.0;
-		// talon.slot0.kF = 0;
-		talon.slot0.kP = 0.1;
-		talon.slot0.kI = 0;
-		talon.slot0.kD = 0;
-		talon.slot0.kF = 0;
-		talon.slot0.integralZone = 900;
-		talon.slot0.allowableClosedloopError = 20;
-		talon.slot0.maxIntegralAccumulator = 254.000000;
-		// talon.slot0.closedLoopPeakOutput = 0.869990; // Sets maximum output of the
-		// PID controller
-		// talon.slot0.closedLoopPeriod = 33; // Sets the hardware update rate of the
-		// PID controller
-
-		return talon;
-	}
-
-	/**
-	 * Contains a position based PID configuration
-	 * 
-	 * @return TalonFX Configuration Object
-	 */
-	public static TalonFXConfiguration getSwerveDriveTalonRotaryConfig() {
-		TalonFXConfiguration talon = new TalonFXConfiguration();
-		// Add configs here:
-		talon.slot0.kP = 0.38;
-		talon.slot0.kI = 0;
-		talon.slot0.kD = 2.0;
-		talon.slot0.kF = 0;
-		talon.slot0.integralZone = 75;
-		talon.slot0.allowableClosedloopError = 5;// 217;
-		talon.slot0.maxIntegralAccumulator = 5120;
-		// talon.slot0.closedLoopPeakOutput = 0.869990; // Sets maximum output of the
-		// PID controller
-		// talon.slot0.closedLoopPeriod = 33; // Sets the hardware update rate of the
-		// PID controller
-
-		return talon;
 	}
 }

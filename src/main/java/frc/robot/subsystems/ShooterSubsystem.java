@@ -15,6 +15,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /***
@@ -39,6 +40,7 @@ public class ShooterSubsystem extends SubsystemBase {
 	private WPI_TalonFX topShooterMotor = new WPI_TalonFX(13);
 	private WPI_TalonFX bottomShooterMotor = new WPI_TalonFX(5);
 	public WPI_TalonFX indexerMotor = new WPI_TalonFX(21);
+	public static DutyCycleEncoder linkageEncoder = new DutyCycleEncoder(0);
 
 	public static boolean INDEX_ON = false;
 
@@ -49,11 +51,11 @@ public class ShooterSubsystem extends SubsystemBase {
 	public void config() {
 		topShooterMotor.setNeutralMode(NeutralMode.Brake);
 		bottomShooterMotor.setNeutralMode(NeutralMode.Brake);
+		linkageMotor.setNeutralMode(NeutralMode.Brake);
+		indexerMotor.setNeutralMode(NeutralMode.Brake);
 		topShooterMotor.setInverted(true);
 		bottomShooterMotor.setInverted(true);
 		bottomShooterMotor.follow(topShooterMotor);
-		linkageMotor.setNeutralMode(NeutralMode.Brake);
-		indexerMotor.setNeutralMode(NeutralMode.Brake);
 	}
 
 	/**
@@ -84,6 +86,10 @@ public class ShooterSubsystem extends SubsystemBase {
 
 	public void shoot(double velocity) {
 		topShooterMotor.set(ControlMode.PercentOutput, velocity);
+	}
+
+	public void input(double velocity) {
+		topShooterMotor.set(ControlMode.PercentOutput, -Math.abs(velocity));
 	}
 
 	public void setIndexer(double speed) {
