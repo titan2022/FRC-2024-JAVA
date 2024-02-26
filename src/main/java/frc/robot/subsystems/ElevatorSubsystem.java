@@ -46,11 +46,19 @@ public class ElevatorSubsystem extends SubsystemBase{
 	}
 
     public void extendElevator(){
-        LEFT_SPOOL_MOTOR.set(ControlMode.Position, TOP_ENCODER_TICKS);
+        for(WPI_TalonFX motor : spool_motors) motor.set(ControlMode.Position, TOP_ENCODER_TICKS);
     }
 
     public void retractElevator(){
-        LEFT_SPOOL_MOTOR.set(ControlMode.Position, BOTTOM_ENCODER_TICKS);
+        for(WPI_TalonFX motor : spool_motors) motor.set(ControlMode.Position, BOTTOM_ENCODER_TICKS);
+    }
+
+    public void winch(){
+        WINCH_MOTOR.set(ControlMode.PercentOutput, 1);
+
+        // probably should test this so the string doesn't break w/ all the extra force
+        // a little bit iffy, since we have to retract the elevator via winch and spool at the same speed
+        retractElevator();
     }
 
     public ElevatorSubsystem(){
