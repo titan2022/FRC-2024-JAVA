@@ -24,9 +24,9 @@ import static frc.robot.utility.Constants.Unit.*;
 
 public class SwerveDriveSubsystem implements DriveSubsystem {
     // Physical parameters
-    public static final double ROBOT_TRACK_WIDTH = 18 * IN; // 0.672; // meters (30 in)
-    public static final double ROBOT_LENGTH = 18 * IN; // 0.672; // meter
-    public static final double WHEEL_RADIUS = 2 * IN; // 0.0508; // meters (2 in)
+    public static final double ROBOT_TRACK_WIDTH = 18 * IN;
+    public static final double ROBOT_LENGTH = 18 * IN;
+    public static final double WHEEL_RADIUS = 2 * IN;
     public static final double GEAR_RATIO = 6.12;//8.16;
     public static final double METERS_PER_TICKS = WHEEL_RADIUS * 2 * Math.PI / FALCON_CPR / GEAR_RATIO;
 
@@ -35,14 +35,14 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
     private static final double ROTATOR_DEADBAND = 0.0001;
 
     // CAN ID numbers
-    private static final int LEFT_FRONT_MOTOR_PORT = 40;//
+    private static final int LEFT_FRONT_MOTOR_PORT = 40;
     private static final int LEFT_BACK_MOTOR_PORT = 43;
     private static final int RIGHT_FRONT_MOTOR_PORT = 41;
-    private static final int RIGHT_BACK_MOTOR_PORT = 42;//
+    private static final int RIGHT_BACK_MOTOR_PORT = 42;
 
     private static final int LEFT_FRONT_MOTOR_ROTATOR_PORT = 30;
     private static final int LEFT_BACK_MOTOR_ROTATOR_PORT = 33;
-    private static final int RIGHT_FRONT_MOTOR_ROTATOR_PORT = 31;//
+    private static final int RIGHT_FRONT_MOTOR_ROTATOR_PORT = 31;
     private static final int RIGHT_BACK_MOTOR_ROTATOR_PORT = 32;
 
     private static final int LEFT_FRONT_ENCODER_ROTATOR_PORT = 50;
@@ -51,7 +51,7 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
     private static final int RIGHT_BACK_ENCODER_ROTATOR_PORT = 52;
 
     // Rotator encoder offsets
-    private static final int FRONT_LEFT_OFFSET = -1024 - 190;//-238;
+    private static final int FRONT_LEFT_OFFSET = -1024 - 190;
     private static final int BACK_LEFT_OFFSET = -3120 - 1024;
     private static final int FRONT_RIGHT_OFFSET = -1930 + 1024;
     private static final int BACK_RIGHT_OFFSET = -1835 + 1024;
@@ -165,9 +165,10 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
     private final TranslationalDrivebase translationalLock = new TranslationalDrivebase() {
         @Override
         public void setVelocity(Translation2d velocity) {
-            
-            Translation2d velocityNew;
-            // Translation2d velocityNew = getVelocity().plus((velocity.minus(getVelocity())).times(0.8));
+            // Anti-coasting things
+
+            Translation2d velocityNew;//getVelocity().plus(velocity.minus(getVelocity()).times(0.8)); // Low-pass filter
+
             if (velocity.getNorm() < 0.1 && getVelocity().getNorm() > 0.1) {
                 velocityNew = getVelocity().times(0.9);
             } else {
@@ -185,6 +186,7 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
             return new Translation2d(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond);
         }
     };
+
     private final RotationalDrivebase rotationalLock = new RotationalDrivebase() {
         @Override
         public void setRotationalVelocity(Rotation2d omega) {
@@ -218,24 +220,22 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
             rotators[0].configAllSettings(rotatorConfig);
         }
 
-        mainConfig = new TalonFXConfiguration();
-        rotatorConfig = new TalonFXConfiguration();
+        // mainConfig = new TalonFXConfiguration();
+        // rotatorConfig = new TalonFXConfiguration();
         motors[0].getAllConfigs(mainConfig);
         rotators[0].getAllConfigs(rotatorConfig);
 
         // Current limits
-        // rotatorConfig.supplyCurrLimit = supplyCurrentLimit;
-        // mainConfig.supplyCurrLimit = supplyCurrentLimit;
-        rotatorConfig.supplyCurrLimit.currentLimit = 12;
-        rotatorConfig.supplyCurrLimit.enable = true;
-        rotatorConfig.supplyCurrLimit.triggerThresholdCurrent = 12;
-        rotatorConfig.supplyCurrLimit.triggerThresholdTime = 0.0;
-        mainConfig.supplyCurrLimit.currentLimit = 20;
+        mainConfig.supplyCurrLimit.currentLimit = 50;
         mainConfig.supplyCurrLimit.enable = true;
-        mainConfig.supplyCurrLimit.triggerThresholdCurrent = 20;
-        mainConfig.supplyCurrLimit.triggerThresholdTime = 0.00;
+        mainConfig.supplyCurrLimit.triggerThresholdCurrent = 60;
+        mainConfig.supplyCurrLimit.triggerThresholdTime = 0.01;
+        
+        rotatorConfig.supplyCurrLimit.currentLimit = 25;
+        rotatorConfig.supplyCurrLimit.enable = true;
+        rotatorConfig.supplyCurrLimit.triggerThresholdCurrent = 40;
+        rotatorConfig.supplyCurrLimit.triggerThresholdTime = 0.01;
         // mainConfig.closedloopRamp = 0.5;
-        SmartDashboard.putNumber("cur lim", 20);
 
         // Deadbands
         rotatorConfig.neutralDeadband = ROTATOR_DEADBAND;
@@ -333,7 +333,6 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
         SmartDashboard.putNumber("Feedforward input Y", feedForwardTicks);
         if (velTicks == 0 && !forceOrient) {
             motors[module].set(ControlMode.Velocity, 0);
-            // SmartDashboard.putNumber("set vel " + module, 0);
             return;
         }
         double currTicks = getRotatorEncoderCount(module);
@@ -352,14 +351,7 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
             velTicks *= -1;
             feedForwardTicks *= -1;
         }
-        // SmartDashboard.putNumber("speed STATE " + module, state.speedMetersPerSecond);
-        // SmartDashboard.putNumber("angle STATE " + module, state.angle.getDegrees());
-        // SmartDashboard.putNumber("set rot " + module, currTicks + deltaTicks);
-        // SmartDashboard.putNumber("set vel " + module, velTicks);
-        // SmartDashboard.putNumber("set rot " + module, currTicks + deltaTicks);
-        // SmartDashboard.putNumber("cur rot " + module, currTicks);
-        // SmartDashboard.putNumber("delta rot" + module, deltaTicks);
-        // SmartDashboard.putNumber("target rot " + module, targetTicks);
+
         motors[module].set(ControlMode.Velocity, velTicks, DemandType.ArbitraryFeedForward, feedForwardTicks);
         // motors[module].set(ControlMode.Velocity, velTicks);
         rotators[module].set(ControlMode.Position, currTicks + deltaTicks + OFFSETS[module]);
@@ -367,18 +359,6 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
 
     private void applyModuleState(SwerveModuleState state, int idx) {
         applyModuleState(state, idx, false);
-    }
-
-    public void crossLockWheels() {
-        applyModuleState(
-                new SwerveModuleState(0, new Rotation2d(-1, 1)), 0, true);
-        applyModuleState(
-                new SwerveModuleState(0, new Rotation2d(-1, -1)), 1, true);
-        applyModuleState(
-                new SwerveModuleState(0, new Rotation2d(1, 1)), 2, true);
-        applyModuleState(
-                new SwerveModuleState(0, new Rotation2d(1, -1)), 3, true);
-        // leftFrontPosition, leftBackPosition, rightFrontPosition, rightBackPosition
     }
 
     /**
@@ -395,16 +375,6 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
             // SwerveModuleState optimized = SwerveModuleState.optimize(modules[i], new Rotation2d(encoders[i].getAbsolutePosition()));
             // applyModuleState(optimized, i);
             applyModuleState(modules[i], i);
-        }
-    }
-
-    private void setSwerveStates(SwerveModuleState state) {
-        if (state.speedMetersPerSecond > MAX_WHEEL_SPEED)
-            state.speedMetersPerSecond = MAX_WHEEL_SPEED;
-        for (int i = 0; i < 4; i++) {
-            // SwerveModuleState optimized = SwerveModuleState.optimize(modules[i], new Rotation2d(encoders[i].getAbsolutePosition()));
-            // applyModuleState(optimized, i);
-            applyModuleState(state, i);
         }
     }
 
@@ -472,16 +442,4 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
         for (WPI_TalonFX rotator : rotators)
             rotator.setNeutralMode(NeutralMode.Brake);
     }
-
-//     public void setRotatorTest() {
-//         int[] adjustments = {
-//             (int) SmartDashboard.getNumber("Front Left", 0),
-//             (int) SmartDashboard.getNumber("Back Left", 0),
-//             (int) SmartDashboard.getNumber("Front Right", 0), 
-//             (int) SmartDashboard.getNumber("Back Right", 0)
-//         };
-//         for (int i = 0; i < 4; ++i) {
-//             rotators[i].set(ControlMode.Position, OFFSETS[i] + adjustments[i]);
-//         }
-//     }
 }
