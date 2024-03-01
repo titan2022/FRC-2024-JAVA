@@ -2,27 +2,23 @@ package frc.robot.commands;
 
 import java.util.ArrayList;
 
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
-abstract public class AutoPlan {
+abstract public class AutoPlan extends SequentialCommandGroup {
     protected ArrayList<Command> commandList;
-    protected boolean onBlueSide;
+    protected Alliance alliance;
 
-    abstract protected void defineCommands();
-
-    public AutoPlan(boolean onBlueSide) {
-        this.onBlueSide = onBlueSide;
-        defineCommands();
-        setSide();
+    public AutoPlan(Alliance alliance) {
+        this.alliance = alliance;
     }
 
-    protected void setSide() {
+    public void flipColor() {
         for (int i = 0; i < commandList.size(); i++) {
             if (VariantCommand.class.isInstance(commandList.get(i))) {
-                if (((VariantCommand) commandList).onBlueSide() != onBlueSide) {
-                    ((VariantCommand) commandList).changeColorSide();
-                }
+                ((VariantCommand) commandList.get(i)).changeColorSide();
             }
         }
     }
