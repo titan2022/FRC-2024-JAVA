@@ -13,56 +13,67 @@ import frc.robot.utility.Utility;
 
 /** An example command that uses an example subsystem. */
 public class TranslationCommand extends Command implements VariantCommand {
-  @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
-  private TranslationalDrivebase driveBase;
-  private Translation2d velocity;
-  private double time;
-  private double endTime;
+    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
+    public TranslationalDrivebase driveBase;
+    public Translation2d velocity;
+    public double time;
+    public double endTime;
 
-  public TranslationCommand(Translation2d position, double speed, TranslationalDrivebase driveBase) {
-    this.driveBase = driveBase;
-    //Gets speed in direction of displacement
-    velocity = Utility.scaleVector(position, speed);
-    time = position.getNorm() / speed;
+    public TranslationCommand(TranslationalDrivebase drivebase) {
+        this.driveBase = driveBase;
 
-    addRequirements(driveBase);
-  }
+        addRequirements(drivebase);
+    }
 
-  // Called when the command is initially scheduled.
-  @Override
-  public void initialize() {
-    endTime = Timer.getFPGATimestamp() + time;
-  }
+    public TranslationCommand(Translation2d position, double speed, TranslationalDrivebase driveBase) {
+        this.driveBase = driveBase;
+        //Gets speed in direction of displacement
+        velocity = Utility.scaleVector(position, speed);
+        time = position.getNorm() / speed;
 
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {
-    // SmartDashboard.putNumber("StartTime", startTime);
-    // SmartDashboard.putNumber("EndTime", endTime);
-    // SmartDashboard.putNumber("CurrentTime", Timer.getFPGATimestamp());
-    // driveBase.setVelocity(velocity);
+        addRequirements(driveBase);
+    }
 
-    // if (error.getNorm() < velocityDeadband) {
-    //   controlVelocity = new Translation2d(0, 0);
-    // } else {
-    //   controlVelocity = error.times(kP);
-    // }
-    driveBase.setVelocity(velocity);
-  }
+    // Called when the command is initially scheduled.
+    @Override
+    public void initialize() {
+        endTime = Timer.getFPGATimestamp() + time;
+    }
 
-  // Called once the command ends or is interrupted.
-  @Override
-  public void end(boolean interrupted) {
-    driveBase.setVelocity(new Translation2d(0, 0));
-    // SmartDashboard.putBoolean("Reached end() 2", true);
-  }
+    // Called every time the scheduler runs while the command is scheduled.
+    @Override
+    public void execute() {
+        // SmartDashboard.putNumber("StartTime", startTime);
+        // SmartDashboard.putNumber("EndTime", endTime);
+        // SmartDashboard.putNumber("CurrentTime", Timer.getFPGATimestamp());
+        // driveBase.setVelocity(velocity);
 
-  // Returns true when the command should end.
-  @Override
-  public boolean isFinished() {
-    if (Timer.getFPGATimestamp() > endTime)
-      return true;
-    else
-      return false;
-  }
+        // if (error.getNorm() < velocityDeadband) {
+        //   controlVelocity = new Translation2d(0, 0);
+        // } else {
+        //   controlVelocity = error.times(kP);
+        // }
+        driveBase.setVelocity(velocity);
+    }
+
+    // Called once the command ends or is interrupted.
+    @Override
+    public void end(boolean interrupted) {
+        driveBase.setVelocity(new Translation2d(0, 0));
+        // SmartDashboard.putBoolean("Reached end() 2", true);
+    }
+
+    // Returns true when the command should end.
+    @Override
+    public boolean isFinished() {
+        if (Timer.getFPGATimestamp() > endTime)
+        return true;
+        else
+        return false;
+    }
+
+    @Override
+    public void changeColorSide() {
+        velocity = new Translation2d(velocity.getX(), -velocity.getY());
+    }
 }

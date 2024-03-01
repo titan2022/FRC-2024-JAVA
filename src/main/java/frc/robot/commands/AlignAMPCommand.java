@@ -7,6 +7,7 @@ package frc.robot.commands;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.utility.Constants;
 import frc.robot.subsystems.RotationalDrivebase;
@@ -16,31 +17,31 @@ import frc.robot.utility.Localizer;
 
 
 /** An example command that uses an example subsystem. */
-public class AlignAMPCommand extends SequentialCommandGroup {
-  @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
-  public static final int BLUE_AMP_APRILTAG = 6;
-  public static final int RED_AMP_APRILTAG = 5;
+public class AlignAMPCommand extends SequentialCommandGroup implements VariantCommand {
+    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
+    public Command[] commands; 
+    public AlignAMPCommand(TranslationalDrivebase translationalDrive, RotationalDrivebase rotationalDrive, Localizer localizer, Alliance alliance) {
+        commands = new Command[] {
+            new RotateToAMPCommand(rotationalDrive, localizer, alliance),
+            new MoveToAMPCommand(translationalDrive, localizer, alliance)
+        };
+        
+        addCommands(
+            commands[0],
+            commands[1]
+        );
 
-  public static final double TRANSLATIONAL_SPEED = 1;
-  public static final Rotation2d ROTATIONAL_SPEED = new Rotation2d(1);
+        addRequirements(translationalDrive, rotationalDrive);
+    }
 
-  public AlignAMPCommand(TranslationalDrivebase translationalDrive, RotationalDrivebase rotationalDrive, Localizer localizer) {
-    Translation2d distanceFromAprilTag;
-    Rotation2d angleOfAprilTag;
-    if (Constants.getColor() == Alliance.Blue) {
-      distanceFromAprilTag = localizer.getTagPosition(6);
-      angleOfAprilTag = localizer.getTagHeading(6);
-    } else {
-      distanceFromAprilTag = localizer.getTagPosition(5);
-      angleOfAprilTag = localizer.getTagHeading(5);
+    @Override
+    public void changeColorSide() {
+        ((VariantCommand) commands[0]).changeColorSide();
+        ((VariantCommand) commands[1]).changeColorSide();
     }
 
 
-    addCommands(
-      new RotationCommand(angleOfAprilTag, ROTATIONAL_SPEED, rotationalDrive, localizer),
-      new TranslationCommand(distanceFromAprilTag, TRANSLATIONAL_SPEED, translationalDrive)
-    );
-    
-    addRequirements(translationalDrive, rotationalDrive);
-  }
+    /***
+     * This is to make the command perform its calculations at run time
+     */
 }
