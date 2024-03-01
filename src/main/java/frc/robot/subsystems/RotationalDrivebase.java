@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 
 /**
@@ -11,12 +12,12 @@ public interface RotationalDrivebase extends Subsystem {
      * 
      * @param omega The desired rotational velocity in radians per second.
      */
-    public void setRotation(double omega);
+    public void setRotationalVelocity(Rotation2d omega);
 
     /**
      * Returns the current rotational velocity in radians per second.
      * 
      * @return The current rotational velocity in radians per second.
      */
-    public double getRate();
+    public Rotation2d getRotationalVelocity();
 }

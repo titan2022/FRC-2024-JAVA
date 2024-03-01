@@ -6,12 +6,12 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.IntakeSubsystem;
-import frc.robot.subsystems.SlamDunkerSubsystem;;
+import frc.robot.subsystems.ShooterSubsystem;
 
 /** An example command that uses an example subsystem. */
 public class ShootAMPCommand extends Command {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
-    public ShootAMPCommand(SlamDunkerSubsystem shooter, IntakeSubsystem intake) {
+    public ShootAMPCommand(ShooterSubsystem shooter) {
 
     }
 

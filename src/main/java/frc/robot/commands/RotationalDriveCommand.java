@@ -1,5 +1,6 @@
 package frc.robot.commands;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -68,15 +69,18 @@ public class RotationalDriveCommand extends Command {
 
     @Override
     public void execute() {
-        double drift = -localizer.getRate() * DEG / S - omega;
+        double drift = 0.0;
+        if (localizer != null) {
+            drift = -localizer.getRate() * DEG / S - omega;
+        }
         double joy = applyDeadband(xbox.getRightX(), 0.1);
         omega = -scaleVelocity(joy);
-        drive.setRotation(omega - 0.5 * drift);
+        drive.setRotationalVelocity(new Rotation2d(omega - 0.5 * drift));
     }
 
     @Override
     public void end(boolean interrupted) {
-        drive.setRotation(0);
+        drive.setRotationalVelocity(new Rotation2d(0));
         if (interrupted)
             new StartEndCommand(() -> {
                 xbox.setRumble(RumbleType.kRightRumble, 0.5);
