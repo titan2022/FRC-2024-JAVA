@@ -25,7 +25,7 @@ import frc.robot.utility.networking.types.NetworkingTag;
  */
 public class Localizer {
     private NetworkingServer server;
-    private WPI_Pigeon2 pigeon = new WPI_Pigeon2(40);
+    private WPI_Pigeon2 pigeon = new WPI_Pigeon2(15);
 
     private Rotation2d pigeonOffset = new Rotation2d(0);
 

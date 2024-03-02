@@ -6,6 +6,9 @@ package frc.robot.utility;
 
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
  * numerical or boolean
@@ -111,6 +114,21 @@ public final class Constants {
 	public static final double MAX_ACCELERATION = 5 * (Unit.M / Unit.S / Unit.S);
 	public static final double MAX_ANGULAR_ACCELERATION = 1 * (Unit.ROT / Unit.S / Unit.S);
 
+	public static Alliance getColor() {
+		return DriverStation.getAlliance().get();
+	}
+
+	public static final class RobotSize {
+		//Units in meters
+		public static final double WIDTH = 1;
+		public static final double LENGTH = 1;
+	}
+	// public static class FeedForward 
+	// {
+	// 	public static final double kS = 0.015;
+	// 	public static final double kV = 0.18;
+	// 	public static final double kA = 0;
+	// }
 	/**
 	 * Contains a velocity based PID configuration.
 	 * 
@@ -119,9 +137,13 @@ public final class Constants {
 	public static TalonFXConfiguration getSwerveDriveTalonDriveConfig() {
 		TalonFXConfiguration talon = new TalonFXConfiguration();
 		// Add configs here:
-		talon.slot0.kP = 0.12;
+		// talon.slot0.kP = 0.12;
+		// talon.slot0.kI = 0;
+		// talon.slot0.kD = 2.5;
+		// talon.slot0.kF = 0;
+		talon.slot0.kP = 0.1;
 		talon.slot0.kI = 0;
-		talon.slot0.kD = 2.5;
+		talon.slot0.kD = 0;
 		talon.slot0.kF = 0;
 		talon.slot0.integralZone = 900;
 		talon.slot0.allowableClosedloopError = 20;
