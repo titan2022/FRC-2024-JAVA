@@ -1,5 +1,9 @@
 package frc.robot.subsystems;
 
+import static frc.robot.utility.Constants.Unit.FALCON_TICKS;
+import static frc.robot.utility.Constants.Unit.IN;
+import static frc.robot.utility.Constants.Unit.METERS;
+
 import java.net.IDN;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
@@ -21,9 +25,12 @@ public class ElevatorSubsystem extends SubsystemBase{
     private final WPI_TalonFX RIGHT_SPOOL_MOTOR = new WPI_TalonFX(0);
     private static final WPI_TalonFX INDEXER = new WPI_TalonFX(0);
 
-    private static final double BOTTOM_HEIGHT = 0.0;
-    private static final double TOP_HEIGHT = 0.0;
-    private static final double SPOOL_RADIUS = 0.0;
+    public static final double BOTTOM_HEIGHT = 0.0;
+    public static final double TOP_HEIGHT = 0.0;
+    public static final double SPOOL_RADIUS = 0.5 * IN / METERS;
+    public static final double GEAR_RATIO = 30;
+    public static final double TOP_HEIGHT_TICKS = TOP_HEIGHT / (2 * SPOOL_RADIUS * FALCON_TICKS);
+
 
     public static final double GRAVITY_OFFSET = 0;
     public static final double ROBOT_WINCH_OFFSET = 0;
@@ -84,15 +91,29 @@ public class ElevatorSubsystem extends SubsystemBase{
 
 
     public void setHeight(double height) {
-        LEFT_SPOOL_MOTOR.set(ControlMode.Position, height, DemandType.ArbitraryFeedForward, GRAVITY_OFFSET);
+        //Two stage elevator 
+        double motorUnits = height / 2;
+        //Number of radians
+        motorUnits /= (SPOOL_RADIUS * GEAR_RATIO);
+        //Convert to number of FalconTicks
+        motorUnits /= FALCON_TICKS;
+
+        LEFT_SPOOL_MOTOR.set(ControlMode.Position, motorUnits, DemandType.ArbitraryFeedForward, GRAVITY_OFFSET);
     }
 
     public double getHeight() {
-        return 0;
+        double position = LEFT_SPOOL_MOTOR.getSelectedSensorPosition();
+        if (position < 0) 
+             position = TOP_HEIGHT_TICKS + position;
+        position *= FALCON_TICKS;
+        position *= SPOOL_RADIUS * GEAR_RATIO;
+        position *= 2;
+        return position;
     }
 
     public void winch(double height) {
-        LEFT_SPOOL_MOTOR.set(ControlMode.Position, -height - SPOOL_RADIUS, DemandType.ArbitraryFeedForward, -ROBOT_WINCH_OFFSET);
+        double motorUnits = -height;
+        LEFT_SPOOL_MOTOR.set(ControlMode.Position, motorUnits, DemandType.ArbitraryFeedForward, -ROBOT_WINCH_OFFSET);
     }
 
     public void index(double displacement) {
