@@ -87,6 +87,10 @@ public class ElevatorSubsystem extends SubsystemBase{
         LEFT_SPOOL_MOTOR.set(ControlMode.Position, height, DemandType.ArbitraryFeedForward, GRAVITY_OFFSET);
     }
 
+    public double getHeight() {
+        return 0;
+    }
+
     public void winch(double height) {
         LEFT_SPOOL_MOTOR.set(ControlMode.Position, -height - SPOOL_RADIUS, DemandType.ArbitraryFeedForward, -ROBOT_WINCH_OFFSET);
     }
@@ -95,11 +99,11 @@ public class ElevatorSubsystem extends SubsystemBase{
         INDEXER.set(ControlMode.Position, INDEXER.getSelectedSensorPosition() + displacement);
     }
 
-    public void indexAMP() {
-        index(0);
-    }
-}
-    public boolean hasNote() {
-        return false;
+    public void indexSpeed(double speed) {
+        INDEXER.set(ControlMode.PercentOutput, speed);
     }
 
+    public boolean hasNote() {
+        return false;
+    } 
+}

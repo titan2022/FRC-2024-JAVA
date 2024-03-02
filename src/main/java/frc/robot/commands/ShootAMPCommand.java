@@ -4,35 +4,24 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
-import frc.robot.subsystems.SlamDunkerSubsystem;;
+import frc.robot.subsystems.ShooterSubsystem;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
 /** An example command that uses an example subsystem. */
-public class ShootAMPCommand extends Command {
+public class ShootAMPCommand extends SequentialCommandGroup{
+    public static double AMP_HEIGHT = 0;
+    public static double SHOOT_AMP_SPEED = 1;
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
-    public ShootAMPCommand(SlamDunkerSubsystem shooter, IntakeSubsystem intake) {
+    public ShootAMPCommand(ElevatorSubsystem subsystem) {
+        addCommands(
+            new MoveElevatorCommand(AMP_HEIGHT, subsystem),
+            new IndexOutNoteCommand(SHOOT_AMP_SPEED, subsystem)
+        );
 
+        addRequirements(subsystem);
     }
 
-    // Called when the command is initially scheduled.
-    @Override
-    public void initialize() {
-    }
-
-    // Called every time the scheduler runs while the command is scheduled.
-    @Override
-    public void execute() {
-    }
-
-    // Called once the command ends or is interrupted.
-    @Override
-    public void end(boolean interrupted) {
-    }
-
-    // Returns true when the command should end.
-    @Override
-    public boolean isFinished() {
-      return false;
-    }
-  }
+}
