@@ -3,26 +3,50 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class IndexerSubsystem extends SubsystemBase{
-    private final WPI_TalonFX MOTOR = new WPI_TalonFX(0);
-    private static final double INDEX_PERCENT_OUTPUT = 0.0;
-    private static final double AMP_PERCENT_OUTPUT = 0.0;
+public class IndexerSubsystem extends SubsystemBase {
+    private static final double INDEX_VELOCITY = 0.0;
+    private static final double AMP_VELOCITY = 0.0;
+    private static final int BREAK_TIMEOUT = 2; // In frames (20ms)
 
-    public void stop(){
-        MOTOR.set(ControlMode.PercentOutput, 0);
+    private WPI_TalonFX motor = new WPI_TalonFX(0);
+    private DigitalInput beamBreakerInput = new DigitalInput(0);
+
+    private int timer = 0; // Shouldn't run out even after a day...
+    private boolean noteStatus = false;
+    private long lastNoteChange = 0;
+
+    public IndexerSubsystem() {
+
     }
 
-    public void index(boolean reverse){
-        MOTOR.set(ControlMode.PercentOutput, (reverse ? -1 : 1) * INDEX_PERCENT_OUTPUT);
+    public void stop() {
+        motor.set(ControlMode.Velocity, 0);
     }
 
-    public void amp(boolean reverse){
-        MOTOR.set(ControlMode.PercentOutput, (reverse ? -1 : 1) * AMP_PERCENT_OUTPUT);
+    public void index(boolean reverse) {
+        motor.set(ControlMode.Velocity, (reverse ? -1 : 1) * INDEX_VELOCITY);
     }
 
-    public IndexerSubsystem(){
-        
+    public void amp(boolean reverse) {
+        motor.set(ControlMode.Velocity, (reverse ? -1 : 1) * AMP_VELOCITY);
+    }
+
+    public boolean hasNote() {
+        return noteStatus;
+    }
+
+    @Override
+    public void periodic() {
+        // Beam breaker needs to be in a state for more than its timeout to count (prevents noise)
+        boolean newNoteStatus = beamBreakerInput.get();
+        if (newNoteStatus != noteStatus && timer - lastNoteChange > BREAK_TIMEOUT) {
+            noteStatus = newNoteStatus;
+            lastNoteChange = timer;
+        }
+
+        timer++;
     }
 }
