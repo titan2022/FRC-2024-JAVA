@@ -102,6 +102,14 @@ public class Localizer {
     }
 
     /**
+     * Resets rotational offset 
+     */
+    public void resetOrientation() {
+        navxGyro.reset();
+        navxGyro.resetDisplacement();
+    }
+
+    /**
      * Gets the Pigeon rotation velocity (clockwise is positive)
      * 
      * @return The current rotational velocity (DEG/S)
@@ -113,7 +121,7 @@ public class Localizer {
     /**
      * Gets the current heading estimate of the robot.
      * 
-     * @return The current heading estimate of the robot, measured counterclockwise
+     * @return The current heading estimate of the robot, measured clockwise
      *         from the positive y-axis
      */
     public Rotation2d getHeading() {
@@ -183,10 +191,7 @@ public class Localizer {
      * Updates first frame localization estimates
      */
     public void setup() {
-        // pigeonOffset = pigeon.getRotation2d();
-
-        navxGyro.reset();
-        navxGyro.resetDisplacement();
+        resetOrientation();
 
         if (server != null) {
             server.subscribe("pos", (NetworkingCall<Translation3d>)(Translation3d position) -> {
