@@ -1,19 +1,12 @@
 package frc.robot.subsystems;
 
-import java.net.IDN;
-
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
-import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
-import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.utility.Constants;
 
 public class ElevatorSubsystem extends SubsystemBase{
     // TODO: get constants
@@ -98,8 +91,8 @@ public class ElevatorSubsystem extends SubsystemBase{
     public void indexAMP() {
         index(0);
     }
-}
+
     public boolean hasNote() {
         return false;
     }
-
+}
