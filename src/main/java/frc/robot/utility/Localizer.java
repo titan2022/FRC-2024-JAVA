@@ -5,6 +5,7 @@ import java.util.Hashtable;
 
 import com.kauailabs.navx.frc.AHRS;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -99,6 +100,15 @@ public class Localizer {
      */
     public Rotation2d getOrientation() {
         return Rotation2d.fromDegrees(-navxGyro.getAngle() + 90);
+    }
+
+    public Pose2d getPose(){
+        return new Pose2d(getPosition(),getOrientation());
+    }
+
+    public void setPose(Pose2d pose){
+        globalPosition = pose.getTranslation();
+        globalOrientation = pose.getRotation();
     }
 
     /**
