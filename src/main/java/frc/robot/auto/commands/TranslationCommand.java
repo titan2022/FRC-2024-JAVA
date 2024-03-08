@@ -13,12 +13,12 @@ import edu.wpi.first.wpilibj2.command.Command;
 /** An example command that uses an example subsystem. */
 public class TranslationCommand extends Command {
     private SwerveDriveSubsystem drive;
-//    private localizer 
+    private localizer 
 
-//    public TranslationCommand(SwerveDriveSubsystem drive) {
-//        this.drive = drive;
-//        addRequirements(drive);
-//    }
+    public TranslationCommand(SwerveDriveSubsystem drive) {
+        this.drive = drive;
+        addRequirements(drive);
+    }
 
     // Called when the command is initially scheduled.
     @Override
@@ -41,6 +41,6 @@ public class TranslationCommand extends Command {
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        return true;
+        
     }
 }
