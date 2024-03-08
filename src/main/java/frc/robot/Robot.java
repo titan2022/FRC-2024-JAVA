@@ -8,22 +8,33 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.commands.AlignAMPCommand;
+import frc.robot.commands.AlignNoteCommand;
+import frc.robot.commands.AlignSpeakerCommand;
+import frc.robot.commands.NoteIntakeCommand;
 import frc.robot.commands.RotationalDriveCommand;
+import frc.robot.commands.ShootAMPCommand;
+import frc.robot.commands.ShootSpeakerCommand;
 import frc.robot.commands.TranslationCommand;
 import frc.robot.commands.TranslationalDriveCommand;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.SwerveDriveSubsystem;
 import frc.robot.utility.Localizer;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 
 public class Robot extends TimedRobot {
-    private SwerveDriveSubsystem drive = new SwerveDriveSubsystem();
+    private Localizer localizer = new Localizer();
+    private SwerveDriveSubsystem drive = new SwerveDriveSubsystem(localizer);
     private final XboxController xbox = new XboxController(0);
     private IntakeSubsystem intake = new IntakeSubsystem();
-    private Localizer localizer = new Localizer();
     private ShooterSubsystem shooter = new ShooterSubsystem();
+    private SendableChooser<Command> autoChooser;
 
     @Override
     public void robotInit() {
@@ -67,6 +78,14 @@ public class Robot extends TimedRobot {
                         new Translation2d(SmartDashboard.getNumber("Desired X Position", 0),
                                 SmartDashboard.getNumber("Desired Y Position", 0)),
                         SmartDashboard.getNumber("Desired Speed", 0), drive.getTranslational()));
+        autoChooser = AutoBuilder.buildAutoChooser("Default Auto");
+        SmartDashboard.putData("Auto Chooser", autoChooser);
+        NamedCommands.registerCommand("Shoot", new ShootSpeakerCommand(50, shooter)); //Set default speed, this is temporary
+        NamedCommands.registerCommand("Align Speaker", new AlignSpeakerCommand(drive.getTranslational(), drive.getRotational(), localizer));
+        NamedCommands.registerCommand("Intake", new NoteIntakeCommand(intake));
+        NamedCommands.registerCommand("Align Intake", new AlignNoteCommand(drive.getTranslational(), drive.getRotational(), intake, localizer));
+        NamedCommands.registerCommand("Amp", new ShootAMPCommand(shooter));
+        NamedCommands.registerCommand("Align Amp", new AlignAMPCommand(drive.getTranslational(), drive.getRotational(), localizer));
         // drive.getTranslational().setDefaultCommand(new
         // TranslationalDriveCommand(drive.getTranslational(), localizer, xbox, 1));
         // drive.getRotational().setDefaultCommand(new
@@ -77,6 +96,10 @@ public class Robot extends TimedRobot {
     @Override
     public void autonomousPeriodic() {
 
+    }
+    /**This function will return the PathPlanner path */
+    public Command getAutonmousCommand(){
+        return autoChooser.getSelected();
     }
 
     @Override
