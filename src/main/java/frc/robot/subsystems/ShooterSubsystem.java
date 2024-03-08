@@ -9,6 +9,7 @@ import static frc.robot.utility.Constants.Unit.FALCON_TICKS;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
@@ -45,6 +46,7 @@ public class ShooterSubsystem extends SubsystemBase {
 	private WPI_TalonFX linkageMotor = new WPI_TalonFX(0);
 	private WPI_TalonFX rotatorMotor = new WPI_TalonFX(0);
 	private WPI_TalonFX shooterMotor = new WPI_TalonFX(0);
+    private PIDController rotationPID = new PIDController(0, 0, 0);
 	private DutyCycleEncoder rotationEncoder = new DutyCycleEncoder(0);
 
 	public ShooterSubsystem() {
@@ -54,8 +56,9 @@ public class ShooterSubsystem extends SubsystemBase {
   	public void config() {
     	rotatorMotor.setInverted(true);
 
-		linkageMotor.setSelectedSensorPosition(0);
-		shooterMotor.setSelectedSensorPosition(0);
+        rotatorMotor.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
+		linkageMotor.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
+		shooterMotor.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
 		rotationEncoder.reset();
   	}
 
@@ -82,12 +85,26 @@ public class ShooterSubsystem extends SubsystemBase {
 		double dx = shooter_x - LINKAGE_PIVOT_DX;
 		double dy = shooter_y - LINKAGE_PIVOT_DY;
 		double d = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
-		double theta1 = Math.acos( // Law of Cosines, can also be negative if we want the linkage "inside"
-			(Math.pow(LINKAGE_LONG_ARM_LENGTH, 2) - Math.pow(d, 2) - Math.pow(LINKAGE_SHORT_ARM_LENGTH, 2)) / 
-			(-2 * d * LINKAGE_SHORT_ARM_LENGTH)
+		// double theta1 = Math.acos( // Law of Cosines, can also be negative if we want the linkage "inside"
+		// 	(Math.pow(LINKAGE_LONG_ARM_LENGTH, 2) - Math.pow(d, 2) - Math.pow(LINKAGE_SHORT_ARM_LENGTH, 2)) / 
+		// 	(-2 * d * LINKAGE_SHORT_ARM_LENGTH)
+		// );
+    	double theta1 = Math.acos( // Law of Cosines, can also be negative if we want the linkage "inside"
+			(-Math.pow(LINKAGE_LONG_ARM_LENGTH, 2) + Math.pow(d, 2) + Math.pow(LINKAGE_SHORT_ARM_LENGTH, 2)) / 
+			(2 * d * LINKAGE_SHORT_ARM_LENGTH)
 		);
 		double theta2 = Math.atan2(dx, dy);
-		double targetRotation = Math.PI / 2 - (theta1 + theta2); // TODO
+        double angleFromY = theta1 - theta2;
+		double targetRotation = Math.PI / 2 - angleFromY; // TODO
+        targetRotation %= 2 * Math.PI;
+
+        if (targetRotation < -Math.PI / 2) {
+             targetRotation += 2 * Math.PI;
+        } else if (targetRotation > 3 * Math.PI / 2) {
+            targetRotation -= 2 * Math.PI;
+        }
+
+        rotatorMotor.set(ControlMode.PercentOutput, rotationPID.calculate(getRotation(), targetRotation));
 	}
 
 	public void shoot(double velocity) {

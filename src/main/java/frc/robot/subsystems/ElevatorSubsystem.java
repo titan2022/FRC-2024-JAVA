@@ -26,8 +26,8 @@ public class ElevatorSubsystem extends SubsystemBase{
     private static final WPI_TalonFX INDEXER = new WPI_TalonFX(0);
 
     public static final double BOTTOM_HEIGHT = 0.0;
-    public static final double TOP_HEIGHT = 0.0;
-    public static final double SPOOL_RADIUS = 0.5 * IN / METERS;
+    public static final double TOP_HEIGHT = 21.5 * IN / METERS;
+    public static final double SPOOL_RADIUS = 1 * IN / METERS;
     public static final double GEAR_RATIO = 30;
     public static final double TOP_HEIGHT_TICKS = TOP_HEIGHT / (2 * SPOOL_RADIUS * FALCON_TICKS);
 
@@ -92,7 +92,7 @@ public class ElevatorSubsystem extends SubsystemBase{
 
     public void setHeight(double height) {
         //Two stage elevator 
-        double motorUnits = height / 2;
+        double motorUnits = height;
         //Number of radians
         motorUnits /= (SPOOL_RADIUS * GEAR_RATIO);
         //Convert to number of FalconTicks
@@ -107,12 +107,15 @@ public class ElevatorSubsystem extends SubsystemBase{
              position = TOP_HEIGHT_TICKS + position;
         position *= FALCON_TICKS;
         position *= SPOOL_RADIUS * GEAR_RATIO;
-        position *= 2;
         return position;
     }
 
-    public void winch(double height) {
-        double motorUnits = -height;
+    public void winch(double climbDistance) {
+        double motorUnits = -climbDistance;
+        //Number of radians
+        motorUnits /= (SPOOL_RADIUS * GEAR_RATIO);
+        //Convert to number of FalconTicks
+        motorUnits /= FALCON_TICKS;
         LEFT_SPOOL_MOTOR.set(ControlMode.Position, motorUnits, DemandType.ArbitraryFeedForward, -ROBOT_WINCH_OFFSET);
     }
 
