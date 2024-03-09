@@ -24,7 +24,7 @@ public class FullNoteIntakeCommand extends SequentialCommandGroup {
     public FullNoteIntakeCommand(TranslationalDrivebase translational, RotationalDrivebase rotational, IntakeSubsystem intake, ElevatorSubsystem elevator, Localizer localizer) {
         addCommands(
             new ParallelCommandGroup(
-                new AlignNoteCommand(translational, rotational, intake, localizer),
+                new AlignNoteCommand(translational, rotational, localizer),
                 new MoveElevatorCommand(false, elevator)
             ),
             new ParallelDeadlineGroup(
