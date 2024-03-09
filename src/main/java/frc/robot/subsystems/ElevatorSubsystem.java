@@ -15,10 +15,10 @@ public class ElevatorSubsystem extends SubsystemBase {
     public static final double STALL_CURRENT_LIMIT = 100;
     // public static final double INDEXER_SPEED = 0.5;
     // TODO: get constants
-    private static final WPI_TalonFX LEFT_SPOOL_MOTOR = new WPI_TalonFX(0);
-    private static final WPI_TalonFX RIGHT_SPOOL_MOTOR = new WPI_TalonFX(0);
-    private static final WPI_TalonFX INDEXER = new WPI_TalonFX(0);
-    private static final DigitalInput noteSensor = new DigitalInput(0);
+    public static final WPI_TalonFX LEFT_SPOOL_MOTOR = new WPI_TalonFX(0);
+    public static final WPI_TalonFX RIGHT_SPOOL_MOTOR = new WPI_TalonFX(0);
+    public static final WPI_TalonFX INDEXER = new WPI_TalonFX(0);
+    public static final DigitalInput NOTE_SENSOR = new DigitalInput(0);
     // public static boolean hasNote = false;
     // public static double noteDuration = 0;
     // public static final double BOTTOM_HEIGHT = 0.0;
@@ -146,13 +146,13 @@ public class ElevatorSubsystem extends SubsystemBase {
     // }
 
     public boolean hasNote() {
-        return noteSensor.get();
+        return NOTE_SENSOR.get();
     } 
 
     // @Override
     // public void periodic() {
     //     // Beam breaker needs to be in a state for more than its timeout to count (prevents noise)
-    //     if (noteSensor.get() && !hasNote) {
+    //     if (NOTE_SENSOR.get() && !hasNote) {
     //         noteDuration = Timer.getFPGATimestamp();
     //         noteDuration++;
     //     } 

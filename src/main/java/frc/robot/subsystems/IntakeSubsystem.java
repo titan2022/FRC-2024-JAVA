@@ -21,49 +21,49 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
  */
 @SuppressWarnings({"deprecated", "removal"})
 public class IntakeSubsystem extends SubsystemBase {
-  public static final double INTAKE_SPEED = 0.5;
-  private static final SupplyCurrentLimitConfiguration LIMIT_CONFIG = new SupplyCurrentLimitConfiguration(true, 30, 30, 0 );
-  private static final WPI_TalonFX wheelMotor = new WPI_TalonFX(3);
-  public IntakeSubsystem() {
-    config();
-  }
-
-  public void config() {
-    wheelMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
-    wheelMotor.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
-    wheelMotor.setInverted(true);
-    wheelMotor.setNeutralMode(NeutralMode.Coast);
-    wheelMotor.configSupplyCurrentLimit(LIMIT_CONFIG);
-  }
-
-  /***  
-   * Sets the speed of the wheels
-   * @param speed In percentage from -1 to 1
-   */
-  public void setWheelSpeed(double speed) {
-    wheelMotor.set(ControlMode.PercentOutput, speed);
-  }
-
-  public double getWheelSpeed() {
-    return wheelMotor.getSelectedSensorVelocity();
-  }
-
-  public void toggle() {
-    if (Math.abs(getWheelSpeed()) <= 0.01) {
-      intake();
-    } else {
-      stop();
+    public static final double INTAKE_SPEED = 0.5;
+    // public static final SupplyCurrentLimitConfiguration LIMIT_CONFIG = new SupplyCurrentLimitConfiguration(true, 30, 30, 0 );
+    public static final WPI_TalonFX wheelMotor = new WPI_TalonFX(3);
+    public IntakeSubsystem() {
+        config();
     }
-  }
 
-  /***
-   * 
-   */
-  public void intake() {
-    setWheelSpeed(INTAKE_SPEED);
-  }
+    public void config() {
+        wheelMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
+        wheelMotor.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
+        wheelMotor.setInverted(true);
+        wheelMotor.setNeutralMode(NeutralMode.Coast);
+        // wheelMotor.configSupplyCurrentLimit(LIMIT_CONFIG);
+    }
 
-  public void stop() {
-    setWheelSpeed(0);
-  }
+    /***  
+     * Sets the speed of the wheels
+     * @param speed In percentage from -1 to 1
+     */
+    public void setWheelSpeed(double speed) {
+        wheelMotor.set(ControlMode.PercentOutput, speed);
+    }
+
+    public double getWheelSpeed() {
+        return wheelMotor.getSelectedSensorVelocity();
+    }
+
+    public void toggle() {
+        if (Math.abs(getWheelSpeed()) <= 0.01) {
+            intake();
+        } else {
+            stop();
+        }
+    }
+
+    /***
+     * 
+     */
+    public void intake() {
+        setWheelSpeed(INTAKE_SPEED);
+    }
+
+    public void stop() {
+        setWheelSpeed(0);
+    }
 }

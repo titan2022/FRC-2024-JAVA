@@ -38,13 +38,13 @@ public class ShooterSubsystem extends SubsystemBase {
 	// SimpleMotorFeedforward shooterFeedForward = new SimpleMotorFeedforward(shooterFeedForwardParams[0], shooterFeedForwardParams[1], shooterFeedForwardParams[2]);
     public static final PIDController rotationPID = new PIDController(0, 0, 0);
     
-	public WPI_TalonFX linkageMotor = new WPI_TalonFX(12);
-	private WPI_TalonFX topShooterMotor = new WPI_TalonFX(13);
-	private WPI_TalonFX bottomShooterMotor = new WPI_TalonFX(5);
-	public WPI_TalonFX indexerMotor = new WPI_TalonFX(21);
-	public static DutyCycleEncoder linkageEncoder = new DutyCycleEncoder(0);
+	public static final WPI_TalonFX linkageMotor = new WPI_TalonFX(12);
+	public static final WPI_TalonFX topShooterMotor = new WPI_TalonFX(13);
+	public static final WPI_TalonFX bottomShooterMotor = new WPI_TalonFX(5);
+	public static final WPI_TalonFX indexerMotor = new WPI_TalonFX(21);
+	public static final DutyCycleEncoder linkageEncoder = new DutyCycleEncoder(0);
 
-	public static boolean INDEX_ON = false;
+	// public static boolean INDEX_ON = false;
 
 	public ShooterSubsystem() {
     	config();
@@ -52,13 +52,15 @@ public class ShooterSubsystem extends SubsystemBase {
 
 	public void config() {
 		linkageEncoder.reset();
+
+		bottomShooterMotor.follow(topShooterMotor);
+		bottomShooterMotor.setInverted(true);
+		bottomShooterMotor.setSensorPhase(true);
+
 		topShooterMotor.setNeutralMode(NeutralMode.Brake);
 		bottomShooterMotor.setNeutralMode(NeutralMode.Brake);
 		linkageMotor.setNeutralMode(NeutralMode.Brake);
 		indexerMotor.setNeutralMode(NeutralMode.Brake);
-		topShooterMotor.setInverted(true);
-		bottomShooterMotor.follow(topShooterMotor);
-		bottomShooterMotor.setInverted(true);
 	}
 
 	/**

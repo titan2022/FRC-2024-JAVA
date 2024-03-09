@@ -55,6 +55,7 @@ public class Robot extends TimedRobot {
         SmartDashboard.putNumber("Current Angle", localizer.getHeading().getDegrees());
         SmartDashboard.putNumber("Rotational Velocity", localizer.getRate());
         SmartDashboard.putNumber("Shooter Angle", shooter.getRotation().getDegrees());
+        SmartDashboard.putNumber("Elevator Current", elevator.LEFT_SPOOL_MOTOR.getOutputCurrent());
         SmartDashboard.putBoolean("hasNote", elevator.hasNote());
         SmartDashboard.putBoolean("IsStalling", elevator.isStalling());
         localizer.step();
