@@ -13,4 +13,8 @@ public class NetworkingPose {
         this.position = position;
         this.rotation = rotation;
     }
+
+    public String toString() {
+        return position.toString() + " " + rotation.toString();
+    }
 }

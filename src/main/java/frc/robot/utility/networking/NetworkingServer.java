@@ -12,7 +12,6 @@ import java.util.List;
 
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.utility.networking.types.NetworkingPose;
 import frc.robot.utility.networking.types.NetworkingTag;
 import frc.robot.utility.networking.types.NetworkingVector;
@@ -21,7 +20,7 @@ import frc.robot.utility.networking.types.NetworkingVector;
  * UDP-based networking server that replaces NetworkTable
  */
 public class NetworkingServer implements Runnable {
-    private static final int MAX_PACKET_SIZE = 1024;
+    private static final int MAX_PACKET_SIZE = 128;
     private static final int DEFAULT_PORT = 5800;
 
     private final int port;
@@ -73,7 +72,7 @@ public class NetworkingServer implements Runnable {
         try {
             socket = new DatagramSocket(port);
         } catch (SocketException err) {
-            SmartDashboard.putString("server error", err.getMessage());
+            System.out.println(err.getMessage());
         }
 
         DatagramPacket packet = null;
@@ -85,8 +84,13 @@ public class NetworkingServer implements Runnable {
             try {
                 socket.receive(packet);
             } catch (IOException err) {
-                SmartDashboard.putString("server error", err.getMessage());
+                System.out.println(err.getMessage());
             }
+
+            // for (int i = 0; i < 72; i++) {
+            //     System.out.print(String.format("%8s", Integer.toBinaryString(buffer[i] & 0xFF)).replace(' ', '0') + " ");
+            // }
+            // System.out.println("\r\n");
 
             char packetType = getPacketType(buffer);
 
@@ -125,10 +129,10 @@ public class NetworkingServer implements Runnable {
             return null;
         }
 
-        double x = bytesToDouble(Arrays.copyOfRange(data, 8, 16)); // 8 - 15: x of vector (double)
-        double y = bytesToDouble(Arrays.copyOfRange(data, 16, 24)); // 16 - 23: y of vector (double)
-        double z = bytesToDouble(Arrays.copyOfRange(data, 24, 32)); // 24 - 31: z of vector (double)
-        String name = bytesToString(Arrays.copyOfRange(data, 32, length)); // 32 - N: name
+        String name = bytesToString(Arrays.copyOfRange(data, 1, 16));
+        double x = bytesToDouble(Arrays.copyOfRange(data, 16, 24));
+        double y = bytesToDouble(Arrays.copyOfRange(data, 24, 32));
+        double z = bytesToDouble(Arrays.copyOfRange(data, 32, 40));
 
         return new NetworkingVector(name, new Translation3d(x, y, z));
     }
@@ -138,15 +142,14 @@ public class NetworkingServer implements Runnable {
             return null;
         }
 
-        double x = bytesToDouble(Arrays.copyOfRange(data, 8, 16)); // 8 - 15: x of vector (double)
-        double y = bytesToDouble(Arrays.copyOfRange(data, 16, 24)); // 16 - 23: y of vector (double)
-        double z = bytesToDouble(Arrays.copyOfRange(data, 24, 32)); // 24 - 31: z of vector (double)
+        String name = bytesToString(Arrays.copyOfRange(data, 1, 16));
+        double x = bytesToDouble(Arrays.copyOfRange(data, 16, 24));
+        double y = bytesToDouble(Arrays.copyOfRange(data, 24, 32));
+        double z = bytesToDouble(Arrays.copyOfRange(data, 32, 40));
 
-        double roll = bytesToDouble(Arrays.copyOfRange(data, 32, 40)); // 32- 39: roll of vector (double)
-        double pitch = bytesToDouble(Arrays.copyOfRange(data, 40, 48)); // 40 - 47: pitch of vector (double)
-        double yaw = bytesToDouble(Arrays.copyOfRange(data, 48, 56)); // 48 - 55: yaw of vector (double)
-
-        String name = bytesToString(Arrays.copyOfRange(data, 56, length)); // 56 - N: name
+        double roll = bytesToDouble(Arrays.copyOfRange(data, 40, 48));
+        double pitch = bytesToDouble(Arrays.copyOfRange(data, 48, 56));
+        double yaw = bytesToDouble(Arrays.copyOfRange(data, 56, 64));
 
         return new NetworkingPose(name, new Translation3d(x, y, z), new Rotation3d(roll, pitch, yaw));
     }
@@ -156,69 +159,36 @@ public class NetworkingServer implements Runnable {
             return null;
         }
 
-        double x = bytesToDouble(Arrays.copyOfRange(data, 8, 16)); // 8 - 15: x of vector (double)
-        double y = bytesToDouble(Arrays.copyOfRange(data, 16, 24)); // 16 - 23: y of vector (double)
-        double z = bytesToDouble(Arrays.copyOfRange(data, 24, 32)); // 24 - 31: z of vector (double)
+        String name = bytesToString(Arrays.copyOfRange(data, 1, 16));
+        double x = bytesToDouble(Arrays.copyOfRange(data, 16, 24));
+        double y = bytesToDouble(Arrays.copyOfRange(data, 24, 32));
+        double z = bytesToDouble(Arrays.copyOfRange(data, 32, 40));
+        
+        double roll = bytesToDouble(Arrays.copyOfRange(data, 40, 48));
+        double pitch = bytesToDouble(Arrays.copyOfRange(data, 48, 56));
+        double yaw = bytesToDouble(Arrays.copyOfRange(data, 56, 64));
 
-        double roll = bytesToDouble(Arrays.copyOfRange(data, 32, 40)); // 32- 39: roll of vector (double)
-        double pitch = bytesToDouble(Arrays.copyOfRange(data, 40, 48)); // 40 - 47: pitch of vector (double)
-        double yaw = bytesToDouble(Arrays.copyOfRange(data, 48, 56)); // 48 - 55: yaw of vector (double)
-
-        int id = bytesToInt(Arrays.copyOfRange(data, 56, 64)); // 56 - 63: id of tag
-        String name = bytesToString(Arrays.copyOfRange(data, 64, length)); // 32 - N: name
+        int id = bytesToInt(Arrays.copyOfRange(data, 64, 68));
 
         return new NetworkingTag(name, new Translation3d(x, y, z), new Rotation3d(roll, pitch, yaw), id);
     }
 
-    // private void serializePacketData(byte[] packet, String name, Translation3d
-    // vector) {
-    // byte[] x = doubleToBytes(vector.getX());
-    // byte[] y = doubleToBytes(vector.getY());
-    // byte[] z = doubleToBytes(vector.getZ());
-    // //byte[] nameData = name.getBytes();
-
-    // int doubleLength = x.length;
-
-    // System.arraycopy(x, 0, packet, 0, doubleLength);
-    // System.arraycopy(y, 0, packet, doubleLength, doubleLength);
-    // System.arraycopy(z, 0, packet, doubleLength * 2, doubleLength);
-    // //System.arraycopy(nameData, 0, packet, doubleLength * 3, nameData.length);
-    // }
-
-    // private NetworkingVector parsePacketData(byte[] data, int length) {
-    // if (data == null) {
-    // return null;
-    // }
-
-    // double vecX = bytesToDouble(Arrays.copyOfRange(data, 0, 8)); // 0 - 7: x of
-    // vector (double)
-    // double vecY = bytesToDouble(Arrays.copyOfRange(data, 8, 16)); // 8 - 15: y of
-    // vector (double)
-    // double vecZ = bytesToDouble(Arrays.copyOfRange(data, 16, 24)); // 16 - 23: z
-    // of vector (double)
-
-    // Translation3d vector = new Translation3d(vecX, vecY, vecZ);
-
-    // String objectName = "";
-    // try {
-    // objectName = new String(data, 24, length - 24, "UTF-8"); // 24 - end: object
-    // name (string)
-    // } catch (UnsupportedEncodingException err) {
-    // SmartDashboard.putString("server error", err.getMessage());
-    // }
-
-    // return new NetworkingVector(objectName.replaceAll("[^\\x20-\\x7E]", ""),
-    // vector);
-    // }
-
-    // private byte[] doubleToBytes(double d) {
-    // ByteBuffer byteBuffer = ByteBuffer.allocate(Double.BYTES);
-    // byteBuffer.putDouble(d);
-    // return byteBuffer.array();
-    // }
+    private byte[] changeEndian(byte[] buffer) {
+        for(int i = 0; i < buffer.length / 2; i++)
+        {
+            byte temp = buffer[i];
+            buffer[i] = buffer[buffer.length - i - 1];
+            buffer[buffer.length - i - 1] = temp;
+        }
+        return buffer;
+    }
 
     private double bytesToDouble(byte[] buffer) {
-        return ByteBuffer.wrap(buffer).getDouble();
+        return ByteBuffer.wrap(changeEndian(buffer)).getDouble();
+    }
+
+    private int bytesToInt(byte[] buffer) {
+        return ByteBuffer.wrap(changeEndian(buffer)).getInt();
     }
 
     private char bytesToChar(byte[] buffer) {
@@ -226,10 +196,6 @@ public class NetworkingServer implements Runnable {
     }
 
     private String bytesToString(byte[] buffer) {
-        return new String(buffer, StandardCharsets.UTF_8).replaceAll("[^\\x20-\\x7E]", "");
-    }
-
-    private int bytesToInt(byte[] buffer) {
-        return ByteBuffer.wrap(buffer).getInt();
+        return new String(buffer, StandardCharsets.UTF_8).replaceAll("\0", "");
     }
 }
