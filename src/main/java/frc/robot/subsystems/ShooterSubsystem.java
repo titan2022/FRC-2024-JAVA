@@ -7,11 +7,8 @@ package frc.robot.subsystems;
 import static frc.robot.utility.Constants.Unit.FALCON_TICKS;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
-<<<<<<< HEAD
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
-=======
->>>>>>> linkage-shooter
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
