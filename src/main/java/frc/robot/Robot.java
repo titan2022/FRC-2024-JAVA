@@ -16,7 +16,6 @@ import frc.robot.commands.NoteIntakeCommand;
 import frc.robot.commands.RotationCommand;
 import frc.robot.commands.ShootAMPCommand;
 import frc.robot.commands.ShootSpeakerCommand;
-import frc.robot.commands.ShooterNoteIntakeCommand;
 import frc.robot.commands.TranslationCommand;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -124,11 +123,6 @@ public class Robot extends TimedRobot {
                 );
                 break;
             case 6: 
-                CommandScheduler.getInstance().schedule(
-                    new ShooterNoteIntakeCommand(shooter, elevator)
-                );
-                break;
-            case 7: 
                 CommandScheduler.getInstance().schedule(
                     new ShootAMPCommand(SmartDashboard.getNumber("A", 0), elevator)
                 );
