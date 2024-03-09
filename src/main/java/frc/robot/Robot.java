@@ -3,37 +3,48 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot;
-import com.ctre.phoenix.motorcontrol.NeutralMode;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.commands.RotationalDriveCommand;
+import frc.robot.commands.MoveElevatorCommand;
+import frc.robot.commands.NoteIntakeCommand;
+import frc.robot.commands.RotationCommand;
+import frc.robot.commands.ShootAMPCommand;
+import frc.robot.commands.ShootSpeakerCommand;
+import frc.robot.commands.ShooterNoteIntakeCommand;
 import frc.robot.commands.TranslationCommand;
-import frc.robot.commands.TranslationalDriveCommand;
+import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.SwerveDriveSubsystem;
 import frc.robot.utility.Localizer;
+import frc.robot.utility.TeleopListener;
 
 public class Robot extends TimedRobot {
     private SwerveDriveSubsystem drive = new SwerveDriveSubsystem();
     private final XboxController xbox = new XboxController(0);
-    private IntakeSubsystem intake = new IntakeSubsystem();
+    private TeleopListener listener = new TeleopListener(xbox);
     private Localizer localizer = new Localizer();
+    private ElevatorSubsystem elevator = new ElevatorSubsystem();
+    private IntakeSubsystem intake = new IntakeSubsystem();
     private ShooterSubsystem shooter = new ShooterSubsystem();
 
     @Override
     public void robotInit() {
-        SmartDashboard.putNumber("Desired Intake Speed", 0.75);
-        SmartDashboard.putNumber("Desired Speed", 0.5);
-        SmartDashboard.putNumber("Desired X Position", 0);
-        SmartDashboard.putNumber("Desired Y Position", 1);
-        SmartDashboard.putNumber("Desired Rotation", 0);
-        SmartDashboard.putNumber("Desired Indexer Speed", 0.25);
-        SmartDashboard.putNumber("Desired Shooter Speed", 0.7);
+        SmartDashboard.putNumber("Command Test", 0);
+        SmartDashboard.putNumber("Subsystem Test", 0);
+
+        SmartDashboard.putNumber("A", 0);
+        SmartDashboard.putNumber("B", 0);
+        SmartDashboard.putNumber("C", 0);
+        SmartDashboard.putNumber("D", 0);
+        SmartDashboard.putNumber("E", 0);
+        SmartDashboard.putNumber("F", 0);
     }
 
     @Override
@@ -42,16 +53,11 @@ public class Robot extends TimedRobot {
         SmartDashboard.putNumber("Current X Velocity", drive.getTranslational().getVelocity().getX());
         SmartDashboard.putNumber("Current Y Velocity", drive.getTranslational().getVelocity().getY());
         SmartDashboard.putNumber("Current Angle", localizer.getHeading().getDegrees());
+        SmartDashboard.putNumber("Rotational Velocity", localizer.getRate());
+        SmartDashboard.putNumber("Shooter Angle", shooter.getRotation().getDegrees());
+        SmartDashboard.putBoolean("hasNote", elevator.hasNote());
+        SmartDashboard.putBoolean("IsStalling", elevator.isStalling());
         localizer.step();
-
-        // SmartDashboard.putNumber("Rotation", shooter.getRotation().getDegrees());
-
-        // SmartDashboard.putNumber("Global X", localizer.getPosition().getX());
-        // SmartDashboard.putNumber("Global Y", localizer.getPosition().getY());
-        // SmartDashboard.putNumber("Global Orientation",
-        // localizer.getOrientation().getDegrees());
-        // SmartDashboard.putNumber("Global Heading",
-        // localizer.getHeading().getDegrees());
     }
 
     @Override
@@ -62,15 +68,6 @@ public class Robot extends TimedRobot {
     @Override
     public void autonomousInit() {
         localizer.setup();
-        CommandScheduler.getInstance().schedule(
-                new TranslationCommand(
-                        new Translation2d(SmartDashboard.getNumber("Desired X Position", 0),
-                                SmartDashboard.getNumber("Desired Y Position", 0)),
-                        SmartDashboard.getNumber("Desired Speed", 0), drive.getTranslational()));
-        // drive.getTranslational().setDefaultCommand(new
-        // TranslationalDriveCommand(drive.getTranslational(), localizer, xbox, 1));
-        // drive.getRotational().setDefaultCommand(new
-        // RotationalDriveCommand(drive.getRotational(), localizer, xbox, Math.PI / 2));
     }
 
     /** This function is called periodically during autonomous. */
@@ -82,83 +79,127 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopInit() {
         localizer.setup();
-
-        drive.getTranslational()
-                .setDefaultCommand(new TranslationalDriveCommand(drive.getTranslational(), localizer, xbox, 6));
-        drive.getRotational()
-                .setDefaultCommand(new RotationalDriveCommand(drive.getRotational(), localizer, xbox, Math.PI));
+        listener.enable();
     }
 
     @Override
     public void teleopPeriodic() {
-        shooter.holdAngle();
+        listener.execute();
+    }
 
-        if (xbox.getLeftBumper()) {
-            if (shooter.INDEX_ON) {
-                shooter.holdNote();
-                shooter.INDEX_ON = false;
-            } else {
-                shooter.setIndexer(SmartDashboard.getNumber("Desired Indexer Speed", 0));
-                shooter.INDEX_ON = true;
-            }
-        } else {
-            if (xbox.getRightBumper()) {
-                shooter.setIndexer(-0.15);
-                shooter.shoot(-0.4);
-            } else if (!xbox.getRightBumper()) {
-                shooter.setIndexer(0);
-                shooter.shoot(0);
-            }
+    @Override
+    public void testInit() {
+        localizer.setup();
+        switch ((int) SmartDashboard.getNumber("Command Test", 0)) {
+            case 1:
+                CommandScheduler.getInstance().schedule(
+                    new TranslationCommand(new Translation2d(SmartDashboard.getNumber("A", 0), SmartDashboard.getNumber("B", 0)),
+                        SmartDashboard.getNumber("C", 0), 
+                        drive.getTranslational())
+                );
+                break;
+            case 2:
+                CommandScheduler.getInstance().schedule(
+                    new RotationCommand(new Rotation2d(SmartDashboard.getNumber("A", 0)), 
+                        new Rotation2d(SmartDashboard.getNumber("B", 0)), 
+                        drive.getRotational(),
+                        localizer)
+                );
+                break;
+            case 3: 
+                    CommandScheduler.getInstance().schedule(
+                        new NoteIntakeCommand(elevator, intake)
+                    );
+                    break;
+            case 4: 
+                CommandScheduler.getInstance().schedule(
+                    new MoveElevatorCommand(true, elevator),
+                    new MoveElevatorCommand(false, elevator)
+                );
+                break;
+            case 5: 
+                CommandScheduler.getInstance().schedule(
+                    new ShootSpeakerCommand(SmartDashboard.getNumber("A", 0), shooter, elevator)
+                );
+                break;
+            case 6: 
+                CommandScheduler.getInstance().schedule(
+                    new ShooterNoteIntakeCommand(shooter, elevator)
+                );
+                break;
+            case 7: 
+                CommandScheduler.getInstance().schedule(
+                    new ShootAMPCommand(SmartDashboard.getNumber("A", 0), elevator)
+                );
+                break;
+            default:
+                break;
         }
+    }
 
-        // if (xbox.getRightBumper())
-        // shooter.linkageMotor.setNeutralMode(NeutralMode.Brake);
-        // else if (xbox.getRightTriggerAxis() >= 0.05)
-        // shooter.linkageMotor.setNeutralMode(NeutralMode.Coast);
+    @Override
+    public void testPeriodic() {
+        switch ((int) SmartDashboard.getNumber("Subsystem Test", 0)) {
+            case 1:
+                drive.getTranslational().setVelocity(new Translation2d(0, 1));
+                break;
+            case 2:
+                drive.getRotational().setRotationalVelocity(new Rotation2d(Math.PI / 4));
+                break;
+            case 3:
+                intake.setWheelSpeed(0.5);
+                break;
+            case 4:
+                intake.intake();
+                break;
+            case 5:
+                intake.stop();
+                break;
+            case 6:
+                double endTimeTwo = Timer.getFPGATimestamp() + 3;
+                intake.toggle();
+                while (true) {
+                if (Timer.getFPGATimestamp() > endTimeTwo) {
+                        intake.toggle();
+                        break;
+                    }
+                }
+                break;
+            case 7:
+                shooter.index(0.5);
+                break;
+            case 8:
+                shooter.holdIndex();
+                break;
+            case 9:
+                shooter.shoot(SmartDashboard.getNumber("A", 0));
+                break;
+            case 10:
+                shooter.rotationPID.setP(SmartDashboard.getNumber("A", 0));
+                shooter.rotationPID.setI(SmartDashboard.getNumber("B", 0));
+                shooter.rotationPID.setD(SmartDashboard.getNumber("C", 0));
+                Rotation2d targetAngle = Rotation2d.fromDegrees(SmartDashboard.getNumber("D", 0));
 
-        SmartDashboard.putNumber("Trigger Value", xbox.getLeftTriggerAxis());
-        if (xbox.getLeftTriggerAxis() > 0) {
-            shooter.shoot(xbox.getLeftTriggerAxis() * SmartDashboard.getNumber("Desired Shooter Speed", 0));
+                if (shooter.getRotation().getDegrees() < targetAngle.getDegrees())
+                    shooter.setRotation(targetAngle);
+                else 
+                    shooter.holdAngle();
+                break;
+            case 11:
+                elevator.index(0.5);
+                break;
+            case 12:
+                elevator.stopIndex();
+                break;
+            case 13:
+                elevator.hold();
+                break;
+            case 14:
+                elevator.elevate(SmartDashboard.getNumber("A", 0));
+            case 15: 
+                elevator.elevate(-SmartDashboard.getNumber("A", 0));;
+            default:
+                break;
         }
-        // drive.getTranslational().setVelocity(new Translation2d(0, 0.5));
-
-        // if (xbox.getYButtonPressed()) {
-        // intake.setWheelSpeed(SmartDashboard.getNumber("Desired Intake Speed", 0));
-        // } else if (xbox.getAButtonPressed())
-        // intake.stop();
-
-        // if (xbox.getYButton()) {
-        // drive.getTranslational().setVelocity(new Translation2d(0,
-        // SmartDashboard.getNumber("Desired Y Velocity", 0)));
-        // } else if (xbox.getAButton()) {
-        // drive.getTranslational().setVelocity(new Translation2d(0, -1 *
-        // SmartDashboard.getNumber("Desired Y Velocity", 0)));
-        // } else if (xbox.getXButton()) {
-        // drive.getTranslational().setVelocity(new
-        // Translation2d(SmartDashboard.getNumber("Desired X Velocity", 0), 0));
-        // } else if(xbox.getBButton()) {
-        // drive.getTranslational().setVelocity(new Translation2d(-1 *
-        // SmartDashboard.getNumber("Desired X Velocity", 0), 0));
-        // } else {
-        // drive.getTranslational().setVelocity(new Translation2d(0, 0));
-        // }
-
-        // SmartDashboard.putBoolean("XButton", xbox.getXButton());
-        // if (xbox.getXButton()) {
-        // intake.testWheelMotor(0.2);
-        // } else if (xbox.getBButton()) {
-        // intake.testWheelMotor(-0.2);
-        // } else if (xbox.getYButton()) {
-        // slamDunker.testRotation(0.1);
-        // } else if (xbox.getAButton()) {
-        // slamDunker.testRotation(-0.1);
-        // } else if (xbox.getRightBumper()) {
-        // slamDunker.testWheelRotation(0.5);
-        // } else if (xbox.getLeftBumper()) {
-        // slamDunker.testWheelRotation(-0.5);
-        // }
-
-        // slamDunker.testWheelRotation(0.2);
-        // intake.testWheelMotor(0.2);
     }
 }

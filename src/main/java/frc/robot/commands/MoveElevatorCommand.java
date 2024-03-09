@@ -32,9 +32,9 @@ public class MoveElevatorCommand extends Command {
     @Override
     public void execute() {
         if (upward)
-            elevator.raise(RAISE_SPEED);
+            elevator.elevate(RAISE_SPEED);
         else 
-            elevator.lower(LOWER_SPEED);
+            elevator.elevate(LOWER_SPEED);
     }
 
     // Called once the command ends or is interrupted.

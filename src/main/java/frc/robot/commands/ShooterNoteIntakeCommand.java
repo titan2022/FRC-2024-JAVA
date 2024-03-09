@@ -10,7 +10,7 @@ import frc.robot.subsystems.ElevatorSubsystem;
 
 
 /** An example command that uses an example subsystem. */
-public class ShooterNoteIntake extends Command {
+public class ShooterNoteIntakeCommand extends Command {
     public static final double SHOOTER_INTAKE_SPEED = -0.5;
     public static final double INDEXER_SPEED = -0.5;
 
@@ -18,7 +18,7 @@ public class ShooterNoteIntake extends Command {
     public ElevatorSubsystem elevator;
 
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
-    public ShooterNoteIntake(ElevatorSubsystem elevator, ShooterSubsystem shooter) {
+    public ShooterNoteIntakeCommand(ShooterSubsystem shooter, ElevatorSubsystem elevator) {
         this.shooter = shooter;
         this.elevator = elevator;
 

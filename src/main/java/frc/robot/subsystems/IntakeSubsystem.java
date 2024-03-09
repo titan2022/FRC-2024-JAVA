@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems;
 
+import static frc.robot.utility.Constants.Unit.IN;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
@@ -19,9 +21,9 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
  */
 @SuppressWarnings({"deprecated", "removal"})
 public class IntakeSubsystem extends SubsystemBase {
+  public static final double INTAKE_SPEED = 0.5;
   private static final SupplyCurrentLimitConfiguration LIMIT_CONFIG = new SupplyCurrentLimitConfiguration(true, 30, 30, 0 );
   private static final WPI_TalonFX wheelMotor = new WPI_TalonFX(3);
-  
   public IntakeSubsystem() {
     config();
   }
@@ -58,7 +60,7 @@ public class IntakeSubsystem extends SubsystemBase {
    * 
    */
   public void intake() {
-    setWheelSpeed(0.5);
+    setWheelSpeed(INTAKE_SPEED);
   }
 
   public void stop() {

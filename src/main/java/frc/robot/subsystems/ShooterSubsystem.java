@@ -4,17 +4,13 @@
 
 package frc.robot.subsystems;
 
-import static frc.robot.utility.Constants.Unit.FALCON_TICKS;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
-import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
-import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -55,6 +51,7 @@ public class ShooterSubsystem extends SubsystemBase {
 	}
 
 	public void config() {
+		linkageEncoder.reset();
 		topShooterMotor.setNeutralMode(NeutralMode.Brake);
 		bottomShooterMotor.setNeutralMode(NeutralMode.Brake);
 		linkageMotor.setNeutralMode(NeutralMode.Brake);
@@ -69,8 +66,8 @@ public class ShooterSubsystem extends SubsystemBase {
 	 * 
 	 * @return Angle in radians (zero is ground, positive is up)
 	 */
-	public double getRotation() {
-		return linkageEncoder.get();
+	public Rotation2d getRotation() {
+		return Rotation2d.fromRadians(linkageEncoder.get() / (2 * Math.PI));
 	}
 
 	/**
@@ -78,7 +75,8 @@ public class ShooterSubsystem extends SubsystemBase {
 	 * 
 	 * @param angle in radians (zero is parallel to the ground, positive is up)
 	 */
-	public void setRotation(double angle) {
+	public void setRotation(Rotation2d theta) {
+		double angle = theta.getRadians();
 		if(angle < MIN_ANGLE || angle > MAX_ANGLE) return;
 		// trust me, the math is right
 		// TODO: check my math
@@ -106,11 +104,15 @@ public class ShooterSubsystem extends SubsystemBase {
             targetRotation -= 2 * Math.PI;
         }
 
-        linkageMotor.set(ControlMode.Position, rotationPID.calculate(getRotation(), targetRotation));
+        linkageMotor.set(ControlMode.Velocity, rotationPID.calculate(getRotation().getRadians(), targetRotation));
+	}
+
+	public void holdAngle() {
+		linkageMotor.set(ControlMode.Velocity, 0);
 	}
 
 	public void shoot(double velocity) {
-		topShooterMotor.set(ControlMode.Velocity, velocity);
+		topShooterMotor.set(ControlMode.PercentOutput, velocity);
 	}
 
 	public void index(double speed) {
@@ -118,6 +120,6 @@ public class ShooterSubsystem extends SubsystemBase {
 	}
 
 	public void holdIndex() {
-		indexerMotor.set(ControlMode.PercentOutput, 0);
+		indexerMotor.set(ControlMode.Velocity, 0);
 	}
 }

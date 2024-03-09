@@ -1,32 +1,26 @@
 package frc.robot.subsystems;
 
-<<<<<<< HEAD
-=======
-import static frc.robot.utility.Constants.Unit.FALCON_TICKS;
-import static frc.robot.utility.Constants.Unit.IN;
-import static frc.robot.utility.Constants.Unit.METERS;
 
-import java.net.IDN;
-
->>>>>>> linkage-shooter
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.DemandType;
-import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class ElevatorSubsystem extends SubsystemBase {
     public static final double RAISE_SPEED = 0.5;
     public static final double LOWER_SPEED = -0.5;
-    public static final double STALL_CURRENT_LIMIT = 12;
+    public static final double STALL_CURRENT_LIMIT = 100;
     // public static final double INDEXER_SPEED = 0.5;
     // TODO: get constants
-    private final WPI_TalonFX LEFT_SPOOL_MOTOR = new WPI_TalonFX(0);
-    private final WPI_TalonFX RIGHT_SPOOL_MOTOR = new WPI_TalonFX(0);
+    private static final WPI_TalonFX LEFT_SPOOL_MOTOR = new WPI_TalonFX(0);
+    private static final WPI_TalonFX RIGHT_SPOOL_MOTOR = new WPI_TalonFX(0);
     private static final WPI_TalonFX INDEXER = new WPI_TalonFX(0);
-
+    private static final DigitalInput noteSensor = new DigitalInput(0);
+    // public static boolean hasNote = false;
+    // public static double noteDuration = 0;
     // public static final double BOTTOM_HEIGHT = 0.0;
     // public static final double TOP_HEIGHT = 21.5 * IN / METERS;
     // public static final double SPOOL_RADIUS = 1 * IN / METERS;
@@ -120,12 +114,12 @@ public class ElevatorSubsystem extends SubsystemBase {
     //     LEFT_SPOOL_MOTOR.set(ControlMode.Position, motorUnits, DemandType.ArbitraryFeedForward, -ROBOT_WINCH_OFFSET);
     // }
 
-    public void raise() {
-        LEFT_SPOOL_MOTOR.set(ControlMode.PercentOutput, RAISE_SPEED);
-    }
+    public void elevate(double speed) {
+        if (isStalling()) 
+            LEFT_SPOOL_MOTOR.set(ControlMode.PercentOutput, Math.copySign(speed / 2, speed));
+        else 
+            LEFT_SPOOL_MOTOR.set(ControlMode.PercentOutput, speed);
 
-    public void lower() {
-        LEFT_SPOOL_MOTOR.set(ControlMode.PercentOutput, LOWER_SPEED);
     }
 
     public void hold() {
@@ -133,7 +127,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public boolean isStalling() {
-        if (LEFT_SPOOL_MOTOR.getOutputCurrent() > STALL_CURRENT_LIMIT) 
+        if (Math.abs(LEFT_SPOOL_MOTOR.getOutputCurrent()) > STALL_CURRENT_LIMIT) 
             return true;
         else 
             return false;
@@ -143,11 +137,26 @@ public class ElevatorSubsystem extends SubsystemBase {
         INDEXER.set(ControlMode.PercentOutput, speed);
     }
 
+    public void stopIndex() {
+        INDEXER.set(ControlMode.Velocity, 0);
+    }
+
     // public void indexSpeed(double speed) {
     //     INDEXER.set(ControlMode.PercentOutput, speed);
     // }
 
     public boolean hasNote() {
-        return false;
+        return noteSensor.get();
     } 
+
+    // @Override
+    // public void periodic() {
+    //     // Beam breaker needs to be in a state for more than its timeout to count (prevents noise)
+    //     if (noteSensor.get() && !hasNote) {
+    //         noteDuration = Timer.getFPGATimestamp();
+    //         noteDuration++;
+    //     } 
+
+
+    // }
 }
