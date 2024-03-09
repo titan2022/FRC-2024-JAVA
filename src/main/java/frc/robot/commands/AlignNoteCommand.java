@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.RotationalDrivebase;
 import frc.robot.subsystems.TranslationalDrivebase;
@@ -15,21 +16,19 @@ import frc.robot.utility.Localizer;
 import frc.robot.utility.Constants.RobotSize;
 
 /** An example command that uses an example subsystem. */
-public class AlignNoteCommand extends ParallelDeadlineGroup {
+public class AlignNoteCommand extends SequentialCommandGroup {
   @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
   public static final double TRANSLATIONAL_SPEED = 1;
   public static final Rotation2d ROTATIONAL_SPEED = new Rotation2d(1);
   public static final double forwardWalk = 0.25;
 
-  public AlignNoteCommand(TranslationalDrivebase translationalDrivebase, RotationalDrivebase rotationalDrive, IntakeSubsystem intake, Localizer localizer) {
+  public AlignNoteCommand(TranslationalDrivebase translationalDrivebase, RotationalDrivebase rotationalDrive, Localizer localizer) {
     // super(new TranslationCommand(new Translation2d(), speed, driveBase), new NoteIntakeCommand(intake)); 
-    super(new TranslationCommand(new Translation2d(0, 0), TRANSLATIONAL_SPEED, translationalDrivebase));
     Translation2d movement = localizer.getNotePosition();
     movement.minus(new Translation2d(0, (RobotSize.LENGTH / 2) - forwardWalk));
 
-    setDeadline(new TranslationCommand(movement, TRANSLATIONAL_SPEED, translationalDrivebase));
-    addCommands(new NoteIntakeCommand(intake));
+    addCommands(new TranslationCommand(movement, TRANSLATIONAL_SPEED, translationalDrivebase));
 
-    addRequirements(translationalDrivebase, rotationalDrive, intake);
+    addRequirements(translationalDrivebase, rotationalDrive);
   }
 }

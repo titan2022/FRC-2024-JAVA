@@ -15,34 +15,34 @@ import frc.robot.utility.Localizer;
 
 /** An example command that uses an example subsystem. */
 public class AlignSpeakerCommand extends SequentialCommandGroup {
-  @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
-  public static final int BLUE_SPEAKER_APRILTAG = 7;
-  public static final int RED_SPEAKER_APRILTAG = 4;
+    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
+    public static final int BLUE_SPEAKER_APRILTAG = 7;
+    public static final int RED_SPEAKER_APRILTAG = 4;
 
-  public static final double TRANSLATIONAL_SPEED = 1;
-  public static final Rotation2d ROTATIONAL_SPEED = new Rotation2d(1);
+    public static final double TRANSLATIONAL_SPEED = 1;
+    public static final Rotation2d ROTATIONAL_SPEED = new Rotation2d(1);
 
-  public static final double SUBWOOFER_LENGTH = 0.91;
+    public static final double SUBWOOFER_LENGTH = 0.91;
 
-  public AlignSpeakerCommand(TranslationalDrivebase translationalDrive, RotationalDrivebase rotationalDrive, Localizer localizer) {
-    Translation2d distanceFromAprilTag;
-    Rotation2d angleOfAprilTag;
+    public AlignSpeakerCommand(TranslationalDrivebase translationalDrive, RotationalDrivebase rotationalDrive, Localizer localizer) {
+        Translation2d distanceFromAprilTag;
+        Rotation2d angleOfAprilTag;
 
-    if (Constants.getColor() == Alliance.Blue) {
-      distanceFromAprilTag = localizer.getTagPosition(BLUE_SPEAKER_APRILTAG);
-      angleOfAprilTag = localizer.getTagHeading(BLUE_SPEAKER_APRILTAG);
-    } else {
-      distanceFromAprilTag = localizer.getTagPosition(RED_SPEAKER_APRILTAG);
-      angleOfAprilTag = localizer.getTagHeading(RED_SPEAKER_APRILTAG);
+        if (Constants.getColor() == Alliance.Blue) {
+            distanceFromAprilTag = localizer.getTagPosition(BLUE_SPEAKER_APRILTAG);
+            angleOfAprilTag = localizer.getTagHeading(BLUE_SPEAKER_APRILTAG);
+        } else {
+            distanceFromAprilTag = localizer.getTagPosition(RED_SPEAKER_APRILTAG);
+            angleOfAprilTag = localizer.getTagHeading(RED_SPEAKER_APRILTAG);
+        }
+
+        distanceFromAprilTag.minus(new Translation2d(0, SUBWOOFER_LENGTH));
+
+        addCommands(
+            new RotationCommand(angleOfAprilTag, ROTATIONAL_SPEED, rotationalDrive, localizer),
+            new TranslationCommand(distanceFromAprilTag, TRANSLATIONAL_SPEED, translationalDrive)
+        );
+        
+        addRequirements(translationalDrive, rotationalDrive);
     }
-
-    distanceFromAprilTag.minus(new Translation2d(0, SUBWOOFER_LENGTH));
-
-    addCommands(
-      new RotationCommand(angleOfAprilTag, ROTATIONAL_SPEED, rotationalDrive, localizer),
-      new TranslationCommand(distanceFromAprilTag, TRANSLATIONAL_SPEED, translationalDrive)
-    );
-    
-    addRequirements(translationalDrive, rotationalDrive);
-  }
 }

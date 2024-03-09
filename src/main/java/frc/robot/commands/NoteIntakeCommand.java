@@ -5,16 +5,19 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 
 /** An example command that uses an example subsystem. */
 public class NoteIntakeCommand extends Command {
   @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
-  private IntakeSubsystem intake;
+  public ElevatorSubsystem elevator;
+  public IntakeSubsystem intake;
 
 
-  public NoteIntakeCommand(IntakeSubsystem intake) {
+  public NoteIntakeCommand(ElevatorSubsystem elevator, IntakeSubsystem intake) {
     this.intake = intake;
+    this.elevator = elevator;
 
     addRequirements(intake);
   }
@@ -40,6 +43,9 @@ public class NoteIntakeCommand extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    if (elevator.hasNote())
+        return true;
+    else 
+        return false;
   }
 }

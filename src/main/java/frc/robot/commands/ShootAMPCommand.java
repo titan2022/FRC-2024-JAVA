@@ -4,24 +4,51 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
-import frc.robot.subsystems.ShooterSubsystem;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj.Timer;
+
 
 /** An example command that uses an example subsystem. */
-public class ShootAMPCommand extends SequentialCommandGroup{
-    public static double AMP_HEIGHT = 0;
-    public static double SHOOT_AMP_SPEED = 1;
+public class ShootAMPCommand extends Command {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
-    public ShootAMPCommand(ElevatorSubsystem subsystem) {
-        addCommands(
-            new MoveElevatorCommand(AMP_HEIGHT, subsystem),
-            new IndexOutNoteCommand(SHOOT_AMP_SPEED, subsystem)
-        );
+    public static final double DURATION = 0.25;
+    public ElevatorSubsystem elevator;
+    public double speed;
+    public double endTime;
 
-        addRequirements(subsystem);
+    public ShootAMPCommand(double speed, ElevatorSubsystem elevator) {
+        this.elevator = elevator;
+        this.speed = speed;
+
+        addRequirements(elevator);
     }
 
-}
+    // Called when the command is initially scheduled.
+    @Override
+    public void initialize() {
+        endTime = Timer.getFPGATimestamp() + DURATION;
+    }
+
+    // Called every time the scheduler runs while the command is scheduled.
+    @Override
+    public void execute() {
+        elevator.index(speed);
+    }
+
+    // Called once the command ends or is interrupted.
+    @Override
+    public void end(boolean interrupted) {
+        elevator.index(0);
+    }
+
+    // Returns true when the command should end.
+    @Override
+    public boolean isFinished() {
+        if (Timer.getFPGATimestamp() > endTime) 
+            return true;
+        else 
+            return false;
+    }
+  }
