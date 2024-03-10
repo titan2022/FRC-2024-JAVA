@@ -8,6 +8,8 @@ import static frc.robot.utility.Constants.Unit.*;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
+import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -20,18 +22,18 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
  * and shoot them into the speaker
  */
 public class ShooterSubsystem extends SubsystemBase {
-	private static final double MAX_ANGLE = 65*DEG;
-	private static final double MIN_ANGLE = 15.8*DEG;
+	private static final double MAX_ANGLE = 0;
+	private static final double MIN_ANGLE = 0;
 	
 	// TODO: measure these in CAD
 	private static final double SHOOTER_LENGTH = 7.078305*IN; // this is from the shooter pivot to its linkage connection
 	private static final double LINKAGE_LONG_ARM_LENGTH = 6.375*IN;
 	private static final double LINKAGE_SHORT_ARM_LENGTH = 2.0*IN;
 	// the distance of the motor axis from the shooter pivot
-	private static final double LINKAGE_PIVOT_DX = 5.270846*IN;
-	private static final double LINKAGE_PIVOT_DY = -0.57172*IN;
-	private static final double ANGLE_OFFSET = 16.9*DEG;
-    public static final double ENCODER_OFFSET = 0;
+	private static final double LINKAGE_PIVOT_DX = 1.0;
+	private static final double LINKAGE_PIVOT_DY = 1.0;
+    public static final double ANGLE_OFFSET  = 16.9 * IN;
+
 
 //   //kP, kI, kD, kF
 // 	public static final double[] shooterPID = {0, 0, 0, 0};
@@ -39,7 +41,7 @@ public class ShooterSubsystem extends SubsystemBase {
 // 	public static final double[] shooterFeedForwardParams = {0, 0, 0};
 
 	// SimpleMotorFeedforward shooterFeedForward = new SimpleMotorFeedforward(shooterFeedForwardParams[0], shooterFeedForwardParams[1], shooterFeedForwardParams[2]);
-    public static PIDController rotationPID = new PIDController(0, 0, 0);
+    public static final PIDController rotationPID = new PIDController(0, 0, 0);
     
 	public WPI_TalonFX linkageMotor = new WPI_TalonFX(12, "CANivore");
 	private WPI_TalonFX topShooterMotor = new WPI_TalonFX(13, "CANivore");
@@ -50,6 +52,10 @@ public class ShooterSubsystem extends SubsystemBase {
 
 	public ShooterSubsystem() {
     	config();
+	}
+
+	public void setLinkageMotor(double value){
+		linkageMotor.set(ControlMode.PercentOutput, value);
 	}
 
 	public void config() {
@@ -69,7 +75,7 @@ public class ShooterSubsystem extends SubsystemBase {
 	 * @return Angle in radians (zero is ground, positive is up)
 	 */
 	public Rotation2d getRotation() {
-		return new Rotation2d(linkageEncoder.getAbsolutePosition()*2.0*Math.PI + MIN_ANGLE);
+		return Rotation2d.fromRadians(linkageEncoder.get() / (2 * Math.PI));
 	}
 
 	/**
@@ -104,20 +110,17 @@ public class ShooterSubsystem extends SubsystemBase {
         } else if (targetRotation > 3 * Math.PI / 2) {
             targetRotation -= 2 * Math.PI;
         }
-		double linkagePIDOutput = rotationPID.calculate(getRotation().getRadians(), targetRotation);
-        // double PID = Math.copySign(Math.min(Math.abs(linkageMag), 10 / FALCON_TICKS), linkageMag);
-		linkageMotor.set(ControlMode.Velocity, linkagePIDOutput);
-		SmartDashboard.putNumber("Target Rotation", targetRotation * 180 / Math.PI);
-		SmartDashboard.putNumber("PID Output", linkagePIDOutput);
+
+        linkageMotor.set(ControlMode.Velocity, rotationPID.calculate(getRotation().getRadians(), targetRotation));
 	}
 
-    public void holdAngle() {
-        linkageMotor.set(ControlMode.PercentOutput, 0);
-    }
+	public void holdAngle() {
+		linkageMotor.set(ControlMode.Velocity, 0);
+	}
 
 
 	public void shoot(double velocity) {
-		topShooterMotor.set(ControlMode.Velocity, velocity);
+		topShooterMotor.set(ControlMode.PercentOutput, velocity);
 	}
 
 	// public double getShooterVelocity(){

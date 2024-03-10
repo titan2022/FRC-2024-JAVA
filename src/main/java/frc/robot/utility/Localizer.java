@@ -5,6 +5,7 @@ import java.util.Hashtable;
 
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -38,6 +39,7 @@ public class Localizer {
     private Rotation3d noteRotation = new Rotation3d();
     private Dictionary<Integer, NetworkingTag> tags = new Hashtable<>();
 
+    private Pose2d startingPose2d = new Pose2d(); 
     /**
      * Localizer constructor
      * 
@@ -186,6 +188,19 @@ public class Localizer {
     public Rotation2d getNoteHeading() {
         return noteRotation.toRotation2d().minus(new Rotation2d(Math.PI / 2)).times(-1);
     }
+
+    public void resetStartingPose2d(Pose2d pose){
+        startingPose2d=pose;
+    }
+    /**
+     * Gets Pose2d based on translation and rotation
+     * @return
+     */
+    public Pose2d getDisplacementPose2d() {
+        return (new Pose2d(globalPosition,globalOrientation)).relativeTo(startingPose2d);
+    }
+
+
 
     /**
      * Updates first frame localization estimates

@@ -12,8 +12,13 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.commands.AlignNoteCommand;
+import frc.robot.commands.AlignSpeakerCommand;
 import frc.robot.commands.MoveElevatorCommand;
 import frc.robot.commands.NoteIntakeCommand;
 import frc.robot.commands.RotationCommand;
@@ -21,20 +26,26 @@ import frc.robot.commands.ShootAMPCommand;
 import frc.robot.commands.ShootSpeakerCommand;
 import frc.robot.commands.TranslationCommand;
 import frc.robot.subsystems.ElevatorSubsystem;
+import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.SwerveDriveSubsystem;
 import frc.robot.utility.Localizer;
 import frc.robot.utility.TeleopListener;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 
 public class Robot extends TimedRobot {
-    private SwerveDriveSubsystem drive = new SwerveDriveSubsystem();
     private final XboxController xbox = new XboxController(0);
     private TeleopListener listener = new TeleopListener(xbox);
     private Localizer localizer = new Localizer();
+    private SwerveDriveSubsystem drive = new SwerveDriveSubsystem(localizer);
     private ElevatorSubsystem elevator = new ElevatorSubsystem();
     private IntakeSubsystem intake = new IntakeSubsystem();
     private ShooterSubsystem shooter = new ShooterSubsystem();
+    private IndexerSubsystem indexer = new IndexerSubsystem();
+    private SendableChooser<Command> autoChooser;
 
     @Override
     public void robotInit() {
@@ -47,7 +58,20 @@ public class Robot extends TimedRobot {
         SmartDashboard.putNumber("D", 0);
         SmartDashboard.putNumber("E", 0);
         SmartDashboard.putNumber("F", 0);
-    }
+        
+        //These speeds are temporary
+        NamedCommands.registerCommand("Shoot Speaker", new ShootSpeakerCommand(60, shooter, indexer, elevator));
+        NamedCommands.registerCommand("Algin Speaker", new AlignSpeakerCommand(drive.getTranslational(), drive.getRotational(), localizer));
+        NamedCommands.registerCommand("Shoot Amp", new ShootAMPCommand(60, indexer));
+        NamedCommands.registerCommand("Algin Amp", new AlignSpeakerCommand(drive.getTranslational(), drive.getRotational(), localizer));
+        NamedCommands.registerCommand("Intake Note", new NoteIntakeCommand(elevator,intake));
+        NamedCommands.registerCommand("Algin Speaker", new AlignNoteCommand(drive.getTranslational(), drive.getRotational(), localizer));
+        
+        SmartDashboard.putData("Example Auto", new PathPlannerAuto("Example Auto"));
+
+        autoChooser = AutoBuilder.buildAutoChooser(); 
+        SmartDashboard.putData("Auto Mode", autoChooser);
+    }   
 
     @Override
     public void robotPeriodic() {
@@ -73,6 +97,7 @@ public class Robot extends TimedRobot {
     @Override
     public void autonomousInit() {
         localizer.setup();
+        autoChooser.getSelected().schedule();
     }
 
     /** This function is called periodically during autonomous. */
@@ -110,8 +135,7 @@ public class Robot extends TimedRobot {
                 break;
             case 2:
                 CommandScheduler.getInstance().schedule(
-                    new RotationCommand(new Rotation2d(SmartDashboard.getNumber("A", 0)), 
-                        new Rotation2d(SmartDashboard.getNumber("B", 0)), 
+                    new RotationCommand(new Rotation2d(SmartDashboard.getNumber("A", 0)),  
                         drive.getRotational(),
                         localizer)
                 );
@@ -129,12 +153,12 @@ public class Robot extends TimedRobot {
                 break;
             case 5: 
                 CommandScheduler.getInstance().schedule(
-                    new ShootSpeakerCommand(SmartDashboard.getNumber("A", 0), shooter, elevator)
+                    new ShootSpeakerCommand(SmartDashboard.getNumber("A", 0), shooter, indexer, elevator)
                 );
                 break;
             case 6: 
                 CommandScheduler.getInstance().schedule(
-                    new ShootAMPCommand(SmartDashboard.getNumber("A", 0), elevator)
+                    new ShootAMPCommand(SmartDashboard.getNumber("A", 0), indexer)
                 );
                 break;
             default:
@@ -207,10 +231,10 @@ public class Robot extends TimedRobot {
 
                 break;
             case 11:
-                elevator.index(0.5);
+                // elevator.index(0.5);
                 break;
             case 12:
-                elevator.stopIndex();
+                // elevator.stopIndex();
                 break;
             case 13:
                 elevator.hold();

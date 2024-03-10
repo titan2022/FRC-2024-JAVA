@@ -1,14 +1,24 @@
 package frc.robot.subsystems;
 
+import static frc.robot.utility.Constants.Unit.FALCON_TICKS;
+import static frc.robot.utility.Constants.Unit.IN;
+import static frc.robot.utility.Constants.Unit.METERS;
+
+import java.net.IDN;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+/***
+ * Uses stalling mechanism to move
+ */
 public class ElevatorSubsystem extends SubsystemBase {
     public static final double RAISE_SPEED = 0.5;
     public static final double LOWER_SPEED = -0.5;
@@ -20,20 +30,22 @@ public class ElevatorSubsystem extends SubsystemBase {
     public static final WPI_TalonFX INDEXER = new WPI_TalonFX(0);
     public static final DigitalInput NOTE_SENSOR = new DigitalInput(0);
     // public static boolean hasNote = false;
-    // public static double noteDuration = 0;
+    public static double noteDuration = 0;
     // public static final double BOTTOM_HEIGHT = 0.0;
     // public static final double TOP_HEIGHT = 21.5 * IN / METERS;
     // public static final double SPOOL_RADIUS = 1 * IN / METERS;
-    // public static final double GEAR_RATIO = 30;
-    // public static final double TOP_HEIGHT_TICKS = TOP_HEIGHT / (2 * SPOOL_RADIUS * FALCON_TICKS);
+    // public static final double GEAR_RATIO = 28;
+    // public static final double DISTANCE_PER_TICK = SPOOL_RADIUS * 2 * Math.PI * FALCON_TICKS / GEAR_RATIO;
+    // public static final double TOP_HEIGHT_TICKS = (int)(TOP_HEIGHT / (DISTANCE_PER_TICK));
+    // public static final int ENCODER_OFFSET = 0;
 
-
-    // public static final double GRAVITY_OFFSET = 0;
-    // public static final double ROBOT_WINCH_OFFSET = 0;
+    public static final double ROBOT_WINCH_OFFSET = 0;
+    public static final double WINCH_SPEED = -0.5;
     
     // private static final int BOTTOM_ENCODER_TICKS = ENCODER_OFFSET;
-    // private static final long TOP_ENCODER_TICKS = Math.round(ENCODER_OFFSET + (TOP_HEIGHT - BOTTOM_HEIGHT) / (2 * Math.PI * SPOOL_RADIUS) * Constants.Unit.FALCON_TICKS);
+    // private static final long TOP_ENCODER_TICKS = Math.round(ENCODER_OFFSET + (TOP_HEIGHT - BOTTOM_HEIGHT) / (2 * Math.PI * SPOOL_RADIUS) * FALCON_TICKS);
     
+
     // private final WPI_TalonFX[] spool_motors = new WPI_TalonFX[] {
     //     LEFT_SPOOL_MOTOR,
     //     RIGHT_SPOOL_MOTOR
@@ -72,7 +84,6 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     public void config() {
         // LEFT_SPOOL_MOTOR.configAllSettings(getSpoolTalonConfig());
-        // RIGHT_SPOOL_MOTOR.configAllSettings(getSpoolTalonConfig());
 
         RIGHT_SPOOL_MOTOR.follow(LEFT_SPOOL_MOTOR);
         RIGHT_SPOOL_MOTOR.setInverted(true);
@@ -82,6 +93,8 @@ public class ElevatorSubsystem extends SubsystemBase {
         RIGHT_SPOOL_MOTOR.setNeutralMode(NeutralMode.Brake);
 
         INDEXER.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
+        LEFT_SPOOL_MOTOR.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
+        RIGHT_SPOOL_MOTOR.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
     }
 
 
@@ -93,55 +106,43 @@ public class ElevatorSubsystem extends SubsystemBase {
     //     //Convert to number of FalconTicks
     //     motorUnits /= FALCON_TICKS;
 
-    //     LEFT_SPOOL_MOTOR.set(ControlMode.Position, motorUnits, DemandType.ArbitraryFeedForward, GRAVITY_OFFSET);
+    //     LEFT_SPOOL_MOTOR.set(ControlMode.Position, motorUnits);
     // }
 
     // public double getHeight() {
     //     double position = LEFT_SPOOL_MOTOR.getSelectedSensorPosition();
-    //     if (position < 0) 
-    //          position = TOP_HEIGHT_TICKS + position;
-    //     position *= FALCON_TICKS;
-    //     position *= SPOOL_RADIUS * GEAR_RATIO;
-    //     return position;
+    //     position -= ENCODER_OFFSET;
+    //     return position * DISTANCE_PER_TICK;
     // }
 
-    // public void winch(double climbDistance) {
-    //     double motorUnits = -climbDistance;
-    //     //Number of radians
-    //     motorUnits /= (SPOOL_RADIUS * GEAR_RATIO);
-    //     //Convert to number of FalconTicks
-    //     motorUnits /= FALCON_TICKS;
-    //     LEFT_SPOOL_MOTOR.set(ControlMode.Position, motorUnits, DemandType.ArbitraryFeedForward, -ROBOT_WINCH_OFFSET);
-    // }
+    public void winch() {
+        LEFT_SPOOL_MOTOR.set(ControlMode.PercentOutput, WINCH_SPEED);
+    }
 
     public void elevate(double speed) {
-        if (isStalling()) 
-            LEFT_SPOOL_MOTOR.set(ControlMode.PercentOutput, Math.copySign(speed / 2, speed));
-        else 
-            LEFT_SPOOL_MOTOR.set(ControlMode.PercentOutput, speed);
-
+        LEFT_SPOOL_MOTOR.set(ControlMode.PercentOutput, RAISE_SPEED);
     }
+
+    // public void raise() {
+    //     LEFT_SPOOL_MOTOR.set(ControlMode.PercentOutput, RAISE_SPEED);
+    // }
+
+    // public void lower() {
+    //     LEFT_SPOOL_MOTOR.set(ControlMode.PercentOutput, LOWER_SPEED);
+    // }
 
     public void hold() {
         LEFT_SPOOL_MOTOR.set(ControlMode.Velocity, 0);
     }
 
     public boolean isStalling() {
-        if (Math.abs(LEFT_SPOOL_MOTOR.getOutputCurrent()) > STALL_CURRENT_LIMIT) 
+        if (LEFT_SPOOL_MOTOR.getOutputCurrent() > STALL_CURRENT_LIMIT) 
             return true;
         else 
             return false;
     }
 
-    public void index(double speed) {
-        INDEXER.set(ControlMode.PercentOutput, speed);
-    }
-
-    public void stopIndex() {
-        INDEXER.set(ControlMode.Velocity, 0);
-    }
-
-    // public void indexSpeed(double speed) {
+    // public void index(double speed) {
     //     INDEXER.set(ControlMode.PercentOutput, speed);
     // }
 

@@ -6,6 +6,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.ElevatorSubsystem;
+import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import edu.wpi.first.wpilibj.Timer;
 
@@ -14,15 +15,15 @@ import edu.wpi.first.wpilibj.Timer;
 public class ShootAMPCommand extends Command {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
     public static final double DURATION = 0.25;
-    public ElevatorSubsystem elevator;
+    public IndexerSubsystem indexer;
     public double speed;
     public double endTime;
 
-    public ShootAMPCommand(double speed, ElevatorSubsystem elevator) {
-        this.elevator = elevator;
+    public ShootAMPCommand(double speed, IndexerSubsystem indexer) {
+        this.indexer = indexer;
         this.speed = speed;
 
-        addRequirements(elevator);
+        addRequirements(indexer);
     }
 
     // Called when the command is initially scheduled.
@@ -34,13 +35,13 @@ public class ShootAMPCommand extends Command {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        elevator.index(speed);
+        indexer.index(speed);
     }
 
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
-        elevator.index(0);
+        indexer.index(0);
     }
 
     // Returns true when the command should end.

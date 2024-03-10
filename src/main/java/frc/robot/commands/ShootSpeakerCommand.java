@@ -5,29 +5,32 @@
 package frc.robot.commands;
 
 import frc.robot.subsystems.ElevatorSubsystem;
+import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 
 /** An example command that uses an example subsystem. */
 public class ShootSpeakerCommand extends Command {
+    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
     public static final double RAMP_TIME = 1;
     public static final double SHOOT_DURATION = 0.25;
     public static final double INDEX_SPEED = 0.5;
 
-
     public ShooterSubsystem shooter;
+    public IndexerSubsystem indexer; 
     public ElevatorSubsystem elevator;
     public double speed;
     public double rampTime;
     public double endTime; 
-    @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
-    public ShootSpeakerCommand(double speed, ShooterSubsystem shooter, ElevatorSubsystem elevator) {
+    
+    public ShootSpeakerCommand(double speed, ShooterSubsystem shooter, IndexerSubsystem indexer, ElevatorSubsystem elevator) {
         this.speed = speed;
         this.shooter = shooter;
+        this.indexer = indexer;
         this.elevator = elevator;
 
-        addRequirements(shooter, elevator);
+        addRequirements(shooter, indexer, elevator);
     }
 
     @Override
@@ -44,7 +47,7 @@ public class ShootSpeakerCommand extends Command {
         else {
             shooter.shoot(speed);
             shooter.index(INDEX_SPEED);
-            elevator.index(INDEX_SPEED);
+            indexer.index(INDEX_SPEED);
         }
     }
 
@@ -53,7 +56,7 @@ public class ShootSpeakerCommand extends Command {
     public void end(boolean interrupted) {
         shooter.shoot(0);
         shooter.index(0);
-        elevator.index(0);
+        indexer.index(0);
     }
 
     // Returns true when the command should end.
