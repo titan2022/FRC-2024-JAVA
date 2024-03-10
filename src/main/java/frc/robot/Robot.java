@@ -4,6 +4,9 @@
 
 package frc.robot;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -36,7 +39,7 @@ public class Robot extends TimedRobot {
     @Override
     public void robotInit() {
         SmartDashboard.putNumber("Command Test", 0);
-        SmartDashboard.putNumber("Subsystem Test", 0);
+        SmartDashboard.putNumber("Subsystem Test", 10);
 
         SmartDashboard.putNumber("A", 0);
         SmartDashboard.putNumber("B", 0);
@@ -51,13 +54,15 @@ public class Robot extends TimedRobot {
         CommandScheduler.getInstance().run();
         SmartDashboard.putNumber("Current X Velocity", drive.getTranslational().getVelocity().getX());
         SmartDashboard.putNumber("Current Y Velocity", drive.getTranslational().getVelocity().getY());
-        SmartDashboard.putNumber("Current Angle", localizer.getHeading().getDegrees());
-        SmartDashboard.putNumber("Rotational Velocity", localizer.getRate());
-        SmartDashboard.putNumber("Shooter Angle", shooter.getRotation().getDegrees());
+        SmartDashboard.putNumber("Swerve Angle", localizer.getHeading().getDegrees());
+        SmartDashboard.putNumber("Swerve Rotation Velocity", localizer.getRate());
+        SmartDashboard.putNumber("Encoder Angle", shooter.getRotation().getDegrees());
         SmartDashboard.putNumber("Elevator Current", elevator.LEFT_SPOOL_MOTOR.getOutputCurrent());
         SmartDashboard.putBoolean("hasNote", elevator.hasNote());
         SmartDashboard.putBoolean("IsStalling", elevator.isStalling());
+
         localizer.step();
+    
     }
 
     @Override
@@ -89,7 +94,12 @@ public class Robot extends TimedRobot {
 
     @Override
     public void testInit() {
-        localizer.setup();
+        // localizer.setup();
+        shooter.rotationPID.setP(SmartDashboard.getNumber("A", 0));
+        shooter.rotationPID.setI(SmartDashboard.getNumber("B", 0));
+        shooter.rotationPID.setD(SmartDashboard.getNumber("C", 0));
+        // shooter.linkageEncoder.reset();
+
         switch ((int) SmartDashboard.getNumber("Command Test", 0)) {
             case 1:
                 CommandScheduler.getInstance().schedule(
@@ -170,15 +180,31 @@ public class Robot extends TimedRobot {
                 shooter.shoot(SmartDashboard.getNumber("A", 0));
                 break;
             case 10:
-                shooter.rotationPID.setP(SmartDashboard.getNumber("A", 0));
-                shooter.rotationPID.setI(SmartDashboard.getNumber("B", 0));
-                shooter.rotationPID.setD(SmartDashboard.getNumber("C", 0));
-                Rotation2d targetAngle = Rotation2d.fromDegrees(SmartDashboard.getNumber("D", 0));
-
-                if (shooter.getRotation().getDegrees() < targetAngle.getDegrees())
-                    shooter.setRotation(targetAngle);
+                if (xbox.getYButton())
+                    shooter.setRotation(Rotation2d.fromDegrees(SmartDashboard.getNumber("D", 0)));
+                else if (xbox.getAButton()) 
+                    shooter.linkageEncoder.reset();
+                else if (xbox.getXButton()) 
+                    shooter.linkageMotor.set(ControlMode.PercentOutput, 0.2);
+                else if (xbox.getBButton())
+                    shooter.linkageMotor.set(ControlMode.PercentOutput, -0.2);
                 else 
                     shooter.holdAngle();
+                // Rotation2d targetAngle = Rotation2d.fromDegrees(SmartDashboard.getNumber("D", 0));
+                // shooter.setRotation(targetAngle);
+
+                // if (xbox.getXButton())
+                //     shooter.linkageEncoder.reset();
+                // if (xbox.getAButton())
+                //     shooter.linkageMotor.setNeutralMode(NeutralMode.Coast);
+                // else
+                //     shooter.linkageMotor.setNeutralMode(NeutralMode.Brake);
+
+                // if (xbox.getYButton())
+                //     shooter.setRotation(targetAngle);
+                // else
+                //     shooter.holdAngle();
+
                 break;
             case 11:
                 elevator.index(0.5);

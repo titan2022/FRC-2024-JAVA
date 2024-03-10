@@ -25,7 +25,7 @@ import frc.robot.utility.networking.types.NetworkingTag;
  */
 public class Localizer {
     private NetworkingServer server;
-    private WPI_Pigeon2 pigeon = new WPI_Pigeon2(15);
+    private WPI_Pigeon2 pigeon = new WPI_Pigeon2(42);
     // public static final AHRS navxGyro = new AHRS(SPI.Port.kMXP);
 
     private Rotation2d pigeonOffset = new Rotation2d(0);
