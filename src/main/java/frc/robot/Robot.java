@@ -5,8 +5,6 @@
 package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.NeutralMode;
-
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -16,7 +14,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.AlignNoteCommand;
 import frc.robot.commands.AlignSpeakerCommand;
 import frc.robot.commands.MoveElevatorCommand;
@@ -76,15 +73,15 @@ public class Robot extends TimedRobot {
     @Override
     public void robotPeriodic() {
         CommandScheduler.getInstance().run();
-        SmartDashboard.putNumber("Current X Velocity", drive.getTranslational().getVelocity().getX());
-        SmartDashboard.putNumber("Current Y Velocity", drive.getTranslational().getVelocity().getY());
-        SmartDashboard.putNumber("Swerve Angle", localizer.getHeading().getDegrees());
-        SmartDashboard.putNumber("Swerve Rotation Velocity", localizer.getRate());
+        // SmartDashboard.putNumber("Current X Velocity", drive.getTranslational().getVelocity().getX());
+        // SmartDashboard.putNumber("Current Y Velocity", drive.getTranslational().getVelocity().getY());
+        // SmartDashboard.putNumber("Swerve Angle", localizer.getHeading().getDegrees());
+        // SmartDashboard.putNumber("Swerve Rotation Velocity", localizer.getRate());
         SmartDashboard.putNumber("Encoder Angle", shooter.getRotation().getDegrees());
-        SmartDashboard.putNumber("Elevator Current", elevator.LEFT_SPOOL_MOTOR.getOutputCurrent());
-        SmartDashboard.putBoolean("hasNote", elevator.hasNote());
-        SmartDashboard.putBoolean("IsStalling", elevator.isStalling());
-
+        // SmartDashboard.putNumber("Elevator Current", elevator.LEFT_SPOOL_MOTOR.getOutputCurrent());
+        // SmartDashboard.putBoolean("hasNote", elevator.hasNote());
+        // SmartDashboard.putBoolean("IsStalling", elevator.isStalling());
+        SmartDashboard.putNumber("Encoder Abs", shooter.getAbsoluteRotation());
         localizer.step();
     
     }
@@ -135,7 +132,8 @@ public class Robot extends TimedRobot {
                 break;
             case 2:
                 CommandScheduler.getInstance().schedule(
-                    new RotationCommand(new Rotation2d(SmartDashboard.getNumber("A", 0)),  
+                    new RotationCommand(new Rotation2d(SmartDashboard.getNumber("A", 0)),
+                        new Rotation2d(SmartDashboard.getNumber("B", 0)),  
                         drive.getRotational(),
                         localizer)
                 );
@@ -208,10 +206,12 @@ public class Robot extends TimedRobot {
                     shooter.setRotation(Rotation2d.fromDegrees(SmartDashboard.getNumber("D", 0)));
                 else if (xbox.getAButton()) 
                     shooter.linkageEncoder.reset();
-                else if (xbox.getXButton()) 
+                else if (xbox.getLeftBumper()) 
                     shooter.linkageMotor.set(ControlMode.PercentOutput, 0.2);
-                else if (xbox.getBButton())
+                else if (xbox.getRightBumper())
                     shooter.linkageMotor.set(ControlMode.PercentOutput, -0.2);
+                else if (xbox.getXButton())
+                    shooter.resetRotation();
                 else 
                     shooter.holdAngle();
                 // Rotation2d targetAngle = Rotation2d.fromDegrees(SmartDashboard.getNumber("D", 0));

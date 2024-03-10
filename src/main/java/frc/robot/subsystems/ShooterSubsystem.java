@@ -23,7 +23,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
  */
 public class ShooterSubsystem extends SubsystemBase {
 	private static final double MAX_ANGLE = 0;
-	private static final double MIN_ANGLE = 0;
+	private static final double MIN_ANGLE = 15.8;
 	
 	// TODO: measure these in CAD
 	private static final double SHOOTER_LENGTH = 7.078305*IN; // this is from the shooter pivot to its linkage connection
@@ -32,8 +32,8 @@ public class ShooterSubsystem extends SubsystemBase {
 	// the distance of the motor axis from the shooter pivot
 	private static final double LINKAGE_PIVOT_DX = 1.0;
 	private static final double LINKAGE_PIVOT_DY = 1.0;
-    public static final double ANGLE_OFFSET  = 16.9 * IN;
-
+    public static final double ANGLE_OFFSET  = 16.9 * DEG;
+    public static final double ENCODER_ABSOLUTE_ZERO = 0;
 
 //   //kP, kI, kD, kF
 // 	public static final double[] shooterPID = {0, 0, 0, 0};
@@ -75,8 +75,21 @@ public class ShooterSubsystem extends SubsystemBase {
 	 * @return Angle in radians (zero is ground, positive is up)
 	 */
 	public Rotation2d getRotation() {
-		return Rotation2d.fromRadians(linkageEncoder.get() / (2 * Math.PI));
+		return Rotation2d.fromRadians(linkageEncoder.get() / (2 * Math.PI) + MIN_ANGLE);
 	}
+
+    /**
+	 * Gets shooter rotation angle
+	 * 
+	 * @return Angle in radians (zero is ground, positive is up)
+	 */
+	public double getAbsoluteRotation() {
+		return linkageEncoder.getAbsolutePosition();
+	}
+
+    public void resetRotation() {
+        linkageMotor.set(ControlMode.PercentOutput, Math.copySign(0.2, ENCODER_ABSOLUTE_ZERO - getAbsoluteRotation()));
+    }
 
 	/**
 	 * Sets target angle of the shooter
@@ -86,14 +99,14 @@ public class ShooterSubsystem extends SubsystemBase {
 	public void setRotation(Rotation2d theta) {
         double angle = theta.getRadians();
 		SmartDashboard.putNumber("Counter", SmartDashboard.getNumber("counter2", 0.0) + 1);    
-		if(angle < MIN_ANGLE || angle > MAX_ANGLE) {
-			return;
-		}
+		// if(angle < MIN_ANGLE || angle > MAX_ANGLE) {
+		// 	return;
+		// }
 		// trust me, the math is right
-		angle += ANGLE_OFFSET;
+		// angle += ANGLE_OFFSET;
 		double shooter_x = SHOOTER_LENGTH * Math.cos(angle);
 		double shooter_y = SHOOTER_LENGTH * Math.sin(angle);
-		double dx = LINKAGE_PIVOT_DX - shooter_x;
+		double dx = shooter_x - LINKAGE_PIVOT_DX;
 		double dy = shooter_y - LINKAGE_PIVOT_DY;
 		double d = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
     	double theta1 = Math.acos( // Law of Cosines, can also be negative if we want the linkage "inside"
@@ -102,7 +115,7 @@ public class ShooterSubsystem extends SubsystemBase {
 		);
 		double theta2 = Math.atan2(dx, dy);
         double angleFromY = theta1 - theta2;
-		double targetRotation = Math.PI - angleFromY;
+		double targetRotation = Math.PI / 2 - angleFromY;
         targetRotation %= 2 * Math.PI;
 
         if (targetRotation < -Math.PI / 2) {
@@ -111,7 +124,9 @@ public class ShooterSubsystem extends SubsystemBase {
             targetRotation -= 2 * Math.PI;
         }
 
-        linkageMotor.set(ControlMode.Velocity, rotationPID.calculate(getRotation().getRadians(), targetRotation));
+        SmartDashboard.putNumber("Calculated Angle(Deg)", targetRotation);
+
+        // linkageMotor.set(ControlMode.Velocity, rotationPID.calculate(getRotation().getRadians(), targetRotation));
 	}
 
 	public void holdAngle() {
