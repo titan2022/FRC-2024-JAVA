@@ -24,7 +24,6 @@ public class FullNoteIntakeCommand extends SequentialCommandGroup {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
     public FullNoteIntakeCommand(TranslationalDrivebase translational, RotationalDrivebase rotational, IntakeSubsystem intake, IndexerSubsystem indexer, ElevatorSubsystem elevator, Localizer localizer) {
         addCommands(
-            new AlignNoteCommand(translational, rotational, localizer),
             new ParallelDeadlineGroup(
                 new NoteIntakeCommand(indexer, intake),
                 new TranslationCommand(new Translation2d(0, MOVE_OVERSHOOT), OVER_SHOOT_SPEED, translational)

@@ -78,6 +78,37 @@ public class ShooterSubsystem extends SubsystemBase {
 		return Rotation2d.fromRadians(linkageEncoder.get() / (2 * Math.PI) + MIN_ANGLE);
 	}
 
+    public Rotation2d calculateEncoderRotation(Rotation2d theta) {
+        double angle = theta.getRadians();
+		SmartDashboard.putNumber("Counter", SmartDashboard.getNumber("counter2", 0.0) + 1);    
+		// if(angle < MIN_ANGLE || angle > MAX_ANGLE) {
+		// 	return;
+		// }
+		// trust me, the math is right
+		// angle += ANGLE_OFFSET;
+		double shooter_x = SHOOTER_LENGTH * Math.cos(angle);
+		double shooter_y = SHOOTER_LENGTH * Math.sin(angle);
+		double dx = shooter_x - LINKAGE_PIVOT_DX;
+		double dy = shooter_y - LINKAGE_PIVOT_DY;
+		double d = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
+    	double theta1 = Math.acos( // Law of Cosines, can also be negative if we want the linkage "inside"
+			(-Math.pow(LINKAGE_LONG_ARM_LENGTH, 2) + Math.pow(d, 2) + Math.pow(LINKAGE_SHORT_ARM_LENGTH, 2)) / 
+			(2 * d * LINKAGE_SHORT_ARM_LENGTH)
+		);
+		double theta2 = Math.atan2(dx, dy);
+        double angleFromY = theta1 - theta2;
+		double targetRotation = Math.PI / 2 - angleFromY;
+        targetRotation %= 2 * Math.PI;
+
+        if (targetRotation < -Math.PI / 2) {
+             targetRotation += 2 * Math.PI;
+        } else if (targetRotation > 3 * Math.PI / 2) {
+            targetRotation -= 2 * Math.PI;
+        }
+
+        return new Rotation2d(targetRotation);
+    }
+
     /**
 	 * Gets shooter rotation angle
 	 * 

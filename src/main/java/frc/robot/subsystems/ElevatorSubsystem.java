@@ -146,6 +146,13 @@ public class ElevatorSubsystem extends SubsystemBase {
             return false;
     }
 
+    public boolean isStalling(double current) {
+        if (LEFT_SPOOL_MOTOR.getOutputCurrent() > current) 
+            return true;
+        else 
+            return false;
+    }
+
     // public void index(double speed) {
     // //     INDEXER.set(ControlMode.PercentOutput, speed);
     // // }
