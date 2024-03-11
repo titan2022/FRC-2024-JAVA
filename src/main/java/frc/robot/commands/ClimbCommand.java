@@ -14,7 +14,7 @@ public class ClimbCommand extends Command {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
     // public static final double RAISE_SPEED = 0.1;
     // public static final double LOWER_SPEED = -0.1;
-    public static final double POWER = -1;
+    public static final double POWER = -0.5;
     public static final double STALL_LIMIT = 30;
 
     public ElevatorSubsystem elevator;
@@ -40,6 +40,7 @@ public class ClimbCommand extends Command {
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
+        MoveElevatorCommand.up = false;
         elevator.hold();
     }
 
