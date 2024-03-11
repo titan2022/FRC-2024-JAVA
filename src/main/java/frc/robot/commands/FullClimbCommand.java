@@ -28,7 +28,7 @@ public class FullClimbCommand extends SequentialCommandGroup {
         this.localizer = localizer;
 
         addCommands(
-            new MoveElevatorCommand(true, elevator),
+            new MoveElevatorCommand(elevator),
             new TranslationCommand(new Translation2d(0, 1), MOVE_SPEED, translational),
             new ClimbCommand(elevator)
         );

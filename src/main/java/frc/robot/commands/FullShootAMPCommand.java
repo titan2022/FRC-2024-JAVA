@@ -14,9 +14,9 @@ public class FullShootAMPCommand extends SequentialCommandGroup {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
     public FullShootAMPCommand(ElevatorSubsystem elevator, IndexerSubsystem indexer) {
         addCommands(
-            new MoveElevatorCommand(true, elevator),
+            new MoveElevatorCommand(elevator),
             new ShootAMPCommand(SHOOT_AMP_SPEED, indexer),
-            new MoveElevatorCommand(false, elevator)
+            new MoveElevatorCommand(elevator)
         );
 
         addRequirements(elevator);
