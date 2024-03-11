@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj.Timer;
 /** An example command that uses an example subsystem. */
 public class ShootAMPCommand extends Command {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
-    public static final double DURATION = 0.25;
+    public static final double DURATION = 2;
     public IndexerSubsystem indexer;
     public double speed;
     public double endTime;

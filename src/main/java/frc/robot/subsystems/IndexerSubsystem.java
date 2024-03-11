@@ -8,14 +8,14 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class IndexerSubsystem extends SubsystemBase {
-    private static final double INDEX_VELOCITY = 0.0;
-    private static final double AMP_VELOCITY = 0.0;
-    private static final int BREAK_TIMEOUT = 2; // In frames (20ms)
+    // private static final double INDEX_VELOCITY = 0.0;
+    // private static final double AMP_VELOCITY = 0.0;
+    // private static final int BREAK_TIMEOUT = 2; // In frames (20ms)
 
-    private WPI_TalonFX motor = new WPI_TalonFX(0);
-    private DigitalInput beamBreakerInput = new DigitalInput(0);
+    private WPI_TalonFX motor = new WPI_TalonFX(22);
+    // private DigitalInput beamBreakerInput = new DigitalInput(0);
 
-    private boolean noteStatus = false;
+    // private boolean noteStatus = false;
     // private long lastNoteChange = 0;
 
     public IndexerSubsystem() {
@@ -39,7 +39,8 @@ public class IndexerSubsystem extends SubsystemBase {
     // }
 
     public boolean hasNote() {
-        return beamBreakerInput.get();
+        // return beamBreakerInput.get();
+        return false;
     }
 
     // @Override

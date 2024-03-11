@@ -43,27 +43,26 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
     private static final double ROTATOR_DEADBAND = 0.0001;
 
     // CAN ID numbers
-    private static final int LEFT_FRONT_MOTOR_PORT = 40;
-    private static final int LEFT_BACK_MOTOR_PORT = 43;
-    private static final int RIGHT_FRONT_MOTOR_PORT = 41;
-    private static final int RIGHT_BACK_MOTOR_PORT = 42;
+    private static final int LEFT_FRONT_MOTOR_PORT = 41;
+    private static final int LEFT_BACK_MOTOR_PORT = 40;
+    private static final int RIGHT_FRONT_MOTOR_PORT = 42;
+    private static final int RIGHT_BACK_MOTOR_PORT = 43;
 
-    private static final int LEFT_FRONT_MOTOR_ROTATOR_PORT = 30;
-    private static final int LEFT_BACK_MOTOR_ROTATOR_PORT = 33;
-    private static final int RIGHT_FRONT_MOTOR_ROTATOR_PORT = 31;
-    private static final int RIGHT_BACK_MOTOR_ROTATOR_PORT = 32;
+    private static final int LEFT_FRONT_MOTOR_ROTATOR_PORT = 31;
+    private static final int LEFT_BACK_MOTOR_ROTATOR_PORT = 30;
+    private static final int RIGHT_FRONT_MOTOR_ROTATOR_PORT = 32;
+    private static final int RIGHT_BACK_MOTOR_ROTATOR_PORT = 33;
 
-    private static final int LEFT_FRONT_ENCODER_ROTATOR_PORT = 50;
-    private static final int LEFT_BACK_ENCODER_ROTATOR_PORT = 53;
-    private static final int RIGHT_FRONT_ENCODER_ROTATOR_PORT = 51;
-    private static final int RIGHT_BACK_ENCODER_ROTATOR_PORT = 52;
+    private static final int LEFT_FRONT_ENCODER_ROTATOR_PORT = 51;
+    private static final int LEFT_BACK_ENCODER_ROTATOR_PORT = 50;
+    private static final int RIGHT_FRONT_ENCODER_ROTATOR_PORT = 52;
+    private static final int RIGHT_BACK_ENCODER_ROTATOR_PORT = 53;
 
     // Rotator encoder offsets
-    private static final int FRONT_LEFT_OFFSET = -1024 - 190;
-    private static final int BACK_LEFT_OFFSET = -3120 - 1024;
-    private static final int FRONT_RIGHT_OFFSET = -1930 + 1024;
-    private static final int BACK_RIGHT_OFFSET = -1835 + 1024;
-
+    private static final int FRONT_LEFT_OFFSET = -1930 + 1024 + 1024; // 1
+    private static final int BACK_LEFT_OFFSET = -1024 - 190 + 1024; // 0
+    private static final int FRONT_RIGHT_OFFSET = -1835 + 1024 + 1024; // 2
+    private static final int BACK_RIGHT_OFFSET = -3120 - 1024 + 1024; // 3
     private static final int[] OFFSETS = new int[] { FRONT_LEFT_OFFSET, BACK_LEFT_OFFSET, FRONT_RIGHT_OFFSET,BACK_RIGHT_OFFSET };
 
     // Motor inversions
