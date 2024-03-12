@@ -15,22 +15,21 @@ public class ShootSpeakerCommand extends Command {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
     public static final double RAMP_TIME = 1;
     public static final double SHOOT_DURATION = 0.25;
-    public static final double INDEX_SPEED = 0.5;
+    public static final double SHOOTER_INDEX_SPEED = 0.6;
+    public static final double ELEVATOR_INDEX_SPEED = -0.6;
 
     public ShooterSubsystem shooter;
     public IndexerSubsystem indexer; 
-    public ElevatorSubsystem elevator;
     public double speed;
     public double rampTime;
     public double endTime; 
     
-    public ShootSpeakerCommand(double speed, ShooterSubsystem shooter, IndexerSubsystem indexer, ElevatorSubsystem elevator) {
+    public ShootSpeakerCommand(double speed, ShooterSubsystem shooter, IndexerSubsystem indexer) {
         this.speed = speed;
         this.shooter = shooter;
         this.indexer = indexer;
-        this.elevator = elevator;
 
-        addRequirements(shooter, indexer, elevator);
+        addRequirements(shooter, indexer);
     }
 
     @Override
@@ -42,12 +41,15 @@ public class ShootSpeakerCommand extends Command {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        if (Timer.getFPGATimestamp() < rampTime)
+        if (Timer.getFPGATimestamp() < rampTime){
+            shooter.holdAngle();
             shooter.shoot(speed);
+        }
         else {
+            shooter.holdAngle();
             shooter.shoot(speed);
-            shooter.index(INDEX_SPEED);
-            indexer.index(INDEX_SPEED);
+            shooter.intake();
+            indexer.intake();
         }
     }
 
@@ -55,8 +57,8 @@ public class ShootSpeakerCommand extends Command {
     @Override
     public void end(boolean interrupted) {
         shooter.shoot(0);
-        shooter.index(0);
-        indexer.index(0);
+        shooter.holdIndex();
+        indexer.stop();
     }
 
     // Returns true when the command should end.

@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
@@ -18,7 +19,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
  */
 @SuppressWarnings({"deprecated", "removal"})
 public class IntakeSubsystem extends SubsystemBase {
-    public static final double intakeSpeed = -0.5;
+    public static final double INTAKE_SPEED = -0.45;
     public static final WPI_TalonFX wheelMotor = new WPI_TalonFX(19);
 
     public IntakeSubsystem() {
@@ -29,7 +30,7 @@ public class IntakeSubsystem extends SubsystemBase {
         wheelMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
         wheelMotor.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
         wheelMotor.setInverted(true);
-        wheelMotor.setNeutralMode(NeutralMode.Coast);
+        wheelMotor.setNeutralMode(NeutralMode.Brake);
         // wheelMotor.configSupplyCurrentLimit(LIMIT_CONFIG);
     }
 
@@ -38,7 +39,7 @@ public class IntakeSubsystem extends SubsystemBase {
      * @param speed In percentage from -1 to 1
      */
     public void setWheelSpeed(double speed) {
-        wheelMotor.set(ControlMode.PercentOutput, speed);
+        wheelMotor.set(ControlMode.Velocity, 0, DemandType.ArbitraryFeedForward, speed);
     }
 
     public double getWheelSpeed() {
@@ -53,7 +54,11 @@ public class IntakeSubsystem extends SubsystemBase {
         }
     }
     public void intake() {
-        setWheelSpeed(intakeSpeed);
+        setWheelSpeed(INTAKE_SPEED);
+    }
+
+    public void reverse() {
+        setWheelSpeed(-INTAKE_SPEED);
     }
 
     public void stop() {

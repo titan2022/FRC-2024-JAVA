@@ -48,6 +48,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     public static final int BOT_ENCODER_VALUE = 0;
     public static final double VELOCITY_STALL_LIMIT = 5000;
     public static final double GRAVITY_CURRENT = 0.3;
+    public static final double GRAVITY_FEEDFOWARD = 0.00022;
     // private static final int BOTTOM_ENCODER_TICKS = ENCODER_OFFSET;
     // private static final long TOP_ENCODER_TICKS = Math.round(ENCODER_OFFSET + (TOP_HEIGHT - BOTTOM_HEIGHT) / (2 * Math.PI * SPOOL_RADIUS) * FALCON_TICKS);
     
@@ -138,7 +139,11 @@ public class ElevatorSubsystem extends SubsystemBase {
         //     SmartDashboard.putNumber("Elevator Speed", speed);
         //     LEFT_SPOOL_MOTOR.set(TalonFXControlMode.Velocity, speed * TICKS_PER_METER);
         // }
-        LEFT_SPOOL_MOTOR.set(TalonFXControlMode.Velocity, speed * TICKS_PER_METER);
+        // LEFT_SPOOL_MOTOR.set(ControlMode.Velocity, speed * TICKS_PER_METER);
+        if (!isStalling())
+            LEFT_SPOOL_MOTOR.set(ControlMode.PercentOutput, speed);
+        else
+            LEFT_SPOOL_MOTOR.set(ControlMode.Velocity, 0);
     }
 
     public void setHeight(double height) {
@@ -147,8 +152,11 @@ public class ElevatorSubsystem extends SubsystemBase {
             setPoint = 1;
         else if (setPoint < 0)
             setPoint = 0;
-        
-        LEFT_SPOOL_MOTOR.set(ControlMode.Position, setPoint * TOP_ENCODER_VALUE);
+
+        if (!isStalling())
+            LEFT_SPOOL_MOTOR.set(ControlMode.Position, setPoint * TOP_ENCODER_VALUE, DemandType.ArbitraryFeedForward, GRAVITY_FEEDFOWARD);
+        else
+            LEFT_SPOOL_MOTOR.set(ControlMode.Velocity, 0);
     }
 
     public void raise() {

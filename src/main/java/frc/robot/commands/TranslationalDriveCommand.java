@@ -98,7 +98,7 @@ public class TranslationalDriveCommand extends Command {
         }
 
         if (xbox.getAButtonPressed()) {
-            phiOffset = localizer.getHeading().plus(new Rotation2d(Math.PI / 2));
+            phiOffset = localizer.getOrientation();
         }
 
         double joyX = applyDeadband(xbox.getLeftX(), 0.15);
@@ -106,7 +106,7 @@ public class TranslationalDriveCommand extends Command {
         Translation2d velocity = new Translation2d(scaleVelocity(joyX), scaleVelocity(joyY));
 
         if (isFieldOriented) {
-            Rotation2d heading = new Rotation2d(Math.PI / 2).plus(localizer.getHeading().minus(phiOffset));
+            Rotation2d heading = new Rotation2d(Math.PI / 2).minus(localizer.getHeading().minus(phiOffset));
             velocity = velocity.rotateBy(heading);
         }
 

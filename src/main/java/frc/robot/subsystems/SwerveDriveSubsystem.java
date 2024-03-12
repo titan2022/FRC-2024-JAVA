@@ -85,8 +85,10 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
 
     public static class TranslationalFeedForward 
 	{
-		public static final double kS = 0.025;
-		public static final double kV = 0.175;
+        // public static final double kS = 0.025;
+		public static final double kS = 0.015;
+		// public static final double kV = 0.175;
+        public static final double kV = 0.175;
 		public static final double kA = 0;
 	}
 
@@ -102,7 +104,8 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
 		// talon.slot0.kI = 0;
 		// talon.slot0.kD = 1.0;
 		// talon.slot0.kF = 0;
-		talon.slot0.kP = 0.1;
+		// talon.slot0.kP = 0.1;
+        talon.slot0.kP = 0;
 		talon.slot0.kI = 0;
 		talon.slot0.kD = 0;
 		talon.slot0.kF = 0;
@@ -130,7 +133,7 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
 		return talon;
 	}
 
-    private final SimpleMotorFeedforward motorFeedfoward = new SimpleMotorFeedforward(TranslationalFeedForward.kS, TranslationalFeedForward.kV, TranslationalFeedForward.kA);
+    public static SimpleMotorFeedforward motorFeedfoward = new SimpleMotorFeedforward(TranslationalFeedForward.kS, TranslationalFeedForward.kV, TranslationalFeedForward.kA);
 
     // Physical Hardware
     private final WPI_TalonFX[] motors = new WPI_TalonFX[] {
@@ -176,11 +179,14 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
 
             Translation2d velocityNew;//getVelocity().plus(velocity.minus(getVelocity()).times(0.8)); // Low-pass filter
 
-            if (velocity.getNorm() < 0.1 && getVelocity().getNorm() > 0.1) {
-                velocityNew = getVelocity().times(0.9);
-            } else {
-                velocityNew = velocity;
-            }
+            // if (velocity.getNorm() < 0.1 && getVelocity().getNorm() > 0.1) {
+            //     velocityNew = getVelocity().times(0.75);
+            // } else {
+            //     velocityNew = velocity;
+            // }
+
+            velocityNew = velocity;
+
 
             lastVelocity.vxMetersPerSecond = velocityNew.getX();
             lastVelocity.vyMetersPerSecond = velocityNew.getY();
@@ -364,7 +370,7 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
     private void applyModuleState(SwerveModuleState state, int module, boolean forceOrient) {
         double velTicks = state.speedMetersPerSecond / (10 * METERS_PER_TICKS);
         double feedForwardTicks = motorFeedfoward.calculate(state.speedMetersPerSecond);
-        SmartDashboard.putNumber("Feedforward input Y", feedForwardTicks);
+        SmartDashboard.putNumber("Desired Speed", state.speedMetersPerSecond);
         if (velTicks == 0 && !forceOrient) {
             motors[module].set(ControlMode.Velocity, 0);
             return;
@@ -385,7 +391,8 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
             velTicks *= -1;
             feedForwardTicks *= -1;
         }
-
+        SmartDashboard.putNumber("VelTicks", velTicks);
+        SmartDashboard.putNumber("Feedforward", feedForwardTicks);
         motors[module].set(ControlMode.Velocity, velTicks, DemandType.ArbitraryFeedForward, feedForwardTicks);
         // motors[module].set(ControlMode.Velocity, velTicks);
         rotators[module].set(ControlMode.Position, currTicks + deltaTicks + OFFSETS[module]);

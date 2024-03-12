@@ -5,6 +5,8 @@
 package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -14,6 +16,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.FullShootAMPCommand;
 import frc.robot.commands.MoveElevatorCommand;
 import frc.robot.commands.NoteIntakeCommand;
@@ -50,7 +53,7 @@ public class Robot extends TimedRobot {
         SmartDashboard.putNumber("Command Test", 0);
         SmartDashboard.putNumber("Subsystem Test", 0);
 
-        SmartDashboard.putNumber("A", 0.15);
+        SmartDashboard.putNumber("A", 0.05);
         SmartDashboard.putNumber("B", 0);
         SmartDashboard.putNumber("C", 0);
         SmartDashboard.putNumber("D", 0);
@@ -72,17 +75,21 @@ public class Robot extends TimedRobot {
     @Override
     public void robotPeriodic() {
         CommandScheduler.getInstance().run();
-        // SmartDashboard.putNumber("Current X Velocity", drive.getTranslational().getVelocity().getX());
-        // SmartDashboard.putNumber("Current Y Velocity", drive.getTranslational().getVelocity().getY());
-        // SmartDashboard.putNumber("Swerve Angle", localizer.getHeading().getDegrees());
-        // SmartDashboard.putNumber("Swerve Rotation Velocity", localizer.getRate());
+        SmartDashboard.putNumber("Current X Velocity", drive.getTranslational().getVelocity().getX());
+        SmartDashboard.putNumber("Current Y Velocity", drive.getTranslational().getVelocity().getY());
+        SmartDashboard.putNumber("Current Speed", drive.getTranslational().getVelocity().getNorm());
+        SmartDashboard.putNumber("Swerve Angle", localizer.getHeading().getDegrees());
+        SmartDashboard.putNumber("Swerve Rotation Velocity", localizer.getRate());
+        SmartDashboard.putNumber("X Axis", xbox.getLeftX());
+        SmartDashboard.putNumber("Y Axis", xbox.getLeftY());
+
         // SmartDashboard.putNumber("Encoder Angle", shooter.getRotation().getDegrees());
-        SmartDashboard.putNumber("Elevator Current", elevator.LEFT_SPOOL_MOTOR.getOutputCurrent());
-        SmartDashboard.putBoolean("hasNote", indexer.hasNote());
-        SmartDashboard.putBoolean("IsStalling", elevator.isStalling(ElevatorSubsystem.STALL_CURRENT_LIMIT));
-        // SmartDashboard.putNumber("Encoder Abs", shooter.getAbsoluteRotation());
-        SmartDashboard.putNumber("Elevator Encoder", elevator.LEFT_SPOOL_MOTOR.getSelectedSensorPosition());
-        SmartDashboard.putNumber("Time", Timer.getFPGATimestamp());
+        // SmartDashboard.putNumber("Elevator Current", elevator.LEFT_SPOOL_MOTOR.getOutputCurrent());
+        // SmartDashboard.putBoolean("hasNote", indexer.hasNote());
+        // SmartDashboard.putBoolean("IsStalling", elevator.isStalling(ElevatorSubsystem.STALL_CURRENT_LIMIT));
+        // // SmartDashboard.putNumber("Encoder Abs", shooter.getAbsoluteRotation());
+        // SmartDashboard.putNumber("Elevator Encoder", elevator.LEFT_SPOOL_MOTOR.getSelectedSensorPosition());
+        // SmartDashboard.putNumber("Time", Timer.getFPGATimestamp());
         localizer.step();
     
     }
@@ -96,6 +103,9 @@ public class Robot extends TimedRobot {
     public void autonomousInit() {
         localizer.setup();
         // autoChooser.getSelected().schedule();
+        CommandScheduler.getInstance().schedule(
+            new TranslationCommand(new Translation2d(0, 3), 1, drive.getTranslational())
+        );
     }
 
     /** This function is called periodically during autonomous. */
@@ -114,21 +124,26 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopInit() {
-        // drive.getTranslational()
-        //         .setDefaultCommand(new TranslationalDriveCommand(drive.getTranslational(), localizer, xbox, 2));
-        // drive.getRotational()
-        //         .setDefaultCommand(new RotationalDriveCommand(drive.getRotational(), localizer, xbox, Math.PI));        
+        drive.getTranslational()
+                .setDefaultCommand(new TranslationalDriveCommand(drive.getTranslational(), localizer, xbox, 2));
+        drive.getRotational()
+                .setDefaultCommand(new RotationalDriveCommand(drive.getRotational(), localizer, xbox, Math.PI));        
         localizer.setup();
         // MoveElevatorCommand.HIGH_SPEED = SmartDashboard.getNumber("A", 0);
         // MoveElevatorCommand.HIGH_SPEED_TIME = SmartDashboard.getNumber("B", 0);
         // MoveElevatorCommand.LOW_SPEED = SmartDashboard.getNumber("C", 0);
         // listener.enable();
-        
+        // elevator.LEFT_SPOOL_MOTOR.config_kF(0, SmartDashboard.getNumber("A", 0));
+        // elevator.LEFT_SPOOL_MOTOR.config_kI(0, SmartDashboard.getNumber("B", 0));
+        // elevator.LEFT_SPOOL_MOTOR.config_kD(0, SmartDashboard.getNumber("C", 0));
+        // elevator.RIGHT_SPOOL_MOTOR.config_kF(0, SmartDashboard.getNumber("A", 0));
+        // elevator.RIGHT_SPOOL_MOTOR.config_kI(0, SmartDashboard.getNumber("B", 0));
+        // elevator.RIGHT_SPOOL_MOTOR.config_kD(0, SmartDashboard.getNumber("C", 0));
     }
 
     @Override
     public void teleopPeriodic() {
-        
+        // SwerveDriveSubsystem.motorFeedfoward = new SimpleMotorFeedforward(SmartDashboard.getNumber("A", 0), SmartDashboard.getNumber("B", 0), 0);
         // listener.execute();
         // SmartDashboard.putNumber("LeftTrigger", xbox.getLeftTriggerAxis());
         // SmartDashboard.putNumber("RightTrigger", xbox.getRightTriggerAxis());
@@ -142,15 +157,26 @@ public class Robot extends TimedRobot {
         // else 
         //     elevator.hold();
 
-        // if (xbox.getAButton()) {
-        //     intake.intake();
-        //     indexer.intake();
-        //     shooter.intake();
-        // } else {
-        //     intake.stop();
-        //     indexer.stop();
-        //     shooter.holdIndex();
-        // }
+        if (xbox.getRightBumper()) {
+            // intake.setWheelSpeed(-SmartDashboard.getNumber("A", 0));
+            intake.intake();
+            indexer.intake();
+        } else if (xbox.getLeftBumper()) {
+            intake.reverse();
+            indexer.reverse();
+        }
+        else {
+            intake.stop();
+            indexer.stop();
+        }
+
+        if (xbox.getYButton()) {
+            shooter.intake();
+            shooter.shoot(0.25);
+        } else {
+            shooter.shoot(0);
+            shooter.holdIndex();
+        }
 
         // if (xbox.getLeftBumper()) {
         //     shooter.setLinkageMotor(0.1);
@@ -163,12 +189,21 @@ public class Robot extends TimedRobot {
         //     shooter.shoot(SmartDashboard.getNumber("A", 0));
         // } else 
         //     shooter.shoot(0);
-        if (xbox.getYButton()) {
-                elevator.elevate(0.3);
-            } else if (xbox.getAButton()) {
-                elevator.elevate(-0.3);
-            } else 
-                elevator.hold();
+        // if (xbox.getLeftBumper()) {
+        //     elevator.elevate(0.2);
+        // } else if (xbox.getRightBumper()) {
+        //     elevator.elevate(-0.2);
+        // } else if (xbox.getYButton())
+        //     elevator.raise();
+        // else if (xbox.getAButton())
+        //     elevator.lower();
+        // else 
+        //     elevator.hold();
+
+        // if (xbox.getXButton())
+        //     elevator.LEFT_SPOOL_MOTOR.setSelectedSensorPosition(0);
+
+
 
         // if (SmartDashboard.getNumber("B", 0) == 1) {
         //     if (xbox.getXButton()) {
@@ -221,9 +256,9 @@ public class Robot extends TimedRobot {
     @Override
     public void testInit() {
         localizer.setup();
-        CommandScheduler.getInstance().schedule(
-            new MoveElevatorCommand(true, elevator)
-        );
+        // CommandScheduler.getInstance().schedule(
+        //     new MoveElevatorCommand(true, elevator)
+        // );
         // ElevatorSubsystem.STALL_CURRENT_LIMIT = SmartDashboard.getNumber("ELE CUR LIMIT", 0);
         // shooter.linkageEncoder.reset();
         // boolean up = (SmartDashboard.getNumber("Up", 0) == 1);

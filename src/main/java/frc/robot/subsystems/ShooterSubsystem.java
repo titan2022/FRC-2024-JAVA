@@ -13,6 +13,7 @@ import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -73,9 +74,8 @@ public class ShooterSubsystem extends SubsystemBase {
 	 * 
 	 * @return Angle in radians (zero is ground, positive is up)
 	 */
-	public double getRotation() {
-		double angle = linkageEncoder.getAbsolutePosition()*2.0*Math.PI + SmartDashboard.getNumber("Encoder_Offset", 0);
-		return angle;
+	public Rotation2d getRotation() {
+		return new Rotation2d(linkageEncoder.getAbsolutePosition()*2.0*Math.PI + SmartDashboard.getNumber("Encoder_Offset", 0));
 	}
 
 	private double lawOfCosines(double a, double b, double c){
@@ -88,7 +88,7 @@ public class ShooterSubsystem extends SubsystemBase {
 	 * 
 	 * @param angle in radians (zero is parallel to the ground, positive is up)
 	 */
-	public void setRotation(Rotation2d theta) {
+	public boolean setRotation(Rotation2d theta) {
         double angle = theta.getRadians();
 		SmartDashboard.putNumber("Counter", SmartDashboard.getNumber("counter2", 0.0) + 1);    
 		// if(angle < MIN_ANGLE || angle > MAX_ANGLE) {
@@ -112,36 +112,37 @@ public class ShooterSubsystem extends SubsystemBase {
         } else if (targetRotation > 3 * Math.PI / 2) {
             targetRotation -= 2 * Math.PI;
         }
-		if(targetRotation - deadzone < getRotation() && getRotation() < targetRotation + deadzone){
-			linkageMotor.set(0.0);
+		if(targetRotation - deadzone < getRotation().getRadians() && getRotation().getRadians() < targetRotation + deadzone){
+			holdAngle();
 			SmartDashboard.putBoolean("Dead", true);
-			return;
+			return true;
 		}
 		SmartDashboard.putBoolean("Dead", false);
 		
-		double linkageMag = rotationPID.calculate(getRotation(), targetRotation);
+		double linkageMag = rotationPID.calculate(getRotation().getRadians(), targetRotation);
         double PID = Math.copySign(Math.min(Math.abs(linkageMag), 40 / FALCON_TICKS), linkageMag);
 		double FF = 
 			(((PID < 0) ?
 				SmartDashboard.getNumber("E", 0.0) :
 				SmartDashboard.getNumber("F", 0.0))
-			* Math.sin(getRotation()) + 
+			* Math.sin(getRotation().getRadians()) + 
 			((PID < 0) ? SmartDashboard.getNumber("G", 0.0) : SmartDashboard.getNumber("H", 0.0))
 		);
-		linkageMotor.set(ControlMode.Velocity, PID,
-			DemandType.ArbitraryFeedForward, FF
-		);
+		linkageMotor.set(ControlMode.Velocity, PID, DemandType.ArbitraryFeedForward, FF);
 		SmartDashboard.putNumber("target", targetRotation * 180 / Math.PI);
 		SmartDashboard.putNumber("FF", FF);
 		SmartDashboard.putNumber("PID", PID);
-	}
 
-	private double current_velocity = 0.0;
+        return false;
+	}
 
 	public void shoot(double velocity) {
 		topShooterMotor.set(ControlMode.PercentOutput, velocity);
 	}
 
+    public void holdAngle() {
+        topShooterMotor.set(ControlMode.Velocity, 0);
+    }
 	// public double getShooterVelocity(){
 	// 	return current_velocity*10*(4*IN)*scale;
 	// }

@@ -13,44 +13,43 @@ import frc.robot.subsystems.IntakeSubsystem;
 public class NoteIntakeCommand extends Command {
   @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
     public static double INDEX_SPEED = 0.8;
-  public IndexerSubsystem indexer;
-  public IntakeSubsystem intake;
+    public IndexerSubsystem indexer;
+    public IntakeSubsystem intake;
 
 
-  public NoteIntakeCommand(IndexerSubsystem indexer, IntakeSubsystem intake) {
-    this.intake = intake;
-    this.indexer = indexer;
+    public NoteIntakeCommand(IndexerSubsystem indexer, IntakeSubsystem intake) {
+        this.intake = intake;
+        this.indexer = indexer;
 
-    addRequirements(intake, indexer);
-  }
+        addRequirements(intake, indexer);
+    }
 
-  // Called when the command is initially scheduled.
-  @Override
-  public void initialize() {
+    // Called when the command is initially scheduled.
+    @Override
+    public void initialize() {
 
-  }
+    }
 
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {
-    intake.intake();
-    indexer.index(INDEX_SPEED);
+    // Called every time the scheduler runs while the command is scheduled.
+    @Override
+    public void execute() {
+        intake.intake();
+        indexer.intake();
+    }
 
-  }
+    // Called once the command ends or is interrupted.
+    @Override
+    public void end(boolean interrupted) {
+        intake.stop();
+        indexer.stop();
+    }
 
-  // Called once the command ends or is interrupted.
-  @Override
-  public void end(boolean interrupted) {
-    intake.stop();
-    indexer.stop();
-  }
-
-  // Returns true when the command should end.
-  @Override
-  public boolean isFinished() {
-    if (indexer.hasNote())
-        return true;
-    else 
-        return false;
-  }
+    // Returns true when the command should end.
+    @Override
+    public boolean isFinished() {
+        if (indexer.hasNote())
+            return true;
+        else 
+            return false;
+    }
 }

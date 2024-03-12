@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 
 /** An example command that uses an example subsystem. */
-public class RotateSpeakerCommand extends Command {
+public class RotateShooterCommand extends Command {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
     // public static final double RAMP_TIME = 1;
     // public static final double SHOOT_DURATION = 0.25;
@@ -22,8 +22,9 @@ public class RotateSpeakerCommand extends Command {
     public static final double ANGLE_DEADBAND = 2 * Unit.DEG;
     public ShooterSubsystem shooter;
     public Rotation2d angle;
+    public boolean reachedAngle = false;
     
-    public RotateSpeakerCommand(Rotation2d angle, ShooterSubsystem shooter) {
+    public RotateShooterCommand(Rotation2d angle, ShooterSubsystem shooter) {
         this.shooter = shooter;
         this.angle = angle;
 
@@ -38,7 +39,8 @@ public class RotateSpeakerCommand extends Command {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        shooter.setRotation(angle);
+        //Methods return if reached desired location
+        reachedAngle = shooter.setRotation(angle);
     }
 
     // Called once the command ends or is interrupted.
@@ -50,11 +52,7 @@ public class RotateSpeakerCommand extends Command {
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        if (Math.abs(shooter.calculateEncoderRotation(angle).minus(shooter.getRotation()).getRadians()) < ANGLE_DEADBAND) 
-            return true;
-        else 
-            return false;
-
+        return reachedAngle;
     }
 }
 
