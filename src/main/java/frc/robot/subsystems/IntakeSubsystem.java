@@ -18,16 +18,11 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
  */
 @SuppressWarnings({"deprecated", "removal"})
 public class IntakeSubsystem extends SubsystemBase {
-    private double intakeSpeed = 0.5;
-    public static final WPI_TalonFX wheelMotor = new WPI_TalonFX(3);
-
-    public IntakeSubsystem(double intakeSpeed) {
-        this.intakeSpeed = intakeSpeed;
-        config();
-    }
+    public static final double intakeSpeed = -0.5;
+    public static final WPI_TalonFX wheelMotor = new WPI_TalonFX(19);
 
     public IntakeSubsystem() {
-        this(0.5);
+        config();
     }
 
     public void config() {

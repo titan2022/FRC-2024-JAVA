@@ -5,6 +5,7 @@
 package frc.robot.commands;
 
 import frc.robot.subsystems.ElevatorSubsystem;
+import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.RotationalDrivebase;
 import frc.robot.subsystems.TranslationalDrivebase;
@@ -21,14 +22,10 @@ public class FullNoteIntakeCommand extends SequentialCommandGroup {
     public static final double MOVE_OVERSHOOT = 0.5;
     public static final double OVER_SHOOT_SPEED = 1;
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
-    public FullNoteIntakeCommand(TranslationalDrivebase translational, RotationalDrivebase rotational, IntakeSubsystem intake, ElevatorSubsystem elevator, Localizer localizer) {
+    public FullNoteIntakeCommand(TranslationalDrivebase translational, RotationalDrivebase rotational, IntakeSubsystem intake, IndexerSubsystem indexer, ElevatorSubsystem elevator, Localizer localizer) {
         addCommands(
-            new ParallelCommandGroup(
-                new AlignNoteCommand(translational, rotational, localizer),
-                new MoveElevatorCommand(false, elevator)
-            ),
             new ParallelDeadlineGroup(
-                new NoteIntakeCommand(elevator, intake),
+                new NoteIntakeCommand(indexer, intake),
                 new TranslationCommand(new Translation2d(0, MOVE_OVERSHOOT), OVER_SHOOT_SPEED, translational)
             )   
         );

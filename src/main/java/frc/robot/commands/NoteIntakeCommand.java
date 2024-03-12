@@ -6,20 +6,22 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.ElevatorSubsystem;
+import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 
 /** An example command that uses an example subsystem. */
 public class NoteIntakeCommand extends Command {
   @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
-  public ElevatorSubsystem elevator;
+    public static double INDEX_SPEED = 0.8;
+  public IndexerSubsystem indexer;
   public IntakeSubsystem intake;
 
 
-  public NoteIntakeCommand(ElevatorSubsystem elevator, IntakeSubsystem intake) {
+  public NoteIntakeCommand(IndexerSubsystem indexer, IntakeSubsystem intake) {
     this.intake = intake;
-    this.elevator = elevator;
+    this.indexer = indexer;
 
-    addRequirements(intake);
+    addRequirements(intake, indexer);
   }
 
   // Called when the command is initially scheduled.
@@ -32,18 +34,21 @@ public class NoteIntakeCommand extends Command {
   @Override
   public void execute() {
     intake.intake();
+    indexer.index(INDEX_SPEED);
+
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
     intake.stop();
+    indexer.stop();
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    if (elevator.hasNote())
+    if (indexer.hasNote())
         return true;
     else 
         return false;

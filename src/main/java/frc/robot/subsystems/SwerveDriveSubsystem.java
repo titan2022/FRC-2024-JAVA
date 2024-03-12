@@ -15,12 +15,20 @@ import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.utility.Localizer;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 
 import static frc.robot.utility.Constants.Unit.*;
+
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
+import com.pathplanner.lib.util.PIDConstants;
+import com.pathplanner.lib.util.ReplanningConfig;
+
 
 public class SwerveDriveSubsystem implements DriveSubsystem {
     // Physical parameters
@@ -35,27 +43,26 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
     private static final double ROTATOR_DEADBAND = 0.0001;
 
     // CAN ID numbers
-    private static final int LEFT_FRONT_MOTOR_PORT = 40;
-    private static final int LEFT_BACK_MOTOR_PORT = 43;
-    private static final int RIGHT_FRONT_MOTOR_PORT = 41;
-    private static final int RIGHT_BACK_MOTOR_PORT = 42;
+    private static final int LEFT_FRONT_MOTOR_PORT = 41;
+    private static final int LEFT_BACK_MOTOR_PORT = 40;
+    private static final int RIGHT_FRONT_MOTOR_PORT = 42;
+    private static final int RIGHT_BACK_MOTOR_PORT = 43;
 
-    private static final int LEFT_FRONT_MOTOR_ROTATOR_PORT = 30;
-    private static final int LEFT_BACK_MOTOR_ROTATOR_PORT = 33;
-    private static final int RIGHT_FRONT_MOTOR_ROTATOR_PORT = 31;
-    private static final int RIGHT_BACK_MOTOR_ROTATOR_PORT = 32;
+    private static final int LEFT_FRONT_MOTOR_ROTATOR_PORT = 31;
+    private static final int LEFT_BACK_MOTOR_ROTATOR_PORT = 30;
+    private static final int RIGHT_FRONT_MOTOR_ROTATOR_PORT = 32;
+    private static final int RIGHT_BACK_MOTOR_ROTATOR_PORT = 33;
 
-    private static final int LEFT_FRONT_ENCODER_ROTATOR_PORT = 50;
-    private static final int LEFT_BACK_ENCODER_ROTATOR_PORT = 53;
-    private static final int RIGHT_FRONT_ENCODER_ROTATOR_PORT = 51;
-    private static final int RIGHT_BACK_ENCODER_ROTATOR_PORT = 52;
+    private static final int LEFT_FRONT_ENCODER_ROTATOR_PORT = 51;
+    private static final int LEFT_BACK_ENCODER_ROTATOR_PORT = 50;
+    private static final int RIGHT_FRONT_ENCODER_ROTATOR_PORT = 52;
+    private static final int RIGHT_BACK_ENCODER_ROTATOR_PORT = 53;
 
     // Rotator encoder offsets
-    private static final int FRONT_LEFT_OFFSET = -1024 - 190;
-    private static final int BACK_LEFT_OFFSET = -3120 - 1024;
-    private static final int FRONT_RIGHT_OFFSET = -1930 + 1024;
-    private static final int BACK_RIGHT_OFFSET = -1835 + 1024;
-
+    private static final int FRONT_LEFT_OFFSET = -1930 + 1024 + 1024; // 1
+    private static final int BACK_LEFT_OFFSET = -1024 - 190 + 1024; // 0
+    private static final int FRONT_RIGHT_OFFSET = -1835 + 1024 + 1024; // 2
+    private static final int BACK_RIGHT_OFFSET = -3120 - 1024 + 1024; // 3
     private static final int[] OFFSETS = new int[] { FRONT_LEFT_OFFSET, BACK_LEFT_OFFSET, FRONT_RIGHT_OFFSET,BACK_RIGHT_OFFSET };
 
     // Motor inversions
@@ -158,7 +165,7 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
     private static final Translation2d rightBackPosition = new Translation2d(ROBOT_TRACK_WIDTH / 2, -ROBOT_LENGTH / 2);
     public static final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(leftFrontPosition,
             leftBackPosition, rightFrontPosition, rightBackPosition);
-
+    private Localizer localizer;
     private ChassisSpeeds lastVelocity = new ChassisSpeeds();
 
     // Locks
@@ -207,10 +214,11 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
      * @param mainConfig    Requires PID configuration in slot 0
      * @param rotatorConfig Requires PID configuration in slot 0
      */
-    public SwerveDriveSubsystem() {
+    public SwerveDriveSubsystem(Localizer localizer) {
         TalonFXConfiguration mainConfig = getSwerveDriveTalonDriveConfig();
         TalonFXConfiguration rotatorConfig = getSwerveDriveTalonRotaryConfig();
 
+        this.localizer = localizer;
         setFactoryMotorConfig();
 
         if (mainConfig != null) {
@@ -248,7 +256,7 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
             motor.setSensorPhase(WHEEL_PHASE);
             motor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
             motor.selectProfileSlot(MAIN_MOTOR_SLOT_IDX, 0);
-            motor.setNeutralMode(NeutralMode.Coast);
+            motor.setNeutralMode(NeutralMode.Brake);
             motor.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 20);
             motor.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 20);
             motor.setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, 5000);
@@ -271,7 +279,7 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
             rotator.setSensorPhase(ROTATOR_PHASE);
             rotator.configSelectedFeedbackSensor(TalonFXFeedbackDevice.RemoteSensor0, 0, 0);
             rotator.selectProfileSlot(ROTATOR_SLOT_IDX, 0);
-            rotator.setNeutralMode(NeutralMode.Coast);
+            rotator.setNeutralMode(NeutralMode.Brake);
             rotator.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 20);
             rotator.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 20);
             rotator.setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, 5000);
@@ -295,6 +303,32 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
         }
         for (int i = 0; i < 4; i++)
             rotators[i].configRemoteFeedbackFilter(encoders[i], 0);
+        AutoBuilder.configureHolonomic(
+            localizer::getDisplacementPose2d, // Robot pose supplier
+            localizer::resetStartingPose2d, // Method to reset odometry (will be called if your auto has a starting pose)
+            this::getVelocities, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+            this::setVelocities, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
+            new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in your Constants class
+                    new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
+                    new PIDConstants(5.0, 0.0, 0.0), // Rotation PID constants
+                    4.5, // Max module speed, in m/s
+                    0.4, // Drive base radius in meters. Distance from robot center to furthest module.
+                    new ReplanningConfig() // Default path replanning config. See the API for the options here
+            ),
+            () -> {
+              // Boolean supplier that controls when the path will be mirrored for the red alliance
+              // This will flip the path being followed to the red side of the field.
+              // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+
+              var alliance = DriverStation.getAlliance();
+              if (alliance.isPresent()) {
+                return alliance.get() == DriverStation.Alliance.Red;
+              }
+              return false;
+            },
+            this // Reference to this subsystem to set requirements
+    );
+    
     }
 
     private void setFactoryMotorConfig() {

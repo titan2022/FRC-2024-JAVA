@@ -30,7 +30,7 @@ public class FullClimbCommand extends SequentialCommandGroup {
         addCommands(
             new MoveElevatorCommand(true, elevator),
             new TranslationCommand(new Translation2d(0, 1), MOVE_SPEED, translational),
-            new MoveElevatorCommand(false, elevator)
+            new ClimbCommand(elevator)
         );
 
         addRequirements(translational, rotational, elevator);

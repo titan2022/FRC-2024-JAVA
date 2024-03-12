@@ -37,7 +37,7 @@ public class AlignAMPCommand extends SequentialCommandGroup {
 
 
     addCommands(
-      new RotationCommand(angleOfAprilTag, rotationalDrive, localizer),
+      new RotationCommand(angleOfAprilTag, ROTATIONAL_SPEED, rotationalDrive, localizer),
       new TranslationCommand(distanceFromAprilTag, TRANSLATIONAL_SPEED, translationalDrive)
     );
     

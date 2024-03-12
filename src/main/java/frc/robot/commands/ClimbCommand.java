@@ -4,51 +4,51 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.ElevatorSubsystem;
-import frc.robot.subsystems.IndexerSubsystem;
-import frc.robot.subsystems.IntakeSubsystem;
-import edu.wpi.first.wpilibj.Timer;
-
 
 /** An example command that uses an example subsystem. */
-public class ShootAMPCommand extends Command {
+public class ClimbCommand extends Command {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
-    public static final double DURATION = 1;
-    public static final double SPEED = 0.7;
-    public IndexerSubsystem indexer;
-    public double endTime;
+    // public static final double RAISE_SPEED = 0.1;
+    // public static final double LOWER_SPEED = -0.1;
+    public static final double POWER = -0.5;
+    public static final double STALL_LIMIT = 30;
 
-    public ShootAMPCommand(IndexerSubsystem indexer) {
-        this.indexer = indexer;
-
-        addRequirements(indexer);
+    public ElevatorSubsystem elevator;
+    
+    public ClimbCommand(ElevatorSubsystem elevator) {
+        this.elevator = elevator;
+        
+        addRequirements(elevator);
     }
 
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-        endTime = Timer.getFPGATimestamp() + DURATION;
+        // SmartDashboard.putBoolean("MoveElevator", true);
     }
 
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        indexer.index(SPEED);
+        elevator.elevate(POWER);
     }
 
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
-        indexer.index(0);
+        elevator.hold();
     }
 
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        if (Timer.getFPGATimestamp() > endTime) 
+        if (elevator.isStalling(STALL_LIMIT))
             return true;
-        else 
+        else
             return false;
     }
   }

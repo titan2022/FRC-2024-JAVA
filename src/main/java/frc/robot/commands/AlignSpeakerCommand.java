@@ -39,7 +39,7 @@ public class AlignSpeakerCommand extends SequentialCommandGroup {
         distanceFromAprilTag.minus(new Translation2d(0, SUBWOOFER_LENGTH));
 
     addCommands(
-      new RotationCommand(angleOfAprilTag, rotationalDrive, localizer),
+      new RotationCommand(angleOfAprilTag, ROTATIONAL_SPEED, rotationalDrive, localizer),
       new TranslationCommand(distanceFromAprilTag, TRANSLATIONAL_SPEED, translationalDrive)
     );
     
