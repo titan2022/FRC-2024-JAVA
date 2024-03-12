@@ -36,13 +36,6 @@ public class MoveElevatorCommand extends Command {
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-        if (up && elevator.isBot())
-            passCheck = true;
-        else if (!up && elevator.isTop())
-            passCheck = true;
-        
-        SmartDashboard.putBoolean("!UP", passCheck);
-        SmartDashboard.putBoolean("Pass Check", passCheck);
         // SmartDashboard.putBoolean("MoveElevator", true);
         highSpeedTime = Timer.getFPGATimestamp() + HIGH_SPEED_TIME;
     }
@@ -74,15 +67,6 @@ public class MoveElevatorCommand extends Command {
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        if (passCheck) {
-            if (up && elevator.isTop())
-                return true;
-            else if (!up && elevator.isBot())
-                return true;
-            else
-                return false;
-        } else {
-            return true;
-        }
+        return true;
     }
   }

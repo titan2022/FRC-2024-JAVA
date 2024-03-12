@@ -8,6 +8,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
+import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.SensorInitializationStrategy;
@@ -21,9 +22,9 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
  * Uses stalling mechanism to move
  */
 public class ElevatorSubsystem extends SubsystemBase {
-    public static final double RAISE_SPEED = 0.5;
-    public static final double LOWER_SPEED = -0.5;
-    public static double STALL_CURRENT_LIMIT = 80;
+    // public static final double RAISE_SPEED = 0.5;
+    // public static final double LOWER_SPEED = -0.5;
+    public static final double STALL_CURRENT_LIMIT = 15;
     // public static final double INDEXER_SPEED = 0.5;
     // TODO: get constants
     public static final WPI_TalonFX LEFT_SPOOL_MOTOR = new WPI_TalonFX(18, "CANivore");
@@ -44,9 +45,9 @@ public class ElevatorSubsystem extends SubsystemBase {
     // public static final double ROBOT_WINCH_OFFSET = 0;
     public static final double WINCH_SPEED = -0.5;
     public static final int TOP_ENCODER_VALUE = 185000;
-    public static final int BOT_ENCODER_VALUE = 500;
-
-    
+    public static final int BOT_ENCODER_VALUE = 0;
+    public static final double VELOCITY_STALL_LIMIT = 5000;
+    public static final double GRAVITY_CURRENT = 0.3;
     // private static final int BOTTOM_ENCODER_TICKS = ENCODER_OFFSET;
     // private static final long TOP_ENCODER_TICKS = Math.round(ENCODER_OFFSET + (TOP_HEIGHT - BOTTOM_HEIGHT) / (2 * Math.PI * SPOOL_RADIUS) * FALCON_TICKS);
     
@@ -102,8 +103,8 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         LEFT_SPOOL_MOTOR.setNeutralMode(NeutralMode.Brake);
         RIGHT_SPOOL_MOTOR.setNeutralMode(NeutralMode.Brake);
-
         // INDEXER.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
+        LEFT_SPOOL_MOTOR.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
         LEFT_SPOOL_MOTOR.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
         LEFT_SPOOL_MOTOR.setSelectedSensorPosition(0);
     }
@@ -131,45 +132,47 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public void elevate(double speed) {
-        if (isStalling(STALL_CURRENT_LIMIT))
-            LEFT_SPOOL_MOTOR.set(TalonFXControlMode.PercentOutput, 0);
-        else {
-            SmartDashboard.putNumber("Elevator Speed", speed);
-            LEFT_SPOOL_MOTOR.set(TalonFXControlMode.Velocity, speed * TICKS_PER_METER);
-        }
+        // if (isStalling())
+        //     LEFT_SPOOL_MOTOR.set(TalonFXControlMode.PercentOutput, 0);
+        // else {
+        //     SmartDashboard.putNumber("Elevator Speed", speed);
+        //     LEFT_SPOOL_MOTOR.set(TalonFXControlMode.Velocity, speed * TICKS_PER_METER);
+        // }
+        LEFT_SPOOL_MOTOR.set(TalonFXControlMode.Velocity, speed * TICKS_PER_METER);
     }
 
-    // public void raise() {
-    //     LEFT_SPOOL_MOTOR.set(ControlMode.PercentOutput, RAISE_SPEED);
-    // }
+    public void setHeight(double height) {
+        double setPoint = Math.abs(height) * TOP_ENCODER_VALUE;
+        if (setPoint > 1)
+            setPoint = 1;
+        else if (setPoint < 0)
+            setPoint = 0;
+        
+        LEFT_SPOOL_MOTOR.set(ControlMode.Position, setPoint * TOP_ENCODER_VALUE);
+    }
 
-    // public void lower() {
-    //     LEFT_SPOOL_MOTOR.set(ControlMode.PercentOutput, LOWER_SPEED);
-    // }
+    public void raise() {
+        setHeight(1);
+    }
+
+    public void lower() {
+        setHeight(0);
+    }
 
     public void hold() {
         LEFT_SPOOL_MOTOR.set(ControlMode.PercentOutput, 0);
     }
 
-    public boolean isTop() {
-        if (LEFT_SPOOL_MOTOR.getSelectedSensorPosition() > TOP_ENCODER_VALUE) 
-            return true;
-        else 
-            return false;
-    }
-
-    public boolean isBot() {
-        if (LEFT_SPOOL_MOTOR.getSelectedSensorPosition() < BOT_ENCODER_VALUE) 
-            return true;
-        else 
-            return false;
-    }
-
     public boolean isStalling(double current) {
-        if (Math.abs(LEFT_SPOOL_MOTOR.getOutputCurrent()) > current) 
+        //The -1 io because it takes less effort to go down instead of up
+        if (Math.abs(LEFT_SPOOL_MOTOR.getOutputCurrent() - GRAVITY_CURRENT) > current && Math.abs(LEFT_SPOOL_MOTOR.getSelectedSensorVelocity()) < VELOCITY_STALL_LIMIT) 
             return true;
         else 
             return false;
+    }
+
+    public boolean isStalling() {
+        return isStalling(STALL_CURRENT_LIMIT);
     }
 
     // public void index(double speed) {
