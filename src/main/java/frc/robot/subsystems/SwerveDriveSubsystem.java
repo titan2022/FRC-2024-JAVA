@@ -256,7 +256,7 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
             motor.setSensorPhase(WHEEL_PHASE);
             motor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
             motor.selectProfileSlot(MAIN_MOTOR_SLOT_IDX, 0);
-            motor.setNeutralMode(NeutralMode.Coast);
+            motor.setNeutralMode(NeutralMode.Brake);
             motor.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 20);
             motor.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 20);
             motor.setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, 5000);
@@ -279,7 +279,7 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
             rotator.setSensorPhase(ROTATOR_PHASE);
             rotator.configSelectedFeedbackSensor(TalonFXFeedbackDevice.RemoteSensor0, 0, 0);
             rotator.selectProfileSlot(ROTATOR_SLOT_IDX, 0);
-            rotator.setNeutralMode(NeutralMode.Coast);
+            rotator.setNeutralMode(NeutralMode.Brake);
             rotator.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 20);
             rotator.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 20);
             rotator.setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, 5000);

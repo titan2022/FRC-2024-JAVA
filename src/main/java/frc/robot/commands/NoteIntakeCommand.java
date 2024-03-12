@@ -12,6 +12,7 @@ import frc.robot.subsystems.IntakeSubsystem;
 /** An example command that uses an example subsystem. */
 public class NoteIntakeCommand extends Command {
   @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
+    public static double INDEX_SPEED = 0.8;
   public IndexerSubsystem indexer;
   public IntakeSubsystem intake;
 
@@ -33,7 +34,7 @@ public class NoteIntakeCommand extends Command {
   @Override
   public void execute() {
     intake.intake();
-    indexer.index(0.5);
+    indexer.index(INDEX_SPEED);
 
   }
 

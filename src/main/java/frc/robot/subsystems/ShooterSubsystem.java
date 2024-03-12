@@ -34,7 +34,7 @@ public class ShooterSubsystem extends SubsystemBase {
 	private static final double LINKAGE_PIVOT_DY = 1.0;
     public static final double ANGLE_OFFSET  = 16.9 * DEG;
     public static final double ENCODER_ABSOLUTE_ZERO = 0;
-
+    public static final double INTAKE_SPEED = 0.6;
 //   //kP, kI, kD, kF
 // 	public static final double[] shooterPID = {0, 0, 0, 0};
 
@@ -46,7 +46,7 @@ public class ShooterSubsystem extends SubsystemBase {
 	public WPI_TalonFX linkageMotor = new WPI_TalonFX(12, "CANivore");
 	private WPI_TalonFX topShooterMotor = new WPI_TalonFX(13, "CANivore");
 	private WPI_TalonFX bottomShooterMotor = new WPI_TalonFX(5,"CANivore");
-	public WPI_TalonFX indexerMotor = new WPI_TalonFX(21, "CANivore");
+	public WPI_TalonFX indexerMotor = new WPI_TalonFX(16, "CANivore");
 	public static DutyCycleEncoder linkageEncoder = new DutyCycleEncoder(9);
 
 
@@ -176,6 +176,10 @@ public class ShooterSubsystem extends SubsystemBase {
 	public void index(double speed) {
 		indexerMotor.set(ControlMode.PercentOutput, speed);
 	}
+
+    public void intake() {
+        index(INTAKE_SPEED);
+    }
 
 	public void holdIndex() {
 		indexerMotor.set(ControlMode.PercentOutput, 0);

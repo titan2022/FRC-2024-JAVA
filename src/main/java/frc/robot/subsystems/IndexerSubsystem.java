@@ -3,17 +3,20 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import edu.wpi.first.wpilibj.AnalogInput;
 
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class IndexerSubsystem extends SubsystemBase {
+    public static final double INTAKE_SPEED = -0.4;
     // private static final double INDEX_VELOCITY = 0.0;
     // private static final double AMP_VELOCITY = 0.0;
     // private static final int BREAK_TIMEOUT = 2; // In frames (20ms)
 
     private WPI_TalonFX motor = new WPI_TalonFX(22);
-    // private DigitalInput beamBreakerInput = new DigitalInput(0);
+    private AnalogInput beamBreakerInput = new AnalogInput(1);
 
     // private boolean noteStatus = false;
     // private long lastNoteChange = 0;
@@ -34,13 +37,21 @@ public class IndexerSubsystem extends SubsystemBase {
         motor.set(ControlMode.PercentOutput, speed);
     }
 
+    public void intake() {
+        motor.set(ControlMode.PercentOutput, INTAKE_SPEED);
+    }
+
     // public void amp(boolean reverse) {
     //     motor.set(ControlMode.Velocity, (reverse ? -1 : 1) * AMP_VELOCITY);
     // }
 
     public boolean hasNote() {
-        // return beamBreakerInput.get();
-        return false;
+        // SmartDashboard.putNumber("Beam Breaker", beamBreakerInput.getValue());
+        if (beamBreakerInput.getValue() > 2350)
+            return true;
+        else 
+            return false;
+        // return false;
     }
 
     // @Override

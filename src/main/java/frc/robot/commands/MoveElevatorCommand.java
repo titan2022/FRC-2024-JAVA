@@ -14,17 +14,21 @@ public class MoveElevatorCommand extends Command {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
     // public static final double RAISE_SPEED = 0.1;
     // public static final double LOWER_SPEED = -0.1;
-    public static double HIGH_SPEED = 1;
-    public static double LOW_SPEED = 0.2;
+    public static double HIGH_SPEED = 0.2;
+    public static double LOW_SPEED = 0.15;
 
-    public static double HIGH_SPEED_TIME = 0.6;
-    public static boolean up = false;
+    public static double HIGH_SPEED_TIME = 2;
+    public static double STALL_CURRENT_LIMIT = 15;
+    public static double ABSOLUTE_STALL_CURRENT_LIMIT = 25;
 
     public ElevatorSubsystem elevator;
     public double highSpeedTime;
+    public boolean up;
+    public boolean passCheck = false;
     
-    public MoveElevatorCommand(ElevatorSubsystem elevator) {
+    public MoveElevatorCommand(boolean up, ElevatorSubsystem elevator) {
         this.elevator = elevator;
+        this.up = up;
         
         addRequirements(elevator);
     }
@@ -32,6 +36,13 @@ public class MoveElevatorCommand extends Command {
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
+        if (up && elevator.isBot())
+            passCheck = true;
+        else if (!up && elevator.isTop())
+            passCheck = true;
+        
+        SmartDashboard.putBoolean("!UP", passCheck);
+        SmartDashboard.putBoolean("Pass Check", passCheck);
         // SmartDashboard.putBoolean("MoveElevator", true);
         highSpeedTime = Timer.getFPGATimestamp() + HIGH_SPEED_TIME;
     }
@@ -42,16 +53,14 @@ public class MoveElevatorCommand extends Command {
         double speed = 1;
         //Sets sign
         if (up)
-            speed *= -1;
-        else 
             speed *= 1;
+        else 
+            speed *= -1;
 
         if (Timer.getFPGATimestamp() < highSpeedTime)
             speed *= HIGH_SPEED;
         else 
             speed *= LOW_SPEED;
-
-        SmartDashboard.putNumber("Elevator Speed", speed);
 
         elevator.elevate(speed);
     }
@@ -59,18 +68,21 @@ public class MoveElevatorCommand extends Command {
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
-        up = !up;
         elevator.hold();
     }
 
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        if (elevator.isStalling() && Timer.getFPGATimestamp() > highSpeedTime) {
+        if (passCheck) {
+            if (up && elevator.isTop())
+                return true;
+            else if (!up && elevator.isBot())
+                return true;
+            else
+                return false;
+        } else {
             return true;
-        }
-        else {
-            return false;
         }
     }
   }

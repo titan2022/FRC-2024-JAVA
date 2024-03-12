@@ -18,8 +18,10 @@ import frc.robot.commands.FullShootAMPCommand;
 import frc.robot.commands.MoveElevatorCommand;
 import frc.robot.commands.NoteIntakeCommand;
 import frc.robot.commands.RotationCommand;
+import frc.robot.commands.RotationalDriveCommand;
 import frc.robot.commands.ShootAMPCommand;
 import frc.robot.commands.TranslationCommand;
+import frc.robot.commands.TranslationalDriveCommand;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -38,23 +40,20 @@ public class Robot extends TimedRobot {
     private SwerveDriveSubsystem drive = new SwerveDriveSubsystem(localizer);
     private ElevatorSubsystem elevator = new ElevatorSubsystem();
     private IntakeSubsystem intake = new IntakeSubsystem();
-    // private ShooterSubsystem shooter = new ShooterSubsystem();
+    private ShooterSubsystem shooter = new ShooterSubsystem();
     private IndexerSubsystem indexer = new IndexerSubsystem();
     private SendableChooser<Command> autoChooser;
+    public double lastTime = 0;
 
     @Override
     public void robotInit() {
         SmartDashboard.putNumber("Command Test", 0);
         SmartDashboard.putNumber("Subsystem Test", 0);
 
-        SmartDashboard.putNumber("A", 0.1);
+        SmartDashboard.putNumber("A", 0.15);
         SmartDashboard.putNumber("B", 0);
-        SmartDashboard.putNumber("C", 0.1);
+        SmartDashboard.putNumber("C", 0);
         SmartDashboard.putNumber("D", 0);
-        SmartDashboard.putNumber("E", 0);
-        SmartDashboard.putNumber("F", 0);
-        SmartDashboard.putNumber("ELE CUR LIMIT", 8);
-        SmartDashboard.putNumber("Up", 1);
         
         //These speeds are temporary
         // NamedCommands.registerCommand("Shoot Speaker", new ShootSpeakerCommand(60, shooter, indexer, elevator));
@@ -78,11 +77,15 @@ public class Robot extends TimedRobot {
         // SmartDashboard.putNumber("Swerve Angle", localizer.getHeading().getDegrees());
         // SmartDashboard.putNumber("Swerve Rotation Velocity", localizer.getRate());
         // SmartDashboard.putNumber("Encoder Angle", shooter.getRotation().getDegrees());
-        // SmartDashboard.putNumber("Elevator Current", elevator.LEFT_SPOOL_MOTOR.getOutputCurrent());
+        SmartDashboard.putNumber("Elevator Current", elevator.LEFT_SPOOL_MOTOR.getOutputCurrent());
         SmartDashboard.putBoolean("hasNote", indexer.hasNote());
-        SmartDashboard.putBoolean("IsStalling", elevator.isStalling());
+        SmartDashboard.putBoolean("IsStalling", elevator.isStalling(ElevatorSubsystem.STALL_CURRENT_LIMIT));
         // SmartDashboard.putNumber("Encoder Abs", shooter.getAbsoluteRotation());
+        SmartDashboard.putBoolean("Elevator Top", elevator.isTop());
+        SmartDashboard.putBoolean("Elevator Bot", elevator.isBot());
+        SmartDashboard.putNumber("Elevator Encoder", elevator.LEFT_SPOOL_MOTOR.getSelectedSensorPosition());
         SmartDashboard.putNumber("Time", Timer.getFPGATimestamp());
+
         localizer.step();
     
     }
@@ -101,38 +104,115 @@ public class Robot extends TimedRobot {
     /** This function is called periodically during autonomous. */
     @Override
     public void autonomousPeriodic() {
-
+        if (xbox.getXButton()) {
+            CommandScheduler.getInstance().schedule(
+                new MoveElevatorCommand(true, elevator)
+            );
+        } else if (xbox.getBButton()) {
+            CommandScheduler.getInstance().schedule(
+                new MoveElevatorCommand(false, elevator)
+            );
+        }
     }
 
     @Override
     public void teleopInit() {
+        // drive.getTranslational()
+        //         .setDefaultCommand(new TranslationalDriveCommand(drive.getTranslational(), localizer, xbox, 2));
+        // drive.getRotational()
+        //         .setDefaultCommand(new RotationalDriveCommand(drive.getRotational(), localizer, xbox, Math.PI));        
         localizer.setup();
+        // MoveElevatorCommand.HIGH_SPEED = SmartDashboard.getNumber("A", 0);
+        // MoveElevatorCommand.HIGH_SPEED_TIME = SmartDashboard.getNumber("B", 0);
+        // MoveElevatorCommand.LOW_SPEED = SmartDashboard.getNumber("C", 0);
         // listener.enable();
+        
     }
 
     @Override
     public void teleopPeriodic() {
+        
         // listener.execute();
-        SmartDashboard.putBoolean("One", true);
         // SmartDashboard.putNumber("LeftTrigger", xbox.getLeftTriggerAxis());
         // SmartDashboard.putNumber("RightTrigger", xbox.getRightTriggerAxis());
 
         // elevator.elevate(SmartDashboard.getNumber("A", 0) * xbox.getLeftTriggerAxis() - SmartDashboard.getNumber("A", 0) * xbox.getRightTriggerAxis());
-        if (xbox.getYButton()){
-            SmartDashboard.putBoolean("Two", true);
-            elevator.elevate(SmartDashboard.getNumber("A", 0));
-        }
-        else if (xbox.getAButton())
-            elevator.elevate(-SmartDashboard.getNumber("A", 0));
-        else 
-            elevator.hold();
+        // if (xbox.getYButton()){
+        //     elevator.elevate(0.1);
+        // }
+        // else if (xbox.getAButton())
+        //     elevator.elevate(-0.1);
+        // else 
+        //     elevator.hold();
 
-        if (xbox.getXButton())
-            indexer.index(SmartDashboard.getNumber("B", 0));
-        else if (xbox.getBButton())
-            indexer.index(-SmartDashboard.getNumber("B", 0));
-        else
-            indexer.stop();
+        // if (xbox.getAButton()) {
+        //     intake.intake();
+        //     indexer.intake();
+        //     shooter.intake();
+        // } else {
+        //     intake.stop();
+        //     indexer.stop();
+        //     shooter.holdIndex();
+        // }
+
+        // if (xbox.getLeftBumper()) {
+        //     shooter.setLinkageMotor(0.1);
+        // } else if (xbox.getRightBumper()) {
+        //     shooter.setLinkageMotor(-0.1);
+        // } else 
+        //     shooter.holdAngle();
+
+        // if (xbox.getYButton()) {
+        //     shooter.shoot(SmartDashboard.getNumber("A", 0));
+        // } else 
+        //     shooter.shoot(0);
+        if (SmartDashboard.getNumber("B", 0) == 0) {
+            if (xbox.getYButton()) {
+                elevator.elevate(0.1);
+            } else if (xbox.getAButton()) {
+                elevator.elevate(-0.1);
+            } else 
+                elevator.hold();
+        }
+
+        if (SmartDashboard.getNumber("B", 0) == 1) {
+            if (xbox.getXButton()) {
+                CommandScheduler.getInstance().schedule(
+                    new MoveElevatorCommand(true, elevator)
+                );
+            } else if (xbox.getBButton()) {
+                CommandScheduler.getInstance().schedule(
+                    new MoveElevatorCommand(false, elevator)
+                );
+            }
+        }
+
+        if (SmartDashboard.getNumber("B", 0) == 2) {
+            if (xbox.getXButton()) 
+                ElevatorSubsystem.LEFT_SPOOL_MOTOR.setSelectedSensorPosition(0);
+        }
+
+        
+
+        // if (xbox.getXButton())
+        //     indexer.index(0.6);
+        // else if (xbox.getBButton())
+        //     indexer.index(-0.6);
+        // else
+        //     indexer.stop();
+
+        // if (xbox.getXButton()) {
+        //     // lastTime = Timer.getFPGATimestamp();
+        //     CommandScheduler.getInstance().schedule(
+        //         new MoveElevatorCommand(true, elevator)
+        //     );
+        // } else if (xbox.getBButton()) {
+        //     CommandScheduler.getInstance().schedule(
+        //         new MoveElevatorCommand(false, elevator)
+        //     );
+        // }
+
+
 
 
         // if (Math.abs(xbox.getLeftTriggerAxis()) > 0.01){
@@ -146,19 +226,18 @@ public class Robot extends TimedRobot {
     @Override
     public void testInit() {
         localizer.setup();
-        
-        // MoveElevatorCommand.HIGH_SPEED = SmartDashboard.getNumber("A", 0);
-        // MoveElevatorCommand.HIGH_SPEED_TIME = SmartDashboard.getNumber("B", 0);
-        // MoveElevatorCommand.LOW_SPEED = SmartDashboard.getNumber("C", 0);
+        CommandScheduler.getInstance().schedule(
+            new MoveElevatorCommand(true, elevator)
+        );
         // ElevatorSubsystem.STALL_CURRENT_LIMIT = SmartDashboard.getNumber("ELE CUR LIMIT", 0);
         // shooter.linkageEncoder.reset();
         // boolean up = (SmartDashboard.getNumber("Up", 0) == 1);
 
-        CommandScheduler.getInstance().schedule(
-            // new MoveElevatorCommand(up, elevator)
-            new FullShootAMPCommand(elevator, indexer)
-                    // new MoveElevatorCommand(false, elevator)
-        );
+        // CommandScheduler.getInstance().schedule(
+        //     new MoveElevatorCommand(elevator)
+        //     //new FullShootAMPCommand(elevator, indexer)
+        //             // new MoveElevatorCommand(false, elevator)
+        // );
 
         // switch ((int) SmartDashboard.getNumber("Command Test", 0)) {
         //     case 1:
@@ -209,32 +288,37 @@ public class Robot extends TimedRobot {
 
     @Override
     public void testPeriodic() {
-        switch ((int) SmartDashboard.getNumber("Subsystem Test", 0)) {
-            case 1:
-                drive.getTranslational().setVelocity(new Translation2d(0, 1));
-                break;
-            case 2:
-                drive.getRotational().setRotationalVelocity(new Rotation2d(Math.PI / 4));
-                break;
-            case 3:
-                intake.setWheelSpeed(0.5);
-                break;
-            case 4:
-                intake.intake();
-                break;
-            case 5:
-                intake.stop();
-                break;
-            case 6:
-                double endTimeTwo = Timer.getFPGATimestamp() + 3;
-                intake.toggle();
-                while (true) {
-                if (Timer.getFPGATimestamp() > endTimeTwo) {
-                        intake.toggle();
-                        break;
-                    }
-                }
-                break;
+        // if (xbox.getYButton()) {
+        //     CommandScheduler.getInstance().schedule(
+        //         new MoveElevatorCommand(elevator)
+        //     );
+        // }
+    //     switch ((int) SmartDashboard.getNumber("Subsystem Test", 0)) {
+    //         case 1:
+    //             drive.getTranslational().setVelocity(new Translation2d(0, 1));
+    //             break;
+    //         case 2:
+    //             drive.getRotational().setRotationalVelocity(new Rotation2d(Math.PI / 4));
+    //             break;
+    //         case 3:
+    //             intake.setWheelSpeed(0.5);
+    //             break;
+    //         case 4:
+    //             intake.intake();
+    //             break;
+    //         case 5:
+    //             intake.stop();
+    //             break;
+    //         case 6:
+    //             double endTimeTwo = Timer.getFPGATimestamp() + 3;
+    //             intake.toggle();
+    //             while (true) {
+    //             if (Timer.getFPGATimestamp() > endTimeTwo) {
+    //                     intake.toggle();
+    //                     break;
+    //                 }
+    //             }
+    //             break;
             // case 7:
             //     shooter.index(0.5);
             //     break;
@@ -272,28 +356,28 @@ public class Robot extends TimedRobot {
                 // else
                 //     shooter.holdAngle();
                 // break;
-            case 11:
-                if (xbox.getYButton())
-                    indexer.index(0.5);
-                else if (xbox.getAButton())
-                    indexer.index(-0.5);
-                else
-                    indexer.stop();
-                break;
-            case 12:
-                SmartDashboard.putBoolean("One", true);
+        //     case 11:
+        //         if (xbox.getYButton())
+        //             indexer.index(0.5);
+        //         else if (xbox.getAButton())
+        //             indexer.index(-0.5);
+        //         else
+        //             indexer.stop();
+        //         break;
+        //     case 12:
+        //         SmartDashboard.putBoolean("One", true);
 
-                if (Math.abs(xbox.getLeftTriggerAxis()) > 0.01){
-                    SmartDashboard.putBoolean("One", true);
-                    elevator.elevate(SmartDashboard.getNumber("A", 0) * xbox.getLeftTriggerAxis());
-                }
-                else if (Math.abs(xbox.getRightTriggerAxis()) > 0.01)
-                    elevator.elevate(-SmartDashboard.getNumber("A", 0) * xbox.getRightTriggerAxis());
-                else 
-                    elevator.hold();
-                break;
-            default:
-                break;
-        }
+        //         if (Math.abs(xbox.getLeftTriggerAxis()) > 0.01){
+        //             SmartDashboard.putBoolean("One", true);
+        //             elevator.elevate(SmartDashboard.getNumber("A", 0) * xbox.getLeftTriggerAxis());
+        //         }
+        //         else if (Math.abs(xbox.getRightTriggerAxis()) > 0.01)
+        //             elevator.elevate(-SmartDashboard.getNumber("A", 0) * xbox.getRightTriggerAxis());
+        //         else 
+        //             elevator.hold();
+        //         break;
+        //     default:
+        //         break;
+        // }
     }
 }
