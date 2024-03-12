@@ -4,15 +4,15 @@
 
 package frc.robot.subsystems;
 
-import static frc.robot.utility.Constants.Unit.*;
+import static frc.robot.utility.Constants.Unit.DEG;
+import static frc.robot.utility.Constants.Unit.FALCON_TICKS;
+import static frc.robot.utility.Constants.Unit.IN;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
-import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -68,60 +68,21 @@ public class ShooterSubsystem extends SubsystemBase {
 		bottomShooterMotor.setInverted(true);
         linkageEncoder.reset();
 	}
-
 	/**
 	 * Gets shooter rotation angle
 	 * 
 	 * @return Angle in radians (zero is ground, positive is up)
 	 */
-	public Rotation2d getRotation() {
-		return Rotation2d.fromRadians(linkageEncoder.get() / (2 * Math.PI) + MIN_ANGLE);
+	public double getRotation() {
+		double angle = linkageEncoder.getAbsolutePosition()*2.0*Math.PI + SmartDashboard.getNumber("Encoder_Offset", 0);
+		return angle;
 	}
 
-    public Rotation2d calculateEncoderRotation(Rotation2d theta) {
-        double angle = theta.getRadians();
-		SmartDashboard.putNumber("Counter", SmartDashboard.getNumber("counter2", 0.0) + 1);    
-		// if(angle < MIN_ANGLE || angle > MAX_ANGLE) {
-		// 	return;
-		// }
-		// trust me, the math is right
-		// angle += ANGLE_OFFSET;
-		double shooter_x = SHOOTER_LENGTH * Math.cos(angle);
-		double shooter_y = SHOOTER_LENGTH * Math.sin(angle);
-		double dx = shooter_x - LINKAGE_PIVOT_DX;
-		double dy = shooter_y - LINKAGE_PIVOT_DY;
-		double d = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
-    	double theta1 = Math.acos( // Law of Cosines, can also be negative if we want the linkage "inside"
-			(-Math.pow(LINKAGE_LONG_ARM_LENGTH, 2) + Math.pow(d, 2) + Math.pow(LINKAGE_SHORT_ARM_LENGTH, 2)) / 
-			(2 * d * LINKAGE_SHORT_ARM_LENGTH)
-		);
-		double theta2 = Math.atan2(dx, dy);
-        double angleFromY = theta1 - theta2;
-		double targetRotation = Math.PI / 2 - angleFromY;
-        targetRotation %= 2 * Math.PI;
-
-        if (targetRotation < -Math.PI / 2) {
-             targetRotation += 2 * Math.PI;
-        } else if (targetRotation > 3 * Math.PI / 2) {
-            targetRotation -= 2 * Math.PI;
-        }
-
-        return new Rotation2d(targetRotation);
-    }
-
-    /**
-	 * Gets shooter rotation angle
-	 * 
-	 * @return Angle in radians (zero is ground, positive is up)
-	 */
-	public double getAbsoluteRotation() {
-		return linkageEncoder.getAbsolutePosition();
+	private double lawOfCosines(double a, double b, double c){
+		return Math.acos((Math.pow(c, 2.0) - Math.pow(a, 2.0) - Math.pow(b, 2.0)) / (-2.0 * a * b));
 	}
 
-    public void resetRotation() {
-        linkageMotor.set(ControlMode.PercentOutput, Math.copySign(0.2, ENCODER_ABSOLUTE_ZERO - getAbsoluteRotation()));
-    }
-
+	private double deadzone = 0.1 * DEG; 
 	/**
 	 * Sets target angle of the shooter
 	 * 
@@ -140,10 +101,7 @@ public class ShooterSubsystem extends SubsystemBase {
 		double dx = shooter_x - LINKAGE_PIVOT_DX;
 		double dy = shooter_y - LINKAGE_PIVOT_DY;
 		double d = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
-    	double theta1 = Math.acos( // Law of Cosines, can also be negative if we want the linkage "inside"
-			(-Math.pow(LINKAGE_LONG_ARM_LENGTH, 2) + Math.pow(d, 2) + Math.pow(LINKAGE_SHORT_ARM_LENGTH, 2)) / 
-			(2 * d * LINKAGE_SHORT_ARM_LENGTH)
-		);
+    	double theta1 = lawOfCosines(d, LINKAGE_SHORT_ARM_LENGTH, LINKAGE_LONG_ARM_LENGTH);
 		double theta2 = Math.atan2(dx, dy);
         double angleFromY = theta1 - theta2;
 		double targetRotation = Math.PI / 2 - angleFromY;
@@ -154,16 +112,31 @@ public class ShooterSubsystem extends SubsystemBase {
         } else if (targetRotation > 3 * Math.PI / 2) {
             targetRotation -= 2 * Math.PI;
         }
-
-        SmartDashboard.putNumber("Calculated Angle(Deg)", targetRotation);
-
-        // linkageMotor.set(ControlMode.Velocity, rotationPID.calculate(getRotation().getRadians(), targetRotation));
+		if(targetRotation - deadzone < getRotation() && getRotation() < targetRotation + deadzone){
+			linkageMotor.set(0.0);
+			SmartDashboard.putBoolean("Dead", true);
+			return;
+		}
+		SmartDashboard.putBoolean("Dead", false);
+		
+		double linkageMag = rotationPID.calculate(getRotation(), targetRotation);
+        double PID = Math.copySign(Math.min(Math.abs(linkageMag), 40 / FALCON_TICKS), linkageMag);
+		double FF = 
+			(((PID < 0) ?
+				SmartDashboard.getNumber("E", 0.0) :
+				SmartDashboard.getNumber("F", 0.0))
+			* Math.sin(getRotation()) + 
+			((PID < 0) ? SmartDashboard.getNumber("G", 0.0) : SmartDashboard.getNumber("H", 0.0))
+		);
+		linkageMotor.set(ControlMode.Velocity, PID,
+			DemandType.ArbitraryFeedForward, FF
+		);
+		SmartDashboard.putNumber("target", targetRotation * 180 / Math.PI);
+		SmartDashboard.putNumber("FF", FF);
+		SmartDashboard.putNumber("PID", PID);
 	}
 
-	public void holdAngle() {
-		linkageMotor.set(ControlMode.Velocity, 0);
-	}
-
+	private double current_velocity = 0.0;
 
 	public void shoot(double velocity) {
 		topShooterMotor.set(ControlMode.PercentOutput, velocity);
