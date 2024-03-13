@@ -8,7 +8,7 @@ import edu.wpi.first.math.Num;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.commands.MoveElevatorCommand;
+import frc.robot.commands.control.TeleElevatorCommand;
 import frc.robot.subsystems.ElevatorSubsystem;
 
 public class TeleopListener {
@@ -49,16 +49,16 @@ public class TeleopListener {
     }
 
     public void setupCommands(ElevatorSubsystem elevator) {
-        MOVE_UP_ELEVATOR_COMMAND = (Boolean a) -> {
-            CommandScheduler.getInstance().schedule(
-                new MoveElevatorCommand(true, elevator)
-            );
-        };
-        MOVE_UP_ELEVATOR_COMMAND = (Boolean a) -> {
-            CommandScheduler.getInstance().schedule(
-                new MoveElevatorCommand(true, elevator)
-            );
-        };
+        // MOVE_UP_ELEVATOR_COMMAND = (Boolean a) -> {
+        //     CommandScheduler.getInstance().schedule(
+        //         new TeleElevatorCommand(true, elevator)
+        //     );
+        // };
+        // MOVE_UP_ELEVATOR_COMMAND = (Boolean a) -> {
+        //     CommandScheduler.getInstance().schedule(
+        //         new TeleElevatorCommand(true, elevator)
+        //     );
+        // };
 
         ELEVATOR_ENCODER_RESET = (Boolean a) -> {elevator.resetEncoder();};
     }

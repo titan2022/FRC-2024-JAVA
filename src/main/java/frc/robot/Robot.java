@@ -18,7 +18,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.FullShootAMPCommand;
-import frc.robot.commands.MoveElevatorCommand;
 import frc.robot.commands.NoteIntakeCommand;
 import frc.robot.commands.RotateShooterCommand;
 import frc.robot.commands.RotationCommand;
@@ -26,6 +25,7 @@ import frc.robot.commands.RotationalDriveCommand;
 import frc.robot.commands.ShootAMPCommand;
 import frc.robot.commands.TranslationCommand;
 import frc.robot.commands.TranslationalDriveCommand;
+import frc.robot.commands.control.TeleElevatorCommand;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -55,7 +55,7 @@ public class Robot extends TimedRobot {
         SmartDashboard.putNumber("Command Test", 0);
         // SmartDashboard.putNumber("Subsystem Test", 0);
 
-        SmartDashboard.putNumber("A", 0.2);
+        SmartDashboard.putNumber("A", 0.25);
         SmartDashboard.putNumber("B",0);
         SmartDashboard.putNumber("C", 0);
         SmartDashboard.putNumber("D", 0);
@@ -132,9 +132,11 @@ public class Robot extends TimedRobot {
         drive.getTranslational()
                 .setDefaultCommand(new TranslationalDriveCommand(drive.getTranslational(), localizer, xbox, 2));
         drive.getRotational()
-                .setDefaultCommand(new RotationalDriveCommand(drive.getRotational(), localizer, xbox, Math.PI));        
-
-        MoveElevatorCommand.LOW_SPEED = SmartDashboard.getNumber("A", 0);
+                .setDefaultCommand(new RotationalDriveCommand(drive.getRotational(), localizer, xbox, Math.PI));  
+        CommandScheduler.getInstance().schedule(
+            new TeleElevatorCommand(elevator, xbox)
+        );      
+        // MoveElevatorCommand.LOW_SPEED = SmartDashboard.getNumber("A", 0);
         // MoveElevatorCommand.HIGH_SPEED = SmartDashboard.getNumber("A", 0);
         // MoveElevatorCommand.HIGH_SPEED_TIME = SmartDashboard.getNumber("B", 0);
         // MoveElevatorCommand.LOW_SPEED = SmartDashboard.getNumber("C", 0);
@@ -149,46 +151,27 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopPeriodic() {
+        // if (xbox.getYButton()) {
+        //     elevator.raise();
+        // } else if (xbox.getBButton()) {
+        //     elevator.lower();
+        // } else if (xbox.getLeftTriggerAxis() > 0.05) {
+        //     elevator.elevate(-xbox.getLeftTriggerAxis() * SmartDashboard.getNumber("A", 0));
+        // } else {
+        //     elevator.hold();
+        // }
         // listener.execute();
 
-        // elevator.elevate(SmartDashboard.getNumber("A", 0) * xbox.getLeftTriggerAxis() - SmartDashboard.getNumber("A", 0) * xbox.getRightTriggerAxis());
-        // if (xbox.getLeftBumper()){
+        // if (xbox.getYButton()){
         //     CommandScheduler.getInstance().schedule(
-        //         new MoveElevatorCommand(true, elevator)
+        //         new TeleElevatorCommand(true, elevator)
         //     );
         // }
-        // else if (xbox.getRightBumper()) {
+        // else if (xbox.getAButton()){
         //     CommandScheduler.getInstance().schedule(
-        //         new MoveElevatorCommand(false, elevator)
-        //     );
-        // } else if (xbox.getYButton()) {
-        //     CommandScheduler.getInstance().schedule(
-        //         new ShootAMPCommand(indexer)
+        //         new TeleElevatorCommand(false, elevator)
         //     );
         // }
-        if (xbox.getXButton()) {
-            intake.intake();
-            indexer.intake();
-        } else {
-            intake.stop();
-            indexer.stop();
-        }
-        // if (xbox.getAButton())
-        //     elevator.resetEncoder();
-
-        if (xbox.getLeftBumper()){
-            elevator.elevate(0.2);
-        }
-        else if (xbox.getRightBumper()) {
-            elevator.elevate(-0.2);
-        } else {
-            elevator.hold();
-        }
-
-        // if (xbox.getXButton()) {
-        //     elevator.resetEncoder();
-        // }
-
 
         // if (xbox.getXButton()) {
         //     shooter.intake();
@@ -305,28 +288,28 @@ public class Robot extends TimedRobot {
         localizer.setup();
         // MoveElevatorCommand.HIGH_SPEED = SmartDashboard.getNumber("A", 0);
         // MoveElevatorCommand.HIGH_SPEED_TIME = SmartDashboard.getNumber("B", 0);
-        MoveElevatorCommand.LOW_SPEED = SmartDashboard.getNumber("A", 0);
+        // MoveElevatorCommand.LOW_SPEED = SmartDashboard.getNumber("A", 0);
 
         int command = (int) SmartDashboard.getNumber("Command Test", 0);
-        SmartDashboard.putNumber("Command Test", command);
-        if (command == 1) {
-            CommandScheduler.getInstance().schedule(
-                new MoveElevatorCommand(true, elevator)
-            );
-        } else if (command == 2) {
-            CommandScheduler.getInstance().schedule(
-                new MoveElevatorCommand(false, elevator)
-            );
-        } else if (command == 3) {
-            CommandScheduler.getInstance().schedule(
-                new NoteIntakeCommand(indexer, intake)
-            );
-        } else if (command == 4) {
-            Rotation2d rotate = Rotation2d.fromDegrees(SmartDashboard.getNumber("A", 0));
-            CommandScheduler.getInstance().schedule(
-                new RotateShooterCommand(rotate, shooter)
-            );
-        }
+        // SmartDashboard.putNumber("Command Test", command);
+        // if (command == 1) {
+        //     CommandScheduler.getInstance().schedule(
+        //         new TeleElevatorCommand(true, elevator)
+        //     );
+        // } else if (command == 2) {
+        //     CommandScheduler.getInstance().schedule(
+        //         new TeleElevatorCommand(false, elevator)
+        //     );
+        // } else if (command == 3) {
+        //     CommandScheduler.getInstance().schedule(
+        //         new NoteIntakeCommand(indexer, intake)
+        //     );
+        // } else if (command == 4) {
+        //     Rotation2d rotate = Rotation2d.fromDegrees(SmartDashboard.getNumber("A", 0));
+        //     CommandScheduler.getInstance().schedule(
+        //         new RotateShooterCommand(rotate, shooter)
+        //     );
+        // }
         // CommandScheduler.getInstance().schedule(
         //     new MoveElevatorCommand(true, elevator)
         // );
@@ -389,6 +372,18 @@ public class Robot extends TimedRobot {
 
     @Override
     public void testPeriodic() {
+        if (xbox.getLeftBumper()){
+            elevator.elevate(0.2);
+        }
+        else if (xbox.getRightBumper()) {
+            elevator.elevate(-0.2);
+        } else {
+            elevator.hold();
+        }
+        
+        if (xbox.getXButton())
+            elevator.resetEncoder();
+
         // if (xbox.getYButton()) {
         //     CommandScheduler.getInstance().schedule(
         //         new MoveElevatorCommand(elevator)

@@ -44,9 +44,10 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     // public static final double ROBOT_WINCH_OFFSET = 0;
     public static final double WINCH_SPEED = -0.5;
-    public static final int TOP_ENCODER_VALUE = 182000;
+    public static final int TOP_ENCODER_VALUE = 196000;
+    // public static final int TOP_ENCODER_VALUE = 182000;
     public static final int BOT_ENCODER_VALUE = 1000;
-    public static final double VELOCITY_STALL_LIMIT = 5000;
+    public static final double VELOCITY_STALL_LIMIT = 250;
     public static final double GRAVITY_CURRENT = 0.3;
     public static final double GRAVITY_FEEDFOWARD = 0.00022;
     public static int STALL_TIMER = 0;
@@ -64,7 +65,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         // Add configs here: 
         talon.slot0.kP = 0.05;
         talon.slot0.kI = 0.0;
-        talon.slot0.kD = 0.0;
+        talon.slot0.kD = 0.00022;
         talon.slot0.kF = 0;
         talon.slot0.integralZone = 75;
         talon.slot0.allowableClosedloopError = 5;
@@ -112,16 +113,21 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
 
-    // public void setHeight(double height) {
-    //     //Two stage elevator 
-    //     double motorUnits = height;
-    //     //Number of radians
-    //     motorUnits /= (SPOOL_RADIUS * GEAR_RATIO);
-    //     //Convert to number of FalconTicks
-    //     motorUnits /= FALCON_TICKS;
+    public void setHeight(double height) {
+        //Two stage elevator 
+        double motorValue = height;
+        if (height > 1)
+            motorValue = 1;
+        else if (height < 0)
+            motorValue = 0;
 
-    //     LEFT_SPOOL_MOTOR.set(ControlMode.Position, motorUnits);
-    // }
+        motorValue *= TOP_ENCODER_VALUE;
+
+        if (canRun())
+            LEFT_SPOOL_MOTOR.set(ControlMode.Position, motorValue);
+        else
+            hold();
+    }
 
     // public double getHeight() {
     //     double position = LEFT_SPOOL_MOTOR.getSelectedSensorPosition();
@@ -141,24 +147,28 @@ public class ElevatorSubsystem extends SubsystemBase {
         //     LEFT_SPOOL_MOTOR.set(TalonFXControlMode.Velocity, speed * TICKS_PER_METER);
         // }
         // LEFT_SPOOL_MOTOR.set(ControlMode.Velocity, speed * TICKS_PER_METER);
+        // if (canRun())
+        //     LEFT_SPOOL_MOTOR.set(ControlMode.Velocity, 0, DemandType.ArbitraryFeedForward, speed);
+        // else
+        //     hold();
         if (canRun())
-            LEFT_SPOOL_MOTOR.set(ControlMode.Velocity, 0, DemandType.ArbitraryFeedForward, speed);
+            LEFT_SPOOL_MOTOR.set(ControlMode.PercentOutput, speed);
         else
-            LEFT_SPOOL_MOTOR.set(ControlMode.Velocity, 0);
+            hold();
     }
 
-    public void setHeight(double height) {
-        double setPoint = Math.abs(height) * TOP_ENCODER_VALUE;
-        if (setPoint > 1)
-            setPoint = 1;
-        else if (setPoint < 0)
-            setPoint = 0;
+    // public void setHeight(double height) {
+    //     double setPoint = Math.abs(height) * TOP_ENCODER_VALUE;
+    //     if (setPoint > 1)
+    //         setPoint = 1;
+    //     else if (setPoint < 0)
+    //         setPoint = 0;
 
-        if (!isStalling())
-            LEFT_SPOOL_MOTOR.set(ControlMode.Position, setPoint * TOP_ENCODER_VALUE, DemandType.ArbitraryFeedForward, GRAVITY_FEEDFOWARD);
-        else
-            LEFT_SPOOL_MOTOR.set(ControlMode.Velocity, 0);
-    }
+    //     if (!isStalling())
+    //         LEFT_SPOOL_MOTOR.set(ControlMode.Position, setPoint * TOP_ENCODER_VALUE, DemandType.ArbitraryFeedForward, GRAVITY_FEEDFOWARD);
+    //     else
+    //         LEFT_SPOOL_MOTOR.set(ControlMode.Velocity, 0);
+    // }
 
     public void raise() {
         setHeight(1);

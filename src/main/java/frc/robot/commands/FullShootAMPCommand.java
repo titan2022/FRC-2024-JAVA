@@ -4,6 +4,7 @@
 
 package frc.robot.commands;
 
+import frc.robot.commands.MoveElevatorCommand;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.utility.Localizer;

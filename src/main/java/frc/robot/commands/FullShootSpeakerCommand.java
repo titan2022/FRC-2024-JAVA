@@ -37,7 +37,7 @@ public class FullShootSpeakerCommand extends SequentialCommandGroup {
 
     public FullShootSpeakerCommand(TranslationalDrivebase translational, RotationalDrivebase rotational, ShooterSubsystem shooter, IndexerSubsystem indexer, Localizer localizer) {
         addCommands(
-            new RotateShooterCommand(calculateShootAngle(new Translation2d(1, 1)), shooter),
+            new RotateShooterCommand(calculateShootAngle(new Translation2d(1,1)), shooter),
             new ShootSpeakerCommand(SHOOT_SPEAKER_SPEED, shooter, indexer)
         );
 
