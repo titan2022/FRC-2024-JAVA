@@ -32,14 +32,14 @@ import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.SwerveDriveSubsystem;
 import frc.robot.utility.Localizer;
-import frc.robot.utility.TeleopListener;
+import frc.robot.utility.controller.TeleopListener;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
 public class Robot extends TimedRobot {
     private final XboxController xbox = new XboxController(0);
-    // private TeleopListener listener = new TeleopListener(xbox);
     private Localizer localizer = new Localizer();
     private SwerveDriveSubsystem drive = new SwerveDriveSubsystem(localizer);
     private ElevatorSubsystem elevator = new ElevatorSubsystem();
@@ -47,6 +47,7 @@ public class Robot extends TimedRobot {
     private ShooterSubsystem shooter = new ShooterSubsystem();
     private IndexerSubsystem indexer = new IndexerSubsystem();
     private SendableChooser<Command> autoChooser;
+    // private TeleopListener listener = new TeleopListener(xbox, elevator);
     public double lastTime = 0;
 
     @Override
@@ -54,9 +55,9 @@ public class Robot extends TimedRobot {
         SmartDashboard.putNumber("Command Test", 0);
         // SmartDashboard.putNumber("Subsystem Test", 0);
 
-        SmartDashboard.putNumber("A", 0.4);
-        SmartDashboard.putNumber("B", 1);
-        SmartDashboard.putNumber("C", 0.2);
+        SmartDashboard.putNumber("A", 0.2);
+        SmartDashboard.putNumber("B",0);
+        SmartDashboard.putNumber("C", 0);
         SmartDashboard.putNumber("D", 0);
         
         //These speeds are temporary
@@ -125,11 +126,15 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopInit() {
-        // drive.getTranslational()
-        //         .setDefaultCommand(new TranslationalDriveCommand(drive.getTranslational(), localizer, xbox, 2));
-        // drive.getRotational()
-        //         .setDefaultCommand(new RotationalDriveCommand(drive.getRotational(), localizer, xbox, Math.PI));        
+        // listener.enable();
         localizer.setup();
+
+        drive.getTranslational()
+                .setDefaultCommand(new TranslationalDriveCommand(drive.getTranslational(), localizer, xbox, 2));
+        drive.getRotational()
+                .setDefaultCommand(new RotationalDriveCommand(drive.getRotational(), localizer, xbox, Math.PI));        
+
+        MoveElevatorCommand.LOW_SPEED = SmartDashboard.getNumber("A", 0);
         // MoveElevatorCommand.HIGH_SPEED = SmartDashboard.getNumber("A", 0);
         // MoveElevatorCommand.HIGH_SPEED_TIME = SmartDashboard.getNumber("B", 0);
         // MoveElevatorCommand.LOW_SPEED = SmartDashboard.getNumber("C", 0);
@@ -144,22 +149,46 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopPeriodic() {
-        // SwerveDriveSubsystem.motorFeedfoward = new SimpleMotorFeedforward(SmartDashboard.getNumber("A", 0), SmartDashboard.getNumber("B", 0), 0);
         // listener.execute();
-        // SmartDashboard.putNumber("LeftTrigger", xbox.getLeftTriggerAxis());
-        // SmartDashboard.putNumber("RightTrigger", xbox.getRightTriggerAxis());
 
         // elevator.elevate(SmartDashboard.getNumber("A", 0) * xbox.getLeftTriggerAxis() - SmartDashboard.getNumber("A", 0) * xbox.getRightTriggerAxis());
-        if (xbox.getYButton()){
-            elevator.elevate(SmartDashboard.getNumber("A", 0));
+        // if (xbox.getLeftBumper()){
+        //     CommandScheduler.getInstance().schedule(
+        //         new MoveElevatorCommand(true, elevator)
+        //     );
+        // }
+        // else if (xbox.getRightBumper()) {
+        //     CommandScheduler.getInstance().schedule(
+        //         new MoveElevatorCommand(false, elevator)
+        //     );
+        // } else if (xbox.getYButton()) {
+        //     CommandScheduler.getInstance().schedule(
+        //         new ShootAMPCommand(indexer)
+        //     );
+        // }
+        if (xbox.getXButton()) {
+            intake.intake();
+            indexer.intake();
+        } else {
+            intake.stop();
+            indexer.stop();
         }
-        else if (xbox.getAButton())
-            elevator.elevate(-SmartDashboard.getNumber("A", 0));
-        else 
-            elevator.hold();
+        // if (xbox.getAButton())
+        //     elevator.resetEncoder();
 
-        if (xbox.getXButton())
-            elevator.LEFT_SPOOL_MOTOR.setSelectedSensorPosition(0);
+        if (xbox.getLeftBumper()){
+            elevator.elevate(0.2);
+        }
+        else if (xbox.getRightBumper()) {
+            elevator.elevate(-0.2);
+        } else {
+            elevator.hold();
+        }
+
+        // if (xbox.getXButton()) {
+        //     elevator.resetEncoder();
+        // }
+
 
         // if (xbox.getXButton()) {
         //     shooter.intake();
@@ -276,7 +305,7 @@ public class Robot extends TimedRobot {
         localizer.setup();
         // MoveElevatorCommand.HIGH_SPEED = SmartDashboard.getNumber("A", 0);
         // MoveElevatorCommand.HIGH_SPEED_TIME = SmartDashboard.getNumber("B", 0);
-        // MoveElevatorCommand.LOW_SPEED = SmartDashboard.getNumber("C", 0);
+        MoveElevatorCommand.LOW_SPEED = SmartDashboard.getNumber("A", 0);
 
         int command = (int) SmartDashboard.getNumber("Command Test", 0);
         SmartDashboard.putNumber("Command Test", command);

@@ -194,6 +194,9 @@ public class ElevatorSubsystem extends SubsystemBase {
         return LEFT_SPOOL_MOTOR.getSelectedSensorPosition();
     }
 
+    public void resetEncoder() {
+        LEFT_SPOOL_MOTOR.setSelectedSensorPosition(0);
+    }
 
 
     // public void index(double speed) {
@@ -209,7 +212,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("STALL TIMER", STALL_TIMER);
         if (isStalling()) {
             hold();
-            STALL_TIMER += 50;
+            STALL_TIMER += 10;
         } else if (STALL_TIMER > 0) {
             STALL_TIMER--;
         }
