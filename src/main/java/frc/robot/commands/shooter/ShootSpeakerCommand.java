@@ -1,4 +1,8 @@
-package frc.robot.commands.shooter;
+// // Copyright (c) FIRST and other WPILib contributors.
+// // Open Source Software; you can modify and/or share it under the terms of
+// // the WPILib BSD license file in the root directory of this project.
+
+// package frc.robot.commands;
 
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.IndexerSubsystem;
@@ -30,11 +34,11 @@ public class ShootSpeakerCommand extends Command {
         addRequirements(shooter, indexer);
     }
 
-    @Override
-    public void initialize() {
-        rampTime = Timer.getFPGATimestamp() + RAMP_TIME;
-        endTime = rampTime + SHOOT_DURATION;
-    }
+//     @Override
+//     public void initialize() {
+//         rampTime = Timer.getFPGATimestamp() + RAMP_TIME;
+//         endTime = rampTime + SHOOT_DURATION;
+//     }
 
     // Called every time the scheduler runs while the command is scheduled.
     @Override

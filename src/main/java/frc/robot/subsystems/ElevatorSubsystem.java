@@ -9,6 +9,10 @@ import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.SensorInitializationStrategy;
+
+import edu.wpi.first.units.Unit;
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -33,30 +37,49 @@ public class ElevatorSubsystem extends SubsystemBase {
 
 	private int stallTimer = 0;
 
-	public static TalonFXConfiguration getSpoolTalonConfig() {
-		TalonFXConfiguration talon = new TalonFXConfiguration();
-		talon.slot0.kP = 0.05;
-		talon.slot0.kI = 0.0;
-		talon.slot0.kD = 0.0;
-		talon.slot0.kF = 0;
-		talon.slot0.integralZone = 75;
-		talon.slot0.allowableClosedloopError = 5;
-		talon.slot0.maxIntegralAccumulator = 5120;
-		return talon;
+    public static TalonFXConfiguration getSpoolTalonConfig() {
+        TalonFXConfiguration talon = new TalonFXConfiguration();
+        // Add configs here: 
+        talon.slot0.kP = SmartDashboard.getNumber("A", 0.0);
+        talon.slot0.kI = SmartDashboard.getNumber("B", 0.0);
+        talon.slot0.kD = SmartDashboard.getNumber("C", 0.0);
+        talon.slot0.kF = SmartDashboard.getNumber("D", 0.0);
+        talon.slot0.integralZone = 75;
+        talon.slot0.allowableClosedloopError = 5;
+        talon.slot0.maxIntegralAccumulator = 5120;
+        return talon;
 	}
 
+    // public static TalonFXConfiguration getIndexerTalonConfig() {
+    //     TalonFXConfiguration talon = new TalonFXConfiguration();
+    //     // Add configs here: 
+    //     talon.slot0.kP = 0.0;
+    //     talon.slot0.kI = 0.0;
+    //     talon.slot0.kD = 0.0;
+    //     talon.slot0.kF = 0;
+    //     talon.slot0.integralZone = 75;
+    //     talon.slot0.allowableClosedloopError = 5;
+    //     talon.slot0.maxIntegralAccumulator = 5120;
+    //     return talon;
+	// }
 
-	public ElevatorSubsystem() {
-		leftSpoolMotor.configAllSettings(getSpoolTalonConfig());
-		rightSpoolMotor.configAllSettings(getSpoolTalonConfig());
 
-		rightSpoolMotor.follow(leftSpoolMotor);
+    public ElevatorSubsystem(){
+        config();
+    }
 
-		leftSpoolMotor.setInverted(true);
-		leftSpoolMotor.setSensorPhase(true);
+    public double getPosition(){
+        return LEFT_SPOOL_MOTOR.getSelectedSensorPosition();
+    }
 
-		leftSpoolMotor.setNeutralMode(NeutralMode.Brake);
-		rightSpoolMotor.setNeutralMode(NeutralMode.Brake);
+    public void config() {
+        LEFT_SPOOL_MOTOR.configAllSettings(getSpoolTalonConfig());
+        RIGHT_SPOOL_MOTOR.follow(LEFT_SPOOL_MOTOR);
+        LEFT_SPOOL_MOTOR.setInverted(true);
+        RIGHT_SPOOL_MOTOR.setSensorPhase(true);
+
+        LEFT_SPOOL_MOTOR.setNeutralMode(NeutralMode.Brake);
+        RIGHT_SPOOL_MOTOR.setNeutralMode(NeutralMode.Brake);
 
 		leftSpoolMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
 		leftSpoolMotor.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);

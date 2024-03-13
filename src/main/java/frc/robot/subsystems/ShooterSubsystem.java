@@ -71,17 +71,18 @@ public class ShooterSubsystem extends SubsystemBase {
 	private double lawOfCosines(double a, double b, double c) {
 		return Math.acos((Math.pow(c, 2.0) - Math.pow(a, 2.0) - Math.pow(b, 2.0)) / (-2.0 * a * b));
 	}
-
 	/**
 	 * Sets target angle of the shooter
 	 * 
 	 * @param angle in radians (zero is parallel to the ground, positive is up)
 	 */
-	public boolean setRotation(Rotation2d theta) {
-		double angle = theta.getRadians();
-		// if(angle < MIN_ANGLE || angle > MAX_ANGLE) {
-		// return;
-		// }
+	public void setRotation(double angle) {
+		double deadzone = SmartDashboard.getNumber("I", 0.0);
+		SmartDashboard.putNumber("counter2", SmartDashboard.getNumber("counter2", 0.0) + 1);    
+		SmartDashboard.putNumber("angle", angle);
+		if(angle < MIN_ANGLE || angle > MAX_ANGLE) {
+			return;
+		}
 		// trust me, the math is right
 		// angle += ANGLE_OFFSET;
 		double shooter_x = SHOOTER_LENGTH * Math.cos(angle);
@@ -95,14 +96,15 @@ public class ShooterSubsystem extends SubsystemBase {
 		double targetRotation = Math.PI / 2 - angleFromY;
 		targetRotation %= 2 * Math.PI;
 
-		if (targetRotation < -Math.PI / 2) {
-			targetRotation += 2 * Math.PI;
-		} else if (targetRotation > 3 * Math.PI / 2) {
-			targetRotation -= 2 * Math.PI;
-		}
-		if (targetRotation - DEADZONE < getRotation().getRadians() && getRotation().getRadians() < targetRotation + DEADZONE) {
-			holdAngle();
-			return true;
+        if (targetRotation < -Math.PI / 2) {
+             targetRotation += 2 * Math.PI;
+        } else if (targetRotation > 3 * Math.PI / 2) {
+            targetRotation -= 2 * Math.PI;
+        }
+		if(targetRotation - deadzone < getRotation() && getRotation() < targetRotation + deadzone){
+			linkageMotor.set(SmartDashboard.getNumber("J", 0.0) * Math.sin(getRotation()));
+			SmartDashboard.putBoolean("Dead", true);
+			return;
 		}
 
 		double linkageMag = rotationPID.calculate(getRotation().getRadians(), targetRotation);
@@ -112,8 +114,6 @@ public class ShooterSubsystem extends SubsystemBase {
 		SmartDashboard.putNumber("target", targetRotation * 180 / Math.PI);
 		SmartDashboard.putNumber("FF", FF);
 		SmartDashboard.putNumber("PID", PID);
-
-		return false;
 	}
 
 	/**
