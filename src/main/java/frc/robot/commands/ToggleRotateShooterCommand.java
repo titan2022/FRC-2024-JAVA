@@ -11,35 +11,39 @@ import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 
 /** An example command that uses an example subsystem. */
-public class RotateShooterCommand extends Command {
+public class ToggleRotateShooterCommand extends Command {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
     // public static final double RAMP_TIME = 1;
     // public static final double SHOOT_DURATION = 0.25;
     // public static final double INDEX_SPEED = 0.5;
     public ShooterSubsystem shooter;
+    public XboxController xbox;
     public Rotation2d angle;
-    public boolean reachedAngle = false;
+    public boolean toggleOn = false;
     
-    public RotateShooterCommand(Rotation2d angle, ShooterSubsystem shooter) {
+    public ToggleRotateShooterCommand(Rotation2d angle, ShooterSubsystem shooter, XboxController xbox) {
         this.shooter = shooter;
         this.angle = angle;
-
-        addRequirements(shooter);
+        this.xbox = xbox;
     }
 
     @Override
     public void initialize() {
-
+        
     }
 
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        //Methods return if reached desired location
-        reachedAngle = shooter.setRotation(angle);
+        if (xbox.getYButton())
+            toggleOn = !toggleOn;
+
+        if (toggleOn)
+            shooter.setRotation(angle);
     }
 
     // Called once the command ends or is interrupted.
@@ -51,6 +55,7 @@ public class RotateShooterCommand extends Command {
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        return reachedAngle;
+        return false;
     }
 }
+

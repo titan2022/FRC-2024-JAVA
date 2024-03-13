@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class IndexerSubsystem extends SubsystemBase {
-    public static final double INTAKE_SPEED = -0.5;
+    public static final double INTAKE_SPEED = -0.7;
     // private static final double INDEX_VELOCITY = 0.0;
     // private static final double AMP_VELOCITY = 0.0;
     // private static final int BREAK_TIMEOUT = 2; // In frames (20ms)

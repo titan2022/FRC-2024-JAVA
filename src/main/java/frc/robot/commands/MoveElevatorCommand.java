@@ -14,17 +14,15 @@ public class MoveElevatorCommand extends Command {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
     // public static final double RAISE_SPEED = 0.1;
     // public static final double LOWER_SPEED = -0.1;
-    public static double HIGH_SPEED = 0.2;
-    public static double LOW_SPEED = 0.15;
+    public static double HIGH_SPEED = 0.4;
+    public static double LOW_SPEED = 0.2;
 
-    public static double HIGH_SPEED_TIME = 2;
-    public static double STALL_CURRENT_LIMIT = 15;
-    public static double ABSOLUTE_STALL_CURRENT_LIMIT = 25;
+    public static double HIGH_SPEED_TIME = 1;
 
     public ElevatorSubsystem elevator;
     public double highSpeedTime;
     public boolean up;
-    public boolean passCheck = false;
+    // public boolean passCheck = false;
     
     public MoveElevatorCommand(boolean up, ElevatorSubsystem elevator) {
         this.elevator = elevator;
@@ -36,7 +34,7 @@ public class MoveElevatorCommand extends Command {
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-        // SmartDashboard.putBoolean("MoveElevator", true);
+        SmartDashboard.putBoolean("MoveElevator", true);
         highSpeedTime = Timer.getFPGATimestamp() + HIGH_SPEED_TIME;
     }
 
@@ -50,10 +48,12 @@ public class MoveElevatorCommand extends Command {
         else 
             speed *= -1;
 
-        if (Timer.getFPGATimestamp() < highSpeedTime)
-            speed *= HIGH_SPEED;
-        else 
-            speed *= LOW_SPEED;
+        // if (Timer.getFPGATimestamp() < highSpeedTime)
+        //     speed *= HIGH_SPEED;
+        // else 
+        //     speed *= LOW_SPEED;
+
+        speed *= LOW_SPEED;
 
         elevator.elevate(speed);
     }
@@ -67,6 +67,26 @@ public class MoveElevatorCommand extends Command {
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        return true;
+        if (elevator.canRun()) {
+            if (up && elevator.getEncoder() < ElevatorSubsystem.TOP_ENCODER_VALUE) 
+                return false;
+            else if (!up && elevator.getEncoder() > ElevatorSubsystem.BOT_ENCODER_VALUE)
+                return false;
+            else 
+                return true;
+        } else 
+            return true;
+        // if (up) {
+        //     if (elevator.getEncoder() > ElevatorSubsystem.TOP_ENCODER_VALUE - 1000)
+        //         return true;
+        //     else 
+        //         return false;
+        // } else {
+        //     if (elevator.getEncoder() < ElevatorSubsystem.BOT_ENCODER_VALUE + 1000)
+        //         return true;
+        //     else 
+        //         return false;
+        // }
+
     }
   }

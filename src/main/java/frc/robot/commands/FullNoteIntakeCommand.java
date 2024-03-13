@@ -22,7 +22,7 @@ public class FullNoteIntakeCommand extends SequentialCommandGroup {
     public static final double MOVE_OVERSHOOT = 0.5;
     public static final double OVER_SHOOT_SPEED = 1;
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
-    public FullNoteIntakeCommand(TranslationalDrivebase translational, RotationalDrivebase rotational, IntakeSubsystem intake, IndexerSubsystem indexer, ElevatorSubsystem elevator, Localizer localizer) {
+    public FullNoteIntakeCommand(TranslationalDrivebase translational, RotationalDrivebase rotational, IntakeSubsystem intake, IndexerSubsystem indexer, Localizer localizer) {
         addCommands(
             new ParallelDeadlineGroup(
                 new NoteIntakeCommand(indexer, intake),
@@ -30,7 +30,7 @@ public class FullNoteIntakeCommand extends SequentialCommandGroup {
             )   
         );
 
-        addRequirements(translational, rotational, intake, elevator);
+        addRequirements(translational, rotational, intake);
     }
 
 }

@@ -141,7 +141,7 @@ public class ShooterSubsystem extends SubsystemBase {
 	}
 
     public void holdAngle() {
-        topShooterMotor.set(ControlMode.Velocity, 0);
+        linkageMotor.set(ControlMode.Velocity, 0);
     }
 	// public double getShooterVelocity(){
 	// 	return current_velocity*10*(4*IN)*scale;
@@ -154,8 +154,12 @@ public class ShooterSubsystem extends SubsystemBase {
     public void intake() {
         index(INTAKE_SPEED);
     }
+    public void reverseIndex() {
+        index(-INTAKE_SPEED);
+    }
 
 	public void holdIndex() {
 		indexerMotor.set(ControlMode.PercentOutput, 0);
 	}
+
 }

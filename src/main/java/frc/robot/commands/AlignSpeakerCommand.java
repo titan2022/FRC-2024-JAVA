@@ -20,7 +20,7 @@ public class AlignSpeakerCommand extends SequentialCommandGroup {
     public static final int RED_SPEAKER_APRILTAG = 4;
 
     public static final double TRANSLATIONAL_SPEED = 1;
-    public static final Rotation2d ROTATIONAL_SPEED = new Rotation2d(1);
+    public static final Rotation2d ROTATIONAL_SPEED = new Rotation2d(0.5);
 
     public static final double SUBWOOFER_LENGTH = 0.91;
 

@@ -44,11 +44,12 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     // public static final double ROBOT_WINCH_OFFSET = 0;
     public static final double WINCH_SPEED = -0.5;
-    public static final int TOP_ENCODER_VALUE = 185000;
-    public static final int BOT_ENCODER_VALUE = 0;
+    public static final int TOP_ENCODER_VALUE = 182000;
+    public static final int BOT_ENCODER_VALUE = 1000;
     public static final double VELOCITY_STALL_LIMIT = 5000;
     public static final double GRAVITY_CURRENT = 0.3;
     public static final double GRAVITY_FEEDFOWARD = 0.00022;
+    public static int STALL_TIMER = 0;
     // private static final int BOTTOM_ENCODER_TICKS = ENCODER_OFFSET;
     // private static final long TOP_ENCODER_TICKS = Math.round(ENCODER_OFFSET + (TOP_HEIGHT - BOTTOM_HEIGHT) / (2 * Math.PI * SPOOL_RADIUS) * FALCON_TICKS);
     
@@ -140,8 +141,8 @@ public class ElevatorSubsystem extends SubsystemBase {
         //     LEFT_SPOOL_MOTOR.set(TalonFXControlMode.Velocity, speed * TICKS_PER_METER);
         // }
         // LEFT_SPOOL_MOTOR.set(ControlMode.Velocity, speed * TICKS_PER_METER);
-        if (!isStalling())
-            LEFT_SPOOL_MOTOR.set(ControlMode.PercentOutput, speed);
+        if (canRun())
+            LEFT_SPOOL_MOTOR.set(ControlMode.Velocity, 0, DemandType.ArbitraryFeedForward, speed);
         else
             LEFT_SPOOL_MOTOR.set(ControlMode.Velocity, 0);
     }
@@ -168,12 +169,11 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public void hold() {
-        LEFT_SPOOL_MOTOR.set(ControlMode.PercentOutput, 0);
+        LEFT_SPOOL_MOTOR.set(ControlMode.Velocity, 0);
     }
 
     public boolean isStalling(double current) {
-        //The -1 io because it takes less effort to go down instead of up
-        if (Math.abs(LEFT_SPOOL_MOTOR.getOutputCurrent() - GRAVITY_CURRENT) > current && Math.abs(LEFT_SPOOL_MOTOR.getSelectedSensorVelocity()) < VELOCITY_STALL_LIMIT) 
+        if (Math.abs(LEFT_SPOOL_MOTOR.getOutputCurrent()) > current && Math.abs(LEFT_SPOOL_MOTOR.getSelectedSensorVelocity()) < VELOCITY_STALL_LIMIT) 
             return true;
         else 
             return false;
@@ -183,6 +183,19 @@ public class ElevatorSubsystem extends SubsystemBase {
         return isStalling(STALL_CURRENT_LIMIT);
     }
 
+    public boolean canRun() {
+        if (!isStalling() && STALL_TIMER <= 0) 
+            return true;
+        else
+            return false;
+    }
+
+    public double getEncoder() {
+        return LEFT_SPOOL_MOTOR.getSelectedSensorPosition();
+    }
+
+
+
     // public void index(double speed) {
     // //     INDEXER.set(ControlMode.PercentOutput, speed);
     // // }
@@ -191,14 +204,15 @@ public class ElevatorSubsystem extends SubsystemBase {
     //     return NOTE_SENSOR.get();
     // } 
 
-    // // @Override
-    // public void periodic() {
-    //     // Beam breaker needs to be in a state for more than its timeout to count (prevents noise)
-    //     if (NOTE_SENSOR.get() && !hasNote) {
-    //         noteDuration = Timer.getFPGATimestamp();
-    //         noteDuration++;
-    //     } 
-
-
-    // }
+    @Override
+    public void periodic() {
+        SmartDashboard.putNumber("STALL TIMER", STALL_TIMER);
+        if (isStalling()) {
+            hold();
+            STALL_TIMER += 50;
+        } else if (STALL_TIMER > 0) {
+            STALL_TIMER--;
+        }
+        
+    }
 }
