@@ -26,14 +26,14 @@ public class ElevatorSubsystem extends SubsystemBase {
 	private static final double GEAR_RATIO = 28;
 	private static final double TICKS_PER_METER = FALCON_CPR * GEAR_RATIO / (10 * SPOOL_RADIUS * 2 * Math.PI);
 	private static final double WINCH_SPEED = -0.5;
-	public static final int TOP_ENCODER_VALUE = 182000;
+	public static int TOP_ENCODER_VALUE = 196000;
 	public static final int BOT_ENCODER_VALUE = 1000;
 	private static final double VELOCITY_STALL_LIMIT = 5000;
 	private static final double GRAVITY_CURRENT = 0.3;
 	private static final double GRAVITY_FEEDFOWARD = 0.00022;
 
-	private final WPI_TalonFX leftSpoolMotor = new WPI_TalonFX(18, "CANivore");
-	private final WPI_TalonFX rightSpoolMotor = new WPI_TalonFX(14, "CANivore");
+	public final WPI_TalonFX leftSpoolMotor = new WPI_TalonFX(18, "CANivore");
+	public final WPI_TalonFX rightSpoolMotor = new WPI_TalonFX(14, "CANivore");
 
 	private int stallTimer = 0;
 
@@ -69,17 +69,18 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public double getPosition(){
-        return LEFT_SPOOL_MOTOR.getSelectedSensorPosition();
+        return leftSpoolMotor.getSelectedSensorPosition();
     }
 
     public void config() {
-        LEFT_SPOOL_MOTOR.configAllSettings(getSpoolTalonConfig());
-        RIGHT_SPOOL_MOTOR.follow(LEFT_SPOOL_MOTOR);
-        LEFT_SPOOL_MOTOR.setInverted(true);
-        RIGHT_SPOOL_MOTOR.setSensorPhase(true);
+		TOP_ENCODER_VALUE =(int)(SmartDashboard.getNumber("E", 185000));
+        leftSpoolMotor.configAllSettings(getSpoolTalonConfig());
+        rightSpoolMotor.follow(leftSpoolMotor);
+        leftSpoolMotor.setInverted(true);
+        rightSpoolMotor.setSensorPhase(true);
 
-        LEFT_SPOOL_MOTOR.setNeutralMode(NeutralMode.Brake);
-        RIGHT_SPOOL_MOTOR.setNeutralMode(NeutralMode.Brake);
+        leftSpoolMotor.setNeutralMode(NeutralMode.Brake);
+        rightSpoolMotor.setNeutralMode(NeutralMode.Brake);
 
 		leftSpoolMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
 		leftSpoolMotor.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
@@ -126,7 +127,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 		}
 			
 		if (!isStalling()) {
-			leftSpoolMotor.set(ControlMode.Position, setPoint * TOP_ENCODER_VALUE, DemandType.ArbitraryFeedForward, GRAVITY_FEEDFOWARD);
+			leftSpoolMotor.set(ControlMode.Position, setPoint * TOP_ENCODER_VALUE);
 		} else {
 			leftSpoolMotor.set(ControlMode.Velocity, 0);
 		}
