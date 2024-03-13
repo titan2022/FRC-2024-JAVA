@@ -52,7 +52,7 @@ public class IndexerSubsystem extends SubsystemBase {
     // }
 
     public boolean hasNote() {
-        // SmartDashboard.putNumber("Beam Breaker", beamBreakerInput.getValue());
+        SmartDashboard.putNumber("Beam Breaker", beamBreakerInput.getValue());
         if (beamBreakerInput.getValue() > 2350)
             return true;
         else 
