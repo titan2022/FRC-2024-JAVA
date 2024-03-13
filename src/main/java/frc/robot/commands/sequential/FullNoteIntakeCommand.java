@@ -1,14 +1,12 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
+package frc.robot.commands.sequential;
 
-package frc.robot.commands;
-
+import frc.robot.commands.control.NoteIntakeCommand;
+import frc.robot.commands.drive.TranslationCommand;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
-import frc.robot.subsystems.RotationalDrivebase;
-import frc.robot.subsystems.TranslationalDrivebase;
+import frc.robot.subsystems.drive.RotationalDrivebase;
+import frc.robot.subsystems.drive.TranslationalDrivebase;
 import frc.robot.utility.Localizer;
 
 

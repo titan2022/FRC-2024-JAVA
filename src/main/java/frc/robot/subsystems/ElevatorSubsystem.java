@@ -1,218 +1,176 @@
 package frc.robot.subsystems;
 
-import static frc.robot.utility.Constants.Unit.*;
-
-import java.net.IDN;
-
+import static frc.robot.utility.Constants.Unit.FALCON_CPR;
+import static frc.robot.utility.Constants.Unit.IN;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.SensorInitializationStrategy;
-
-import edu.wpi.first.units.Unit;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /***
  * Uses stalling mechanism to move
  */
+@SuppressWarnings({"deprecated", "removal"})
 public class ElevatorSubsystem extends SubsystemBase {
-    // public static final double RAISE_SPEED = 0.5;
-    // public static final double LOWER_SPEED = -0.5;
-    public static final double STALL_CURRENT_LIMIT = 15;
-    // public static final double INDEXER_SPEED = 0.5;
-    // TODO: get constants
-    public static final WPI_TalonFX LEFT_SPOOL_MOTOR = new WPI_TalonFX(18, "CANivore");
-    public static final WPI_TalonFX RIGHT_SPOOL_MOTOR = new WPI_TalonFX(14, "CANivore");
-    // public static final WPI_TalonFX INDEXER = new WPI_TalonFX(0);
-    // public static final DigitalInput NOTE_SENSOR = new DigitalInput(0);
-    // public static boolean hasNote = false;
-    // public static double noteDuration = 0;
-    // public static final double BOTTOM_HEIGHT = 0.0;
-    // public static final double TOP_HEIGHT = 21.5 * IN / METERS;
-    public static final double SPOOL_RADIUS = 1 * IN;
-    public static final double GEAR_RATIO = 28;
-    public static final double TICKS_PER_METER = FALCON_CPR * GEAR_RATIO / (10 * SPOOL_RADIUS * 2 * Math.PI);
-    // public static final double DISTANCE_PER_TICK = SPOOL_RADIUS * 2 * Math.PI * FALCON_TICKS / GEAR_RATIO;
-    // public static final double TOP_HEIGHT_TICKS = (int)(TOP_HEIGHT / (DISTANCE_PER_TICK));
-    // public static final int ENCODER_OFFSET = 0;
+	private static final double STALL_CURRENT_LIMIT = 15;
+	private static final double SPOOL_RADIUS = 1 * IN;
+	private static final double GEAR_RATIO = 28;
+	private static final double TICKS_PER_METER = FALCON_CPR * GEAR_RATIO / (10 * SPOOL_RADIUS * 2 * Math.PI);
+	private static final double WINCH_SPEED = -0.5;
+	public static final int TOP_ENCODER_VALUE = 182000;
+	public static final int BOT_ENCODER_VALUE = 1000;
+	private static final double VELOCITY_STALL_LIMIT = 5000;
+	private static final double GRAVITY_CURRENT = 0.3;
+	private static final double GRAVITY_FEEDFOWARD = 0.00022;
 
-    // public static final double ROBOT_WINCH_OFFSET = 0;
-    public static final double WINCH_SPEED = -0.5;
-    public static final int TOP_ENCODER_VALUE = 182000;
-    public static final int BOT_ENCODER_VALUE = 1000;
-    public static final double VELOCITY_STALL_LIMIT = 5000;
-    public static final double GRAVITY_CURRENT = 0.3;
-    public static final double GRAVITY_FEEDFOWARD = 0.00022;
-    public static int STALL_TIMER = 0;
-    // private static final int BOTTOM_ENCODER_TICKS = ENCODER_OFFSET;
-    // private static final long TOP_ENCODER_TICKS = Math.round(ENCODER_OFFSET + (TOP_HEIGHT - BOTTOM_HEIGHT) / (2 * Math.PI * SPOOL_RADIUS) * FALCON_TICKS);
-    
+	private final WPI_TalonFX leftSpoolMotor = new WPI_TalonFX(18, "CANivore");
+	private final WPI_TalonFX rightSpoolMotor = new WPI_TalonFX(14, "CANivore");
 
-    // private final WPI_TalonFX[] spool_motors = new WPI_TalonFX[] {
-    //     LEFT_SPOOL_MOTOR,
-    //     RIGHT_SPOOL_MOTOR
-    // };
+	private int stallTimer = 0;
 
-    public static TalonFXConfiguration getSpoolTalonConfig() {
-        TalonFXConfiguration talon = new TalonFXConfiguration();
-        // Add configs here: 
-        talon.slot0.kP = 0.05;
-        talon.slot0.kI = 0.0;
-        talon.slot0.kD = 0.0;
-        talon.slot0.kF = 0;
-        talon.slot0.integralZone = 75;
-        talon.slot0.allowableClosedloopError = 5;
-        talon.slot0.maxIntegralAccumulator = 5120;
-        return talon;
+	public static TalonFXConfiguration getSpoolTalonConfig() {
+		TalonFXConfiguration talon = new TalonFXConfiguration();
+		talon.slot0.kP = 0.05;
+		talon.slot0.kI = 0.0;
+		talon.slot0.kD = 0.0;
+		talon.slot0.kF = 0;
+		talon.slot0.integralZone = 75;
+		talon.slot0.allowableClosedloopError = 5;
+		talon.slot0.maxIntegralAccumulator = 5120;
+		return talon;
 	}
 
-    // public static TalonFXConfiguration getIndexerTalonConfig() {
-    //     TalonFXConfiguration talon = new TalonFXConfiguration();
-    //     // Add configs here: 
-    //     talon.slot0.kP = 0.0;
-    //     talon.slot0.kI = 0.0;
-    //     talon.slot0.kD = 0.0;
-    //     talon.slot0.kF = 0;
-    //     talon.slot0.integralZone = 75;
-    //     talon.slot0.allowableClosedloopError = 5;
-    //     talon.slot0.maxIntegralAccumulator = 5120;
-    //     return talon;
-	// }
 
+	public ElevatorSubsystem() {
+		leftSpoolMotor.configAllSettings(getSpoolTalonConfig());
+		rightSpoolMotor.configAllSettings(getSpoolTalonConfig());
 
-    public ElevatorSubsystem(){
-        config();
-    }
+		rightSpoolMotor.follow(leftSpoolMotor);
 
-    public void config() {
-        LEFT_SPOOL_MOTOR.configAllSettings(getSpoolTalonConfig());
-        RIGHT_SPOOL_MOTOR.configAllSettings(getSpoolTalonConfig());
+		leftSpoolMotor.setInverted(true);
+		leftSpoolMotor.setSensorPhase(true);
 
+		leftSpoolMotor.setNeutralMode(NeutralMode.Brake);
+		rightSpoolMotor.setNeutralMode(NeutralMode.Brake);
 
-        RIGHT_SPOOL_MOTOR.follow(LEFT_SPOOL_MOTOR);
-        // RIGHT_SPOOL_MOTOR.setInverted(false);
-        // RIGHT_SPOOL_MOTOR.setSensorPhase(false);
+		leftSpoolMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
+		leftSpoolMotor.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
+		leftSpoolMotor.setSelectedSensorPosition(0);
+	}
 
-        LEFT_SPOOL_MOTOR.setInverted(true);
-        LEFT_SPOOL_MOTOR.setSensorPhase(true);
-        // LEFT_SPOOL_MOTOR.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition);
+	/**
+	 * Winches elevator for climb
+	 * @param currentLimit new limit specific to elevator
+	 */
+	public void climb(double currentLimit) {
+		throw new UnsupportedOperationException("Impliment this.");
+	}
 
-        LEFT_SPOOL_MOTOR.setNeutralMode(NeutralMode.Brake);
-        RIGHT_SPOOL_MOTOR.setNeutralMode(NeutralMode.Brake);
-        // INDEXER.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
-        LEFT_SPOOL_MOTOR.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
-        LEFT_SPOOL_MOTOR.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
-        LEFT_SPOOL_MOTOR.setSelectedSensorPosition(0);
-    }
+	/**
+	 * Winches elevator
+	 */
+	public void winch() {
+		elevate(WINCH_SPEED);
+	}
 
+	/**
+	 * Sets elevator speed
+	 * @param speed in Falcon ticks per 100ms (?)
+	 */
+	public void elevate(double speed) {
+		if (canRun()) {
+			leftSpoolMotor.set(ControlMode.Velocity, 0, DemandType.ArbitraryFeedForward, speed);
+		} else {
+			leftSpoolMotor.set(ControlMode.Velocity, 0);
+		}
+	}
 
-    // public void setHeight(double height) {
-    //     //Two stage elevator 
-    //     double motorUnits = height;
-    //     //Number of radians
-    //     motorUnits /= (SPOOL_RADIUS * GEAR_RATIO);
-    //     //Convert to number of FalconTicks
-    //     motorUnits /= FALCON_TICKS;
+	/**
+	 * Sets target height of elevator
+	 * @param height value from 0.0 to 1.0 (zero is bottom)
+	 */
+	public void setHeight(double height) {
+		double setPoint = Math.abs(height) * TOP_ENCODER_VALUE;
+		if (setPoint > 1) {
+			setPoint = 1;
+		} else if (setPoint < 0) {
+			setPoint = 0;
+		}
+			
+		if (!isStalling()) {
+			leftSpoolMotor.set(ControlMode.Position, setPoint * TOP_ENCODER_VALUE, DemandType.ArbitraryFeedForward, GRAVITY_FEEDFOWARD);
+		} else {
+			leftSpoolMotor.set(ControlMode.Velocity, 0);
+		}
+	}
 
-    //     LEFT_SPOOL_MOTOR.set(ControlMode.Position, motorUnits);
-    // }
+	/**
+	 * Raises elevator to the top
+	 */
+	public void raise() {
+		setHeight(1);
+	}
 
-    // public double getHeight() {
-    //     double position = LEFT_SPOOL_MOTOR.getSelectedSensorPosition();
-    //     position -= ENCODER_OFFSET;
-    //     return position * DISTANCE_PER_TICK;
-    // }
+	/**
+	 * Lowers elevator to the bottom
+	 */
+	public void lower() {
+		setHeight(0);
+	}
 
-    public void winch() {
-        elevate(WINCH_SPEED);
-    }
+	/**
+	 * Holds elevator using brake mode
+	 */
+	public void hold() {
+		leftSpoolMotor.set(ControlMode.Velocity, 0);
+	}
 
-    public void elevate(double speed) {
-        // if (isStalling())
-        //     LEFT_SPOOL_MOTOR.set(TalonFXControlMode.PercentOutput, 0);
-        // else {
-        //     SmartDashboard.putNumber("Elevator Speed", speed);
-        //     LEFT_SPOOL_MOTOR.set(TalonFXControlMode.Velocity, speed * TICKS_PER_METER);
-        // }
-        // LEFT_SPOOL_MOTOR.set(ControlMode.Velocity, speed * TICKS_PER_METER);
-        if (canRun())
-            LEFT_SPOOL_MOTOR.set(ControlMode.Velocity, 0, DemandType.ArbitraryFeedForward, speed);
-        else
-            LEFT_SPOOL_MOTOR.set(ControlMode.Velocity, 0);
-    }
+	/**
+	 * Checks if elevator is stalling at current limit
+	 * @param current limit in amps
+	 * @return true if stalling
+	 */
+	public boolean isStalling(double current) {
+		return Math.abs(leftSpoolMotor.getOutputCurrent()) > current && Math.abs(leftSpoolMotor.getSelectedSensorVelocity()) < VELOCITY_STALL_LIMIT;
+	}
 
-    public void setHeight(double height) {
-        double setPoint = Math.abs(height) * TOP_ENCODER_VALUE;
-        if (setPoint > 1)
-            setPoint = 1;
-        else if (setPoint < 0)
-            setPoint = 0;
+	/**
+	 * Checks if elevator is stalling at default current limit
+	 * @return true if stalling
+	 */
+	public boolean isStalling() {
+		return isStalling(STALL_CURRENT_LIMIT);
+	}
 
-        if (!isStalling())
-            LEFT_SPOOL_MOTOR.set(ControlMode.Position, setPoint * TOP_ENCODER_VALUE, DemandType.ArbitraryFeedForward, GRAVITY_FEEDFOWARD);
-        else
-            LEFT_SPOOL_MOTOR.set(ControlMode.Velocity, 0);
-    }
+	/**
+	 * Checks if elevator hasn't stalled for too long
+	 * @return true if elevator is safe to run
+	 */
+	public boolean canRun() {
+		return !isStalling() && stallTimer <= 0;
+	}
 
-    public void raise() {
-        setHeight(1);
-    }
-
-    public void lower() {
-        setHeight(0);
-    }
-
-    public void hold() {
-        LEFT_SPOOL_MOTOR.set(ControlMode.Velocity, 0);
-    }
-
-    public boolean isStalling(double current) {
-        if (Math.abs(LEFT_SPOOL_MOTOR.getOutputCurrent()) > current && Math.abs(LEFT_SPOOL_MOTOR.getSelectedSensorVelocity()) < VELOCITY_STALL_LIMIT) 
-            return true;
-        else 
-            return false;
-    }
-
-    public boolean isStalling() {
-        return isStalling(STALL_CURRENT_LIMIT);
-    }
-
-    public boolean canRun() {
-        if (!isStalling() && STALL_TIMER <= 0) 
-            return true;
-        else
-            return false;
-    }
-
-    public double getEncoder() {
-        return LEFT_SPOOL_MOTOR.getSelectedSensorPosition();
-    }
-
-
-
-    // public void index(double speed) {
-    // //     INDEXER.set(ControlMode.PercentOutput, speed);
-    // // }
-
-    // public boolean hasNote() {
-    //     return NOTE_SENSOR.get();
-    // } 
-
-    @Override
-    public void periodic() {
-        SmartDashboard.putNumber("STALL TIMER", STALL_TIMER);
-        if (isStalling()) {
-            hold();
-            STALL_TIMER += 50;
-        } else if (STALL_TIMER > 0) {
-            STALL_TIMER--;
-        }
-        
-    }
+	/**
+	 * Gets spool motor encoder position
+	 * @return position in Falcon integrated encoder ticks
+	 */
+	public double getEncoder() {
+		return leftSpoolMotor.getSelectedSensorPosition();
+	}
+	
+	@Override
+	public void periodic() {
+		SmartDashboard.putNumber("STALL TIMER", stallTimer);
+		if (isStalling()) {
+			hold();
+			stallTimer += 50;
+		} else if (stallTimer > 0) {
+			stallTimer--;
+		}
+	}
 }

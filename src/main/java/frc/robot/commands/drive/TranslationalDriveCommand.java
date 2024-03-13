@@ -1,4 +1,4 @@
-package frc.robot.commands;
+package frc.robot.commands.drive;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
-import frc.robot.subsystems.TranslationalDrivebase;
+import frc.robot.subsystems.drive.TranslationalDrivebase;
 import frc.robot.utility.Localizer;
 
 public class TranslationalDriveCommand extends Command {

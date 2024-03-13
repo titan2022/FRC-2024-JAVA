@@ -1,14 +1,6 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
@@ -16,26 +8,15 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.commands.FullShootAMPCommand;
-import frc.robot.commands.MoveElevatorCommand;
-import frc.robot.commands.NoteIntakeCommand;
-import frc.robot.commands.RotateShooterCommand;
-import frc.robot.commands.RotationCommand;
-import frc.robot.commands.RotationalDriveCommand;
-import frc.robot.commands.ShootAMPCommand;
-import frc.robot.commands.TranslationCommand;
-import frc.robot.commands.TranslationalDriveCommand;
+import frc.robot.commands.control.MoveElevatorCommand;
+import frc.robot.commands.control.NoteIntakeCommand;
+import frc.robot.commands.shooter.RotateShooterCommand;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
-import frc.robot.subsystems.SwerveDriveSubsystem;
+import frc.robot.subsystems.drive.SwerveDriveSubsystem;
 import frc.robot.utility.Localizer;
-import frc.robot.utility.TeleopListener;
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.commands.PathPlannerAuto;
 
 public class Robot extends TimedRobot {
     private final XboxController xbox = new XboxController(0);
@@ -85,7 +66,7 @@ public class Robot extends TimedRobot {
         SmartDashboard.putNumber("Y Axis", xbox.getLeftY());
 
         // SmartDashboard.putNumber("Encoder Angle", shooter.getRotation().getDegrees());
-        SmartDashboard.putNumber("Elevator Current", elevator.LEFT_SPOOL_MOTOR.getOutputCurrent());
+        SmartDashboard.putNumber("Elevator Current", elevator.leftSpoolMotor.getOutputCurrent());
         SmartDashboard.putBoolean("hasNote", indexer.hasNote());
         SmartDashboard.putBoolean("canRunEle", elevator.canRun());
         // SmartDashboard.putNumber("Encoder Abs", shooter.getAbsoluteRotation());
@@ -159,7 +140,7 @@ public class Robot extends TimedRobot {
             elevator.hold();
 
         if (xbox.getXButton())
-            elevator.LEFT_SPOOL_MOTOR.setSelectedSensorPosition(0);
+            elevator.leftSpoolMotor.setSelectedSensorPosition(0);
 
         // if (xbox.getXButton()) {
         //     shooter.intake();
