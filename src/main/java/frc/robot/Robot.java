@@ -87,9 +87,9 @@ public class Robot extends TimedRobot {
         }
 
         if (xbox2.getBButton()) {
-            indexer.index(0.7);
+            indexer.reverse();
         }
-        
+
         if (!xbox2.getBButton() && !xbox2.getAButton() && !xbox2.getYButton()) {
             indexer.stop();
         }
