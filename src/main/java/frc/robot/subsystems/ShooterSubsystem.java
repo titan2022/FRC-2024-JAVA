@@ -48,13 +48,19 @@ public class ShooterSubsystem extends SubsystemBase {
 	public static TalonFXConfiguration getShooterTalonConfig() {
 		TalonFXConfiguration talon = new TalonFXConfiguration();
 		// Add configs here:
-		talon.slot0.kP = 0;
-		talon.slot0.kI = 0;
-		talon.slot0.kD = 0;
-		talon.slot0.kF = 0;
-		talon.slot0.integralZone = 75;
-		talon.slot0.allowableClosedloopError = 5;// 217;
-		talon.slot0.maxIntegralAccumulator = 5120;
+		// talon.slot0.kP = 0;
+		// talon.slot0.kI = 0;
+		// talon.slot0.kD = 0;
+		// talon.slot0.kF = 0;
+		// talon.slot0.integralZone = 75;
+		// talon.slot0.allowableClosedloopError = 5;// 217;
+		// talon.slot0.maxIntegralAccumulator = 5120;
+
+        talon.supplyCurrLimit.currentLimit = 20;
+        talon.supplyCurrLimit.enable = true;
+        talon.supplyCurrLimit.triggerThresholdCurrent = 30;
+        talon.supplyCurrLimit.triggerThresholdTime = 0.1;
+
 		return talon;
 	}
 
@@ -68,7 +74,8 @@ public class ShooterSubsystem extends SubsystemBase {
 		bottomShooterMotor.setInverted(true);
 		linkageEncoder.reset();
 
-		// topShooterMotor.configSupplyCurrentLimit(null)
+		topShooterMotor.configAllSettings(getShooterTalonConfig());
+		bottomShooterMotor.configAllSettings(getShooterTalonConfig());
 	}
 
 	/**
@@ -103,7 +110,7 @@ public class ShooterSubsystem extends SubsystemBase {
 			return false;
 		}
 		// trust me, the math is right
-		// angle += ANGLE_OFFSET;
+		angle += ANGLE_OFFSET;
 		double shooter_x = SHOOTER_LENGTH * Math.cos(angle);
 		double shooter_y = SHOOTER_LENGTH * Math.sin(angle);
 		double dx = LINKAGE_PIVOT_DX - shooter_x;
@@ -135,7 +142,7 @@ public class ShooterSubsystem extends SubsystemBase {
 		linkageMotor.set(ControlMode.Velocity, PID,
 			DemandType.ArbitraryFeedForward, FF
 		);
-		SmartDashboard.putNumber("Target Shooter Angle", targetRotation / DEG);
+		SmartDashboard.putNumber("TargetShooterAngle", targetRotation / DEG);
 		SmartDashboard.putNumber("Shooter PID", PID);
 		SmartDashboard.putNumber("Shooter FF", FF);
 

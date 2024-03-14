@@ -4,6 +4,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
+import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 
@@ -14,6 +15,17 @@ public class IntakeSubsystem extends SubsystemBase {
 	private static final double INTAKE_SPEED = 0.45;
 	
 	private static final WPI_TalonFX wheelMotor = new WPI_TalonFX(19);
+
+    // public static TalonFXConfiguration getIntakeTalonConfig() {
+    //     TalonFXConfiguration talon = new TalonFXConfiguration();
+
+    //     talon.supplyCurrLimit.currentLimit = 25;
+    //     talon.supplyCurrLimit.enable = true;
+    //     talon.supplyCurrLimit.triggerThresholdCurrent = 30;
+    //     talon.supplyCurrLimit.triggerThresholdTime = 0.0;
+
+    //     return talon;
+	// }
 
 	public IntakeSubsystem() {
 		wheelMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
