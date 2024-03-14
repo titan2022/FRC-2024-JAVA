@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.utility.networking.NetworkingCall;
 import frc.robot.utility.networking.NetworkingServer;
 import frc.robot.utility.networking.types.NetworkingPose;
@@ -210,6 +211,7 @@ public class Localizer {
 
         if (server != null) {
             server.subscribe("pose", (NetworkingCall<NetworkingPose>)(NetworkingPose pose) -> {
+                SmartDashboard.putNumber("poseX", pose.position.getX());
                 globalPosition = pose.position.toTranslation2d();
                 globalOrientationFromTags = pose.rotation;
             });

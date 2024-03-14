@@ -5,47 +5,43 @@ import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import edu.wpi.first.wpilibj.AnalogInput;
-
-import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+@SuppressWarnings({"deprecated", "removal"})
 public class IndexerSubsystem extends SubsystemBase {
-    public static final double INTAKE_SPEED = -0.7;
-    // private static final double INDEX_VELOCITY = 0.0;
-    // private static final double AMP_VELOCITY = 0.0;
-    // private static final int BREAK_TIMEOUT = 2; // In frames (20ms)
+	private static final double INTAKE_SPEED = -0.7;
+	private static final int BREAK_TIMEOUT = 1; // In frames (20ms)
 
-    private WPI_TalonFX motor = new WPI_TalonFX(22);
-    private AnalogInput beamBreakerInput = new AnalogInput(1);
+	private final WPI_TalonFX intakeMotor = new WPI_TalonFX(22);
+	private final AnalogInput beamBreakerInput = new AnalogInput(1);
 
-    // private boolean noteStatus = false;
-    // private long lastNoteChange = 0;
+	private boolean noteStatus = false;
+	private int noteStatusTimer = 0;
+	private int lastNoteChange = 0;
 
-    public IndexerSubsystem() {
-        config();
-    }
+	public IndexerSubsystem() {
+		intakeMotor.setNeutralMode(NeutralMode.Brake);
+	}
 
-    public void config() {
-        motor.setNeutralMode(NeutralMode.Brake);
-    }
+	public void stop() {
+		intakeMotor.set(ControlMode.PercentOutput, 0);
+	}
 
-    public void stop() {
-        motor.set(ControlMode.PercentOutput, 0);
-    }
+	public void index(double speed) {
+		intakeMotor.set(ControlMode.Velocity, 0, DemandType.ArbitraryFeedForward, speed);
+	}
 
-    public void index(double speed) {
-        // motor.set(ControlMode.PercentOutput, speed);
-        motor.set(ControlMode.Velocity, 0,DemandType.ArbitraryFeedForward,speed);
-    }
+	public void intake() {
+		index(INTAKE_SPEED);
+	}
 
-    public void intake() {
-        index(INTAKE_SPEED);
-    }
+	public void reverse() {
+		index(-INTAKE_SPEED);
+	}
 
-    public void reverse() {
-        index(-INTAKE_SPEED);
-    }
+	public boolean hasNote() {
+		return noteStatus;
+	}
 
     // public void amp(boolean reverse) {
     //     motor.set(ControlMode.Velocity, (reverse ? -1 : 1) * AMP_VELOCITY);

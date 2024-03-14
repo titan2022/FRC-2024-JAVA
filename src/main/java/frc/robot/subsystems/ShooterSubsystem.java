@@ -1,7 +1,3 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot.subsystems;
 
 import static frc.robot.utility.Constants.Unit.DEG;
@@ -19,47 +15,35 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /***
- * A linkage shooter subsystem designed to take notes from the IntakeSubsystem
- * and shoot them into the speaker
+ * A linkage shooter subsystem designed to take notes from the IntakeSubsystem and shoot them into
+ * the speaker
  */
+@SuppressWarnings({"deprecated", "removal"})
 public class ShooterSubsystem extends SubsystemBase {
-	private static final double MAX_ANGLE = 0;
-	private static final double MIN_ANGLE = 15.8;
-	
 	// TODO: measure these in CAD
-	private static final double SHOOTER_LENGTH = 7.078305*IN; // this is from the shooter pivot to its linkage connection
-	private static final double LINKAGE_LONG_ARM_LENGTH = 6.375*IN;
-	private static final double LINKAGE_SHORT_ARM_LENGTH = 2.0*IN;
-	// the distance of the motor axis from the shooter pivot
-	private static final double LINKAGE_PIVOT_DX = 1.0;
-	private static final double LINKAGE_PIVOT_DY = 1.0;
-    public static final double ANGLE_OFFSET  = 16.9 * DEG;
-    public static final double ENCODER_ABSOLUTE_ZERO = 0;
-    public static final double INTAKE_SPEED = 0.6;
-//   //kP, kI, kD, kF
-// 	public static final double[] shooterPID = {0, 0, 0, 0};
+	private static final double SHOOTER_LENGTH = 7.078305 * IN; // this is from the shooter pivot to its linkage connection
+	private static final double LINKAGE_LONG_ARM_LENGTH = 6.375 * IN;
+	private static final double LINKAGE_SHORT_ARM_LENGTH = 2.0 * IN;
+	// The distance of the motor axis from the shooter pivot
+	private static final double LINKAGE_PIVOT_DX = 5.270846*IN;
+	private static final double LINKAGE_PIVOT_DY = -0.57172*IN;
+	private static final double ANGLE_OFFSET = 16.9 * DEG;
+	private static final double ENCODER_ABSOLUTE_ZERO = 0;
+	private static final double INTAKE_SPEED = 0.6;
+	private static final double DEADZONE = 0.1 * DEG;
+	
+	public final PIDController rotationPID = new PIDController(7500, 0, 5);
 
-// 	public static final double[] shooterFeedForwardParams = {0, 0, 0};
-
-	// SimpleMotorFeedforward shooterFeedForward = new SimpleMotorFeedforward(shooterFeedForwardParams[0], shooterFeedForwardParams[1], shooterFeedForwardParams[2]);
-    public static final PIDController rotationPID = new PIDController(0, 0, 0);
-    
-	public WPI_TalonFX linkageMotor = new WPI_TalonFX(12, "CANivore");
-	private WPI_TalonFX topShooterMotor = new WPI_TalonFX(13, "CANivore");
-	private WPI_TalonFX bottomShooterMotor = new WPI_TalonFX(5,"CANivore");
-	public WPI_TalonFX indexerMotor = new WPI_TalonFX(16, "CANivore");
-	public static DutyCycleEncoder linkageEncoder = new DutyCycleEncoder(9);
+	public final WPI_TalonFX linkageMotor = new WPI_TalonFX(12, "CANivore");
+	private final WPI_TalonFX topShooterMotor = new WPI_TalonFX(13, "CANivore");
+	private final WPI_TalonFX bottomShooterMotor = new WPI_TalonFX(5, "CANivore");
+	private final WPI_TalonFX indexerMotor = new WPI_TalonFX(16, "CANivore");
+	private final DutyCycleEncoder linkageEncoder = new DutyCycleEncoder(9);
+	private final double MIN_ANGLE = 15*DEG;
+	private final double MAX_ANGLE = 65*DEG;
 
 
 	public ShooterSubsystem() {
-    	config();
-	}
-
-	public void setLinkageMotor(double value){
-		linkageMotor.set(ControlMode.PercentOutput, value);
-	}
-
-	public void config() {
 		topShooterMotor.setNeutralMode(NeutralMode.Brake);
 		bottomShooterMotor.setNeutralMode(NeutralMode.Brake);
 		linkageMotor.setNeutralMode(NeutralMode.Brake);
@@ -67,33 +51,41 @@ public class ShooterSubsystem extends SubsystemBase {
 		topShooterMotor.setInverted(true);
 		bottomShooterMotor.follow(topShooterMotor);
 		bottomShooterMotor.setInverted(true);
-        linkageEncoder.reset();
+		linkageEncoder.reset();
 	}
+
+	/**
+	 * Sets percent output for linkage motor
+	 * @param percent
+	 */
+	public void setLinkageMotor(double percent) {
+		linkageMotor.set(ControlMode.PercentOutput, percent);
+	}
+
 	/**
 	 * Gets shooter rotation angle
-	 * 
 	 * @return Angle in radians (zero is ground, positive is up)
 	 */
-	public Rotation2d getRotation() {
-		return new Rotation2d(linkageEncoder.getAbsolutePosition()*2.0*Math.PI + SmartDashboard.getNumber("Encoder_Offset", 0));
+	public double getRotation() {
+		SmartDashboard.putNumber("test123", linkageEncoder.getAbsolutePosition());
+		return linkageEncoder.getAbsolutePosition() * 2.0 * Math.PI + SmartDashboard.getNumber("Encoder_Offset", 0);
 	}
 
-	private double lawOfCosines(double a, double b, double c){
+	private double lawOfCosines(double a, double b, double c) {
 		return Math.acos((Math.pow(c, 2.0) - Math.pow(a, 2.0) - Math.pow(b, 2.0)) / (-2.0 * a * b));
 	}
-
-	private double deadzone = 0.1 * DEG; 
 	/**
 	 * Sets target angle of the shooter
 	 * 
-	 * @param angle in radians (zero is parallel to the ground, positive is up)
+	 * @param set_angle in radians (zero is parallel to the ground, positive is up)
 	 */
-	public boolean setRotation(Rotation2d theta) {
-        double angle = theta.getRadians();
-		SmartDashboard.putNumber("Counter", SmartDashboard.getNumber("counter2", 0.0) + 1);    
-		// if(angle < MIN_ANGLE || angle > MAX_ANGLE) {
-		// 	return;
-		// }
+	public void setRotation(double angle) {
+		double deadzone = 0.015; // maybe decrease
+		// SmartDashboard.putNumber("counter2", SmartDashboard.getNumber("counter2", 0.0) + 1);
+		// SmartDashboard.putNumber("angle", angle);
+		if(angle < MIN_ANGLE || angle > MAX_ANGLE) {
+			return;
+		}
 		// trust me, the math is right
 		// angle += ANGLE_OFFSET;
 		double shooter_x = SHOOTER_LENGTH * Math.cos(angle);
@@ -101,63 +93,77 @@ public class ShooterSubsystem extends SubsystemBase {
 		double dx = shooter_x - LINKAGE_PIVOT_DX;
 		double dy = shooter_y - LINKAGE_PIVOT_DY;
 		double d = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
-    	double theta1 = lawOfCosines(d, LINKAGE_SHORT_ARM_LENGTH, LINKAGE_LONG_ARM_LENGTH);
+		double theta1 = lawOfCosines(d, LINKAGE_SHORT_ARM_LENGTH, LINKAGE_LONG_ARM_LENGTH);
 		double theta2 = Math.atan2(dx, dy);
-        double angleFromY = theta1 - theta2;
+		double angleFromY = theta1 - theta2;
 		double targetRotation = Math.PI / 2 - angleFromY;
-        targetRotation %= 2 * Math.PI;
+		targetRotation %= 2 * Math.PI;
 
         if (targetRotation < -Math.PI / 2) {
              targetRotation += 2 * Math.PI;
         } else if (targetRotation > 3 * Math.PI / 2) {
             targetRotation -= 2 * Math.PI;
         }
-		if(targetRotation - deadzone < getRotation().getRadians() && getRotation().getRadians() < targetRotation + deadzone){
-			holdAngle();
+		double in_rotation = lawOfCosines(LINKAGE_LONG_ARM_LENGTH, LINKAGE_SHORT_ARM_LENGTH, d);
+		if(targetRotation - deadzone < getRotation() && getRotation() < targetRotation + deadzone){
+			linkageMotor.set(0.061 * Math.sin(in_rotation));
 			SmartDashboard.putBoolean("Dead", true);
-			return true;
+			return;
 		}
 		SmartDashboard.putBoolean("Dead", false);
 		
-		double linkageMag = rotationPID.calculate(getRotation().getRadians(), targetRotation);
+		double linkageMag = rotationPID.calculate(getRotation(), targetRotation);
         double PID = Math.copySign(Math.min(Math.abs(linkageMag), 40 / FALCON_TICKS), linkageMag);
-		double FF = 
-			(((PID < 0) ?
-				SmartDashboard.getNumber("E", 0.0) :
-				SmartDashboard.getNumber("F", 0.0))
-			* Math.sin(getRotation().getRadians()) + 
-			((PID < 0) ? SmartDashboard.getNumber("G", 0.0) : SmartDashboard.getNumber("H", 0.0))
+		double FF = ((PID < 0) ? -0.04 : 0.04);
+		linkageMotor.set(ControlMode.Velocity, PID,
+			DemandType.ArbitraryFeedForward, FF
 		);
-		linkageMotor.set(ControlMode.Velocity, PID, DemandType.ArbitraryFeedForward, FF);
 		SmartDashboard.putNumber("target", targetRotation * 180 / Math.PI);
 		SmartDashboard.putNumber("FF", FF);
 		SmartDashboard.putNumber("PID", PID);
+	}
+	
 
-        return false;
+	/**
+	 * Shoots at specified motor percentage
+	 * @param percent
+	 */
+	public void shoot(double percent) {
+		topShooterMotor.set(ControlMode.PercentOutput, percent);
 	}
 
-	public void shoot(double velocity) {
-		topShooterMotor.set(ControlMode.PercentOutput, velocity);
+	/**
+	 * Holds angle with brake mode
+	 */
+	public void holdAngle() {
+		linkageMotor.set(ControlMode.Velocity, 0);
 	}
 
-    public void holdAngle() {
-        linkageMotor.set(ControlMode.Velocity, 0);
-    }
-	// public double getShooterVelocity(){
-	// 	return current_velocity*10*(4*IN)*scale;
-	// }
-
-	public void index(double speed) {
-		indexerMotor.set(ControlMode.PercentOutput, speed);
+	/**
+	 * Runs shooter indexer at specified motor percentage
+	 * @param percent
+	 */
+	public void index(double percent) {
+		indexerMotor.set(ControlMode.PercentOutput, percent);
 	}
 
-    public void intake() {
-        index(INTAKE_SPEED);
-    }
-    public void reverseIndex() {
-        index(-INTAKE_SPEED);
-    }
+	/**
+	 * Intakes note into the shooter with indexer
+	 */
+	public void intake() {
+		index(INTAKE_SPEED);
+	}
 
+	/**
+	 * Removes note from the shooter with indexer
+	 */
+	public void reverseIndex() {
+		index(-INTAKE_SPEED);
+	}
+
+	/**
+	 * Holds note in place with break mode
+	 */
 	public void holdIndex() {
 		indexerMotor.set(ControlMode.PercentOutput, 0);
 	}

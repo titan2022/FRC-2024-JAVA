@@ -21,7 +21,7 @@ import frc.robot.utility.networking.types.NetworkingVector;
  */
 public class NetworkingServer implements Runnable {
     private static final int MAX_PACKET_SIZE = 128;
-    private static final int DEFAULT_PORT = 5800;
+    private static final int DEFAULT_PORT = 5804;
 
     private final int port;
     private Thread thread;

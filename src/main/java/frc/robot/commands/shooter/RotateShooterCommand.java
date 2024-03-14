@@ -1,8 +1,4 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
-package frc.robot.commands;
+package frc.robot.commands.shooter;
 
 import frc.robot.utility.Constants.Unit;
 import frc.robot.utility.Constants.Unit.*;
@@ -39,7 +35,7 @@ public class RotateShooterCommand extends Command {
     @Override
     public void execute() {
         //Methods return if reached desired location
-        reachedAngle = shooter.setRotation(angle);
+        // reachedAngle = shooter.setRotation(angle.getRadians());
     }
 
     // Called once the command ends or is interrupted.
