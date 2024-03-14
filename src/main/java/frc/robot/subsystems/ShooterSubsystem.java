@@ -41,7 +41,9 @@ public class ShooterSubsystem extends SubsystemBase {
 	private final WPI_TalonFX indexerMotor = new WPI_TalonFX(16, "CANivore");
 	private final DutyCycleEncoder linkageEncoder = new DutyCycleEncoder(9);
 	public static final double MIN_ANGLE = 15*DEG;
-	public static final double MAX_ANGLE = 65*DEG;
+	// public static final double MAX_ANGLE = 65*DEG;
+    public static final double MAX_ANGLE = 65*DEG;
+
 
 	public static TalonFXConfiguration getShooterTalonConfig() {
 		TalonFXConfiguration talon = new TalonFXConfiguration();

@@ -26,7 +26,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 /** An example command that uses an example subsystem. */
 public class SimpleAutoPlanOne extends SequentialCommandGroup {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
-    public static double SHOOT_SPEAKER_SPEED = 0.5;
+    public static double SHOOT_SPEAKER_SPEED = 0.8;
     public static Rotation2d SHOOT_ANGLE = Rotation2d.fromDegrees(65);
     public static final double SPEAKER_HEIGHT = 2 * METERS;
 
