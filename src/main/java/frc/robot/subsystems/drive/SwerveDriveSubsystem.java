@@ -82,8 +82,7 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
 		// public static final double kV = 0.175;
         public static final double kV = 0.175;
 		public static final double kA = 0;
-	}
-
+    }
     /**
 	 * Contains a velocity based PID configuration.
 	 * 
@@ -190,6 +189,7 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
             return new Translation2d(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond);
         }
     };
+
     private final RotationalDrivebase rotationalLock = new RotationalDrivebase() {
         @Override
         public void setRotationalVelocity(Rotation2d omega) {
@@ -253,7 +253,7 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
             motor.setSensorPhase(WHEEL_PHASE);
             motor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
             motor.selectProfileSlot(MAIN_MOTOR_SLOT_IDX, 0);
-            motor.setNeutralMode(NeutralMode.Coast);
+            motor.setNeutralMode(NeutralMode.Brake);
             motor.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 20);
             motor.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 20);
             motor.setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, 5000);
@@ -276,7 +276,7 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
             rotator.setSensorPhase(ROTATOR_PHASE);
             rotator.configSelectedFeedbackSensor(TalonFXFeedbackDevice.RemoteSensor0, 0, 0);
             rotator.selectProfileSlot(ROTATOR_SLOT_IDX, 0);
-            rotator.setNeutralMode(NeutralMode.Coast);
+            rotator.setNeutralMode(NeutralMode.Brake);
             rotator.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 20);
             rotator.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 20);
             rotator.setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, 5000);

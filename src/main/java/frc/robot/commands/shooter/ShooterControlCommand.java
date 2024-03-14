@@ -26,6 +26,7 @@ public class ShooterControlCommand extends Command {
     @Override
     public void initialize() {
         SmartDashboard.putNumber("targetAngle", ShooterSubsystem.MIN_ANGLE);
+        shooter.setRotation(65 * DEG);
     }
 
     @Override
@@ -33,7 +34,9 @@ public class ShooterControlCommand extends Command {
         shooterAngle = SmartDashboard.getNumber("targetAngle", ShooterSubsystem.MIN_ANGLE);//+= xbox.getRightY() * 5 * DEG * 0.02;
         shooterAngle = Math.min(shooterAngle, ShooterSubsystem.MAX_ANGLE);
         shooterAngle = Math.max(shooterAngle, ShooterSubsystem.MIN_ANGLE);
-        shooter.setRotation(shooterAngle);
+        // shooter.setRotation(shooterAngle);
+        shooter.setRotation(65 * DEG);
+        // shooter.holdAngle();
 
         if (xbox.getXButton()) {
             shooterDir = -1;
@@ -41,7 +44,7 @@ public class ShooterControlCommand extends Command {
             shooterDir = 1;
         }
 
-        shooter.shoot(xbox.getRightTriggerAxis() * 0.8 * shooterDir);
+        shooter.shoot(xbox.getRightTriggerAxis() * 0.5 * shooterDir);
 
         if (xbox.getRightBumperPressed()) {
             shooter.index(0.5);

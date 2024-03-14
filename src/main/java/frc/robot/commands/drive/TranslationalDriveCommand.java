@@ -110,6 +110,8 @@ public class TranslationalDriveCommand extends Command {
             velocity = velocity.rotateBy(heading);
         }
 
+        SmartDashboard.putNumber("Target Velocity X", velocity.getX());
+        SmartDashboard.putNumber("Target Velocity Y", velocity.getY());
         drive.setVelocity(velocity);
     }
 

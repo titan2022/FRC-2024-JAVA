@@ -118,7 +118,8 @@ public class ShooterSubsystem extends SubsystemBase {
         }
 		double in_rotation = lawOfCosines(LINKAGE_LONG_ARM_LENGTH, LINKAGE_SHORT_ARM_LENGTH, d);
 		if(targetRotation - deadzone < getRotation() && getRotation() < targetRotation + deadzone){
-			linkageMotor.set(0.061 * Math.sin(in_rotation));
+			// linkageMotor.set(0.061 * Math.sin(in_rotation));
+			holdAngle();
 			// SmartDashboard.putBoolean("Dead", true);
 			return true;
 		}
