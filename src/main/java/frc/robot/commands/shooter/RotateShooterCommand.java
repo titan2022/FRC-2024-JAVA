@@ -35,13 +35,12 @@ public class RotateShooterCommand extends Command {
     @Override
     public void execute() {
         //Methods return if reached desired location
-        // reachedAngle = shooter.setRotation(angle.getRadians());
+        reachedAngle = shooter.setRotation(angle.getRadians());
     }
 
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
-        shooter.holdAngle();
     }
 
     // Returns true when the command should end.

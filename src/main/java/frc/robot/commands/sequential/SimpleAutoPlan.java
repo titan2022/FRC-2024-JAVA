@@ -3,11 +3,13 @@ package frc.robot.commands.sequential;
 import frc.robot.utility.Localizer;
 import frc.robot.utility.Constants.Unit.*;
 import frc.robot.commands.align.AlignSpeakerCommand;
+import frc.robot.commands.drive.TranslationCommand;
 import frc.robot.commands.shooter.RotateShooterCommand;
 import frc.robot.commands.shooter.ShooterAlignSpeakerCommand;
 import frc.robot.commands.shooter.SimpleShootCommand;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.IndexerSubsystem;
+import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.drive.RotationalDrivebase;
 import frc.robot.subsystems.drive.TranslationalDrivebase;
@@ -21,7 +23,7 @@ import edu.wpi.first.units.Unit;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
 /** An example command that uses an example subsystem. */
-public class FullShootSpeakerCommand extends SequentialCommandGroup {
+public class SimpleAutoPlan extends SequentialCommandGroup {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
     public static final double SHOOT_SPEAKER_SPEED = 0.5;
     public static final double SPEAKER_HEIGHT = 2 * METERS;
@@ -36,13 +38,15 @@ public class FullShootSpeakerCommand extends SequentialCommandGroup {
         return 0.4;
     }
 
-    public FullShootSpeakerCommand(RotationalDrivebase rotational, ShooterSubsystem shooter, Localizer localizer) {
+    public SimpleAutoPlan(TranslationalDrivebase translational, RotationalDrivebase rotational, ShooterSubsystem shooter, IndexerSubsystem indexer, IntakeSubsystem intake, ElevatorSubsystem elevator, Localizer localizer) {
         addCommands(
-            new AlignSpeakerCommand(rotational, localizer)
+            new RotateShooterCommand(Rotation2d.fromDegrees(30), shooter),
+            new SimpleShootCommand(SHOOT_SPEAKER_SPEED, shooter, indexer),
+            new TranslationCommand(new Translation2d(0, 3), 1, translational)
             // new ShooterAlignSpeakerCommand(shooter, localizer)
         );
 
-        addRequirements(rotational, shooter);
+        addRequirements(rotational, translational, shooter, indexer, elevator, intake);
     }
 
 }
