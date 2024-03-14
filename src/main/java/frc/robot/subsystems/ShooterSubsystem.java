@@ -25,20 +25,22 @@ public class ShooterSubsystem extends SubsystemBase {
 	private static final double LINKAGE_LONG_ARM_LENGTH = 6.375 * IN;
 	private static final double LINKAGE_SHORT_ARM_LENGTH = 2.0 * IN;
 	// The distance of the motor axis from the shooter pivot
-	private static final double LINKAGE_PIVOT_DX = 1.0;
-	private static final double LINKAGE_PIVOT_DY = 1.0;
+	private static final double LINKAGE_PIVOT_DX = 5.270846*IN;
+	private static final double LINKAGE_PIVOT_DY = -0.57172*IN;
 	private static final double ANGLE_OFFSET = 16.9 * DEG;
 	private static final double ENCODER_ABSOLUTE_ZERO = 0;
 	private static final double INTAKE_SPEED = 0.6;
 	private static final double DEADZONE = 0.1 * DEG;
 	
-	private final PIDController rotationPID = new PIDController(0, 0, 0);
+	public final PIDController rotationPID = new PIDController(7500, 0, 5);
 
-	private final WPI_TalonFX linkageMotor = new WPI_TalonFX(12, "CANivore");
+	public final WPI_TalonFX linkageMotor = new WPI_TalonFX(12, "CANivore");
 	private final WPI_TalonFX topShooterMotor = new WPI_TalonFX(13, "CANivore");
 	private final WPI_TalonFX bottomShooterMotor = new WPI_TalonFX(5, "CANivore");
 	private final WPI_TalonFX indexerMotor = new WPI_TalonFX(16, "CANivore");
 	private final DutyCycleEncoder linkageEncoder = new DutyCycleEncoder(9);
+	private final double MIN_ANGLE = 15*DEG;
+	private final double MAX_ANGLE = 65*DEG;
 
 
 	public ShooterSubsystem() {
@@ -64,8 +66,9 @@ public class ShooterSubsystem extends SubsystemBase {
 	 * Gets shooter rotation angle
 	 * @return Angle in radians (zero is ground, positive is up)
 	 */
-	public Rotation2d getRotation() {
-		return new Rotation2d(linkageEncoder.getAbsolutePosition() * 2.0 * Math.PI + SmartDashboard.getNumber("Encoder_Offset", 0));
+	public double getRotation() {
+		SmartDashboard.putNumber("test123", linkageEncoder.getAbsolutePosition());
+		return linkageEncoder.getAbsolutePosition() * 2.0 * Math.PI + SmartDashboard.getNumber("Encoder_Offset", 0);
 	}
 
 	private double lawOfCosines(double a, double b, double c) {
@@ -74,12 +77,12 @@ public class ShooterSubsystem extends SubsystemBase {
 	/**
 	 * Sets target angle of the shooter
 	 * 
-	 * @param angle in radians (zero is parallel to the ground, positive is up)
+	 * @param set_angle in radians (zero is parallel to the ground, positive is up)
 	 */
 	public void setRotation(double angle) {
-		double deadzone = SmartDashboard.getNumber("I", 0.0);
-		SmartDashboard.putNumber("counter2", SmartDashboard.getNumber("counter2", 0.0) + 1);    
-		SmartDashboard.putNumber("angle", angle);
+		double deadzone = 0.015; // maybe decrease
+		// SmartDashboard.putNumber("counter2", SmartDashboard.getNumber("counter2", 0.0) + 1);
+		// SmartDashboard.putNumber("angle", angle);
 		if(angle < MIN_ANGLE || angle > MAX_ANGLE) {
 			return;
 		}
@@ -101,20 +104,25 @@ public class ShooterSubsystem extends SubsystemBase {
         } else if (targetRotation > 3 * Math.PI / 2) {
             targetRotation -= 2 * Math.PI;
         }
+		double in_rotation = lawOfCosines(LINKAGE_LONG_ARM_LENGTH, LINKAGE_SHORT_ARM_LENGTH, d);
 		if(targetRotation - deadzone < getRotation() && getRotation() < targetRotation + deadzone){
-			linkageMotor.set(SmartDashboard.getNumber("J", 0.0) * Math.sin(getRotation()));
+			linkageMotor.set(0.061 * Math.sin(in_rotation));
 			SmartDashboard.putBoolean("Dead", true);
 			return;
 		}
-
-		double linkageMag = rotationPID.calculate(getRotation().getRadians(), targetRotation);
-		double PID = Math.copySign(Math.min(Math.abs(linkageMag), 40 / FALCON_TICKS), linkageMag);
-		double FF = (((PID < 0) ? SmartDashboard.getNumber("E", 0.0) : SmartDashboard.getNumber("F", 0.0)) * Math.sin(getRotation().getRadians()) + ((PID < 0) ? SmartDashboard.getNumber("G", 0.0) : SmartDashboard.getNumber("H", 0.0)));
-		linkageMotor.set(ControlMode.Velocity, PID, DemandType.ArbitraryFeedForward, FF);
+		SmartDashboard.putBoolean("Dead", false);
+		
+		double linkageMag = rotationPID.calculate(getRotation(), targetRotation);
+        double PID = Math.copySign(Math.min(Math.abs(linkageMag), 40 / FALCON_TICKS), linkageMag);
+		double FF = ((PID < 0) ? -0.04 : 0.04);
+		linkageMotor.set(ControlMode.Velocity, PID,
+			DemandType.ArbitraryFeedForward, FF
+		);
 		SmartDashboard.putNumber("target", targetRotation * 180 / Math.PI);
 		SmartDashboard.putNumber("FF", FF);
 		SmartDashboard.putNumber("PID", PID);
 	}
+	
 
 	/**
 	 * Shoots at specified motor percentage
