@@ -73,7 +73,6 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public void config() {
-		TOP_ENCODER_VALUE =(int)(SmartDashboard.getNumber("E", 185000));
         leftSpoolMotor.configAllSettings(getSpoolTalonConfig());
         rightSpoolMotor.follow(leftSpoolMotor);
         leftSpoolMotor.setInverted(true);
