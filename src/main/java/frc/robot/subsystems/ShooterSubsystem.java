@@ -42,7 +42,7 @@ public class ShooterSubsystem extends SubsystemBase {
 	private final DutyCycleEncoder linkageEncoder = new DutyCycleEncoder(9);
 	public static final double MIN_ANGLE = 15*DEG;
 	// public static final double MAX_ANGLE = 65*DEG;
-    public static final double MAX_ANGLE = 70*DEG;
+    public static final double MAX_ANGLE = 65*DEG;
 
 
 	public static TalonFXConfiguration getShooterTalonConfig() {
@@ -67,6 +67,8 @@ public class ShooterSubsystem extends SubsystemBase {
 		bottomShooterMotor.follow(topShooterMotor);
 		bottomShooterMotor.setInverted(true);
 		linkageEncoder.reset();
+
+		// topShooterMotor.configSupplyCurrentLimit(null)
 	}
 
 	/**
@@ -104,13 +106,13 @@ public class ShooterSubsystem extends SubsystemBase {
 		// angle += ANGLE_OFFSET;
 		double shooter_x = SHOOTER_LENGTH * Math.cos(angle);
 		double shooter_y = SHOOTER_LENGTH * Math.sin(angle);
-		double dx = shooter_x - LINKAGE_PIVOT_DX;
+		double dx = LINKAGE_PIVOT_DX - shooter_x;
 		double dy = shooter_y - LINKAGE_PIVOT_DY;
 		double d = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
 		double theta1 = lawOfCosines(d, LINKAGE_SHORT_ARM_LENGTH, LINKAGE_LONG_ARM_LENGTH);
 		double theta2 = Math.atan2(dx, dy);
 		double angleFromY = theta1 - theta2;
-		double targetRotation = Math.PI / 2 - angleFromY;
+		double targetRotation = Math.PI - angleFromY;
 		targetRotation %= 2 * Math.PI;
 
         if (targetRotation < -Math.PI / 2) {
@@ -120,7 +122,8 @@ public class ShooterSubsystem extends SubsystemBase {
         }
 		double in_rotation = lawOfCosines(LINKAGE_LONG_ARM_LENGTH, LINKAGE_SHORT_ARM_LENGTH, d);
 		if(targetRotation - deadzone < getRotation() && getRotation() < targetRotation + deadzone){
-			linkageMotor.set(0.061 * Math.sin(in_rotation));
+			// linkageMotor.set(0.061 * Math.sin(in_rotation));
+			holdAngle();
 			// SmartDashboard.putBoolean("Dead", true);
 			return true;
 		}

@@ -87,7 +87,11 @@ public class TranslationalDriveCommand extends Command {
     }
 
     private double scaleVelocity(double joy) {
-        return Math.signum(joy) * joy * joy * maxVel;
+        double scaledVel = Math.signum(joy) * joy * joy * maxVel;
+        if (xbox.getLeftBumper()) {
+            scaledVel *= 0.3;
+        }
+        return scaledVel;
     }
 
     @Override
@@ -110,6 +114,8 @@ public class TranslationalDriveCommand extends Command {
             velocity = velocity.rotateBy(heading);
         }
 
+        SmartDashboard.putNumber("Target Velocity X", velocity.getX());
+        SmartDashboard.putNumber("Target Velocity Y", velocity.getY());
         drive.setVelocity(velocity);
     }
 

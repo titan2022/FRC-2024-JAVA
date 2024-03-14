@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.commands.auto.SimpleAutoPlanOne;
 import frc.robot.commands.control.ElevatorControlCommand;
 import frc.robot.commands.drive.RotationalDriveCommand;
 import frc.robot.commands.drive.TranslationalDriveCommand;
@@ -50,6 +51,7 @@ public class Robot extends TimedRobot {
     @Override
     public void autonomousInit() {
         localizer.setup();
+        new SimpleAutoPlanOne(drive.getTranslational(), drive.getRotational(), shooter, indexer, intake, elevator, localizer).schedule();
     }
 
     @Override
@@ -62,7 +64,7 @@ public class Robot extends TimedRobot {
         localizer.setup();
 
         // Main driver
-        drive.getTranslational().setDefaultCommand(new TranslationalDriveCommand(drive.getTranslational(), localizer, xbox1, 2));
+        drive.getTranslational().setDefaultCommand(new TranslationalDriveCommand(drive.getTranslational(), localizer, xbox1, 6));
         drive.getRotational().setDefaultCommand(new RotationalDriveCommand(drive.getRotational(), localizer, xbox1, Math.PI));
 
         // Second driver

@@ -3,6 +3,7 @@ package frc.robot.commands.drive;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import frc.robot.subsystems.drive.RotationalDrivebase;
@@ -75,6 +76,7 @@ public class RotationalDriveCommand extends Command {
             drift = -localizer.getRate() * DEG / S - omega;
         }
         omega = -scaleVelocity(joy);
+        SmartDashboard.putNumber("Target Omega", new Rotation2d(omega - 0.5 * drift).getDegrees());
         drive.setRotationalVelocity(new Rotation2d(omega - 0.5 * drift));
     }
 
