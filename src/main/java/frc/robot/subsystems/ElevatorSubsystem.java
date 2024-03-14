@@ -45,6 +45,12 @@ public class ElevatorSubsystem extends SubsystemBase {
         talon.slot0.integralZone = 75;
         talon.slot0.allowableClosedloopError = 5;
         talon.slot0.maxIntegralAccumulator = 5120;
+
+        talon.supplyCurrLimit.currentLimit = 25;
+        talon.supplyCurrLimit.enable = true;
+        talon.supplyCurrLimit.triggerThresholdCurrent = 30;
+        talon.supplyCurrLimit.triggerThresholdTime = 0.0;
+
         return talon;
 	}
 

@@ -1,10 +1,12 @@
 package frc.robot;
 
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.commands.auto.SimpleAutoPlanOne;
+import frc.robot.commands.auto.SimpleAutoPlanTwo;
 import frc.robot.commands.control.ElevatorControlCommand;
 import frc.robot.commands.drive.RotationalDriveCommand;
 import frc.robot.commands.drive.TranslationalDriveCommand;
@@ -30,6 +32,10 @@ public class Robot extends TimedRobot {
     public void robotInit() {
         elevator.leftSpoolMotor.setSelectedSensorPosition(0.0);
         elevator.config();
+        SmartDashboard.putNumber("swkP", 0.0);
+        SmartDashboard.putNumber("swkI", 0.0);
+        SmartDashboard.putNumber("swkD", 0.0);
+        SmartDashboard.putNumber("swkF", 0.0);
     }
 
     @Override
@@ -51,7 +57,7 @@ public class Robot extends TimedRobot {
     @Override
     public void autonomousInit() {
         localizer.setup();
-        new SimpleAutoPlanOne(drive.getTranslational(), drive.getRotational(), shooter, indexer, intake, elevator, localizer).schedule();
+        new SimpleAutoPlanTwo(drive.getTranslational(), drive.getRotational(), shooter, indexer, intake, elevator, localizer).schedule();
     }
 
     @Override
@@ -61,6 +67,12 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopInit() {
+        for (int i = 0; i < drive.motors.length; i++) {
+            drive.motors[i].config_kP(0, SmartDashboard.getNumber("swkP", 0.0));
+            drive.motors[i].config_kI(0, SmartDashboard.getNumber("swkI", 0.0));
+            drive.motors[i].config_kD(0, SmartDashboard.getNumber("swkD", 0.0));
+            drive.motors[i].config_kF(0, SmartDashboard.getNumber("swkF", 0.0));
+        }
         localizer.setup();
 
         // Main driver
@@ -68,7 +80,7 @@ public class Robot extends TimedRobot {
         drive.getRotational().setDefaultCommand(new RotationalDriveCommand(drive.getRotational(), localizer, xbox1, Math.PI));
 
         // Second driver
-        shooter.setDefaultCommand(new ShooterControlCommand(shooter, xbox2));
+        shooter.setDefaultCommand(new ShooterControlCommand(shooter, indexer, xbox2));
         elevator.setDefaultCommand(new ElevatorControlCommand(elevator, xbox2));
         // Trigger xboxTrigger = new JoystickButton(xbox1, XboxController.Button.kY.value);
         // xboxTrigger.onTrue(new PreSpeakerAlignCommand(drive, localizer, new Rotation2d(0), 0.2 * Math.PI));
@@ -78,6 +90,8 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopPeriodic() {
+
+
         if (xbox2.getAButton()) {
             intake.setWheelSpeed(0.45);
             indexer.intake();
