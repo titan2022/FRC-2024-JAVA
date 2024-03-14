@@ -102,13 +102,13 @@ public class ShooterSubsystem extends SubsystemBase {
 		// angle += ANGLE_OFFSET;
 		double shooter_x = SHOOTER_LENGTH * Math.cos(angle);
 		double shooter_y = SHOOTER_LENGTH * Math.sin(angle);
-		double dx = shooter_x - LINKAGE_PIVOT_DX;
+		double dx = LINKAGE_PIVOT_DX - shooter_x;
 		double dy = shooter_y - LINKAGE_PIVOT_DY;
 		double d = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
 		double theta1 = lawOfCosines(d, LINKAGE_SHORT_ARM_LENGTH, LINKAGE_LONG_ARM_LENGTH);
 		double theta2 = Math.atan2(dx, dy);
 		double angleFromY = theta1 - theta2;
-		double targetRotation = Math.PI / 2 - angleFromY;
+		double targetRotation = Math.PI - angleFromY;
 		targetRotation %= 2 * Math.PI;
 
         if (targetRotation < -Math.PI / 2) {
