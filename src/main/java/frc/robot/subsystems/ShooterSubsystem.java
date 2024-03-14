@@ -7,6 +7,7 @@ import static frc.robot.utility.Constants.Unit.IN;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -42,6 +43,18 @@ public class ShooterSubsystem extends SubsystemBase {
 	public static final double MIN_ANGLE = 15*DEG;
 	public static final double MAX_ANGLE = 65*DEG;
 
+	public static TalonFXConfiguration getShooterTalonConfig() {
+		TalonFXConfiguration talon = new TalonFXConfiguration();
+		// Add configs here:
+		talon.slot0.kP = 0;
+		talon.slot0.kI = 0;
+		talon.slot0.kD = 0;
+		talon.slot0.kF = 0;
+		talon.slot0.integralZone = 75;
+		talon.slot0.allowableClosedloopError = 5;// 217;
+		talon.slot0.maxIntegralAccumulator = 5120;
+		return talon;
+	}
 
 	public ShooterSubsystem() {
 		topShooterMotor.setNeutralMode(NeutralMode.Brake);
@@ -78,12 +91,12 @@ public class ShooterSubsystem extends SubsystemBase {
 	 * 
 	 * @param set_angle in radians (zero is parallel to the ground, positive is up)
 	 */
-	public void setRotation(double angle) {
+	public boolean setRotation(double angle) {
 		double deadzone = 0.015; // maybe decrease
 		// SmartDashboard.putNumber("counter2", SmartDashboard.getNumber("counter2", 0.0) + 1);
 		// SmartDashboard.putNumber("angle", angle);
 		if(angle < MIN_ANGLE || angle > MAX_ANGLE) {
-			return;
+			return false;
 		}
 		// trust me, the math is right
 		// angle += ANGLE_OFFSET;
@@ -107,7 +120,7 @@ public class ShooterSubsystem extends SubsystemBase {
 		if(targetRotation - deadzone < getRotation() && getRotation() < targetRotation + deadzone){
 			linkageMotor.set(0.061 * Math.sin(in_rotation));
 			// SmartDashboard.putBoolean("Dead", true);
-			return;
+			return true;
 		}
 		// SmartDashboard.putBoolean("Dead", false);
 		
@@ -120,6 +133,8 @@ public class ShooterSubsystem extends SubsystemBase {
 		SmartDashboard.putNumber("Target Shooter Angle", targetRotation / DEG);
 		SmartDashboard.putNumber("Shooter PID", PID);
 		SmartDashboard.putNumber("Shooter FF", FF);
+
+		return false;
 	}
 	
 
@@ -130,6 +145,13 @@ public class ShooterSubsystem extends SubsystemBase {
 	public void shoot(double percent) {
 		topShooterMotor.set(ControlMode.PercentOutput, percent);
 	}
+
+    // public void shoot(double speed) {
+    //     //Converts from rotations / sec to ticks / 100ms
+    //     double motorSpeed = (speed / 10) / FALCON_TICKS;
+
+	// 	topShooterMotor.set(ControlMode.Velocity, motorSpeed);
+	// }
 
 	/**
 	 * Holds angle with brake mode

@@ -5,6 +5,7 @@ import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import edu.wpi.first.wpilibj.AnalogInput;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 @SuppressWarnings({"deprecated", "removal"})
@@ -40,18 +41,32 @@ public class IndexerSubsystem extends SubsystemBase {
 		index(-INTAKE_SPEED);
 	}
 
-	public boolean hasNote() {
-		return noteStatus;
-	}
+	// public boolean hasNote() {
+	// 	return noteStatus;
+	// }
 
-	@Override
-	public void periodic() {
-		// Beam breaker needs to be in a state for more than its timeout to count (prevents noise)
-		boolean newNoteStatus = beamBreakerInput.getValue() > 2350;
-		if (newNoteStatus != noteStatus && noteStatusTimer - lastNoteChange > BREAK_TIMEOUT) {
-			noteStatus = newNoteStatus;
-			lastNoteChange = noteStatusTimer;
-		}
-		noteStatusTimer++;
-	}
+    // public void amp(boolean reverse) {
+    //     motor.set(ControlMode.Velocity, (reverse ? -1 : 1) * AMP_VELOCITY);
+    // }
+
+    public boolean hasNote() {
+        SmartDashboard.putNumber("Beam Breaker", beamBreakerInput.getValue());
+        if (beamBreakerInput.getValue() > 2350)
+            return true;
+        else 
+            return false;
+        // return false;
+    }
+
+    // @Override
+    // public void periodic() {
+    //     // Beam breaker needs to be in a state for more than its timeout to count (prevents noise)
+    //     boolean newNoteStatus = beamBreakerInput.get();
+    //     if (newNoteStatus != noteStatus && timer - lastNoteChange > BREAK_TIMEOUT) {
+    //         noteStatus = newNoteStatus;
+    //         lastNoteChange = timer;
+    //     }
+
+    //     timer++;
+    // }
 }
