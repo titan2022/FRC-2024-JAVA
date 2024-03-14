@@ -24,10 +24,11 @@ import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.drive.SwerveDriveSubsystem;
 import frc.robot.utility.Localizer;
+import frc.robot.utility.TeleopListener;
 
 public class Robot extends TimedRobot {
     private final XboxController xbox = new XboxController(0);
-    // private TeleopListener listener = new TeleopListener(xbox);
+    private TeleopListener listener = new TeleopListener(xbox);
     private Localizer localizer = new Localizer();
     private SwerveDriveSubsystem drive = new SwerveDriveSubsystem(localizer);
     private ElevatorSubsystem elevator = new ElevatorSubsystem();
@@ -63,21 +64,21 @@ public class Robot extends TimedRobot {
     @Override
     public void robotPeriodic() {
         CommandScheduler.getInstance().run();
-        SmartDashboard.putNumber("Current X Velocity", drive.getTranslational().getVelocity().getX());
-        SmartDashboard.putNumber("Current Y Velocity", drive.getTranslational().getVelocity().getY());
-        SmartDashboard.putNumber("Current Speed", drive.getTranslational().getVelocity().getNorm());
-        SmartDashboard.putNumber("Swerve Angle", localizer.getHeading().getDegrees());
-        SmartDashboard.putNumber("Swerve Rotation Velocity", localizer.getRate());
-        SmartDashboard.putNumber("X Axis", xbox.getLeftX());
-        SmartDashboard.putNumber("Y Axis", xbox.getLeftY());
+        // SmartDashboard.putNumber("Current X Velocity", drive.getTranslational().getVelocity().getX());
+        // SmartDashboard.putNumber("Current Y Velocity", drive.getTranslational().getVelocity().getY());
+        // SmartDashboard.putNumber("Current Speed", drive.getTranslational().getVelocity().getNorm());
+        // SmartDashboard.putNumber("Swerve Angle", localizer.getHeading().getDegrees());
+        // SmartDashboard.putNumber("Swerve Rotation Velocity", localizer.getRate());
+        // SmartDashboard.putNumber("X Axis", xbox.getLeftX());
+        // SmartDashboard.putNumber("Y Axis", xbox.getLeftY());
 
-        // SmartDashboard.putNumber("Encoder Angle", shooter.getRotation().getDegrees());
-        SmartDashboard.putNumber("Elevator Current", elevator.leftSpoolMotor.getOutputCurrent());
-        SmartDashboard.putBoolean("hasNote", indexer.hasNote());
-        SmartDashboard.putBoolean("canRunEle", elevator.canRun());
-        // SmartDashboard.putNumber("Encoder Abs", shooter.getAbsoluteRotation());
-        SmartDashboard.putNumber("Elevator Encoder", elevator.getEncoder());
-        SmartDashboard.putNumber("Time", Timer.getFPGATimestamp());
+        // // SmartDashboard.putNumber("Encoder Angle", shooter.getRotation().getDegrees());
+        // SmartDashboard.putNumber("Elevator Current", elevator.leftSpoolMotor.getOutputCurrent());
+        // SmartDashboard.putBoolean("hasNote", indexer.hasNote());
+        // SmartDashboard.putBoolean("canRunEle", elevator.canRun());
+        // // SmartDashboard.putNumber("Encoder Abs", shooter.getAbsoluteRotation());
+        // SmartDashboard.putNumber("Elevator Encoder", elevator.getEncoder());
+        // SmartDashboard.putNumber("Time", Timer.getFPGATimestamp());
         localizer.step();
     
     }
@@ -133,54 +134,54 @@ public class Robot extends TimedRobot {
         // SmartDashboard.putNumber("cur_test", (int)(SmartDashboard.getNumber("Test", 0)));
         // switch((int)(SmartDashboard.getNumber("Test", 0))){
         //     case 0:
-            //     SmartDashboard.putNumber("linkage_angle", shooter.getRotation()*180/Math.PI);
-            //     listener.execute();
-            //     if(xbox.getAButton()){
-            //         shooter.setRotation(SmartDashboard.getNumber("D", 0.0) * Math.PI / 180.0);
-            //     }
-            //     else {
-            //         if(xbox.getLeftBumper()){
-            //             shooter.linkageMotor.set(ControlMode.Velocity, 6000);
-            //             // shooter.linkageMotor.set(ControlMode.PercentOutput, 0.1);
-            //         } else if(xbox.getRightBumper()){
-            //             shooter.linkageMotor.set(ControlMode.Velocity, -6000);
-            //         } else {
-            //             shooter.linkageMotor.set(ControlMode.PercentOutput, 0.0);
-            //         }
-            //     }
+                SmartDashboard.putNumber("linkage_angle", shooter.getRotation()*180/Math.PI);
+                listener.execute();
+                if(xbox.getAButton()){
+                    shooter.setRotation(SmartDashboard.getNumber("D", 0.0) * Math.PI / 180.0);
+                }
+                else {
+                    if(xbox.getLeftBumper()){
+                        shooter.linkageMotor.set(ControlMode.Velocity, 6000);
+                        // shooter.linkageMotor.set(ControlMode.PercentOutput, 0.1);
+                    } else if(xbox.getRightBumper()){
+                        shooter.linkageMotor.set(ControlMode.Velocity, -6000);
+                    } else {
+                        shooter.linkageMotor.set(ControlMode.PercentOutput, 0.0);
+                    }
+                }
 
-            //     shooter.rotationPID.setP(SmartDashboard.getNumber("A", 0));
-            //     shooter.rotationPID.setI(SmartDashboard.getNumber("B", 0));
-            //     shooter.rotationPID.setD(SmartDashboard.getNumber("C", 0));
+                shooter.rotationPID.setP(SmartDashboard.getNumber("A", 0));
+                shooter.rotationPID.setI(SmartDashboard.getNumber("B", 0));
+                shooter.rotationPID.setD(SmartDashboard.getNumber("C", 0));
             //     break;
             // case 1:
-        SmartDashboard.putNumber("dashboard_counter", SmartDashboard.getNumber("dashboard_counter", 0.0) + 1);
-        SmartDashboard.putNumber("encoder", elevator.leftSpoolMotor.getSelectedSensorPosition());
-        SmartDashboard.putNumber("error", elevator.leftSpoolMotor.getClosedLoopError());
-        SmartDashboard.putNumber("input", elevator.leftSpoolMotor.getSupplyCurrent());
-        SmartDashboard.putNumber("output", elevator.leftSpoolMotor.getStatorCurrent());
-        if(xbox.getAButton()){
-            elevator.setHeight(1);
-        } else if(xbox.getBButton()){
-            elevator.setHeight(0);
-        } else {
-            elevator.leftSpoolMotor.set(ControlMode.PercentOutput, 0.2*(xbox.getLeftTriggerAxis() - xbox.getRightTriggerAxis()));
-        }
-        if(xbox.getXButton()){
-            intake.intake();
-            indexer.intake();
-        } else {
-            intake.stop();
-        }
-        if(xbox.getRightBumper()){
-            elevator.leftSpoolMotor.setSelectedSensorPosition(0.0);
-        }
-        if(xbox.getLeftBumper()){
-            indexer.reverse();
-        }
-        if(!xbox.getLeftBumper() && !xbox.getXButton()){
-            indexer.stop();
-        }
+        // SmartDashboard.putNumber("dashboard_counter", SmartDashboard.getNumber("dashboard_counter", 0.0) + 1);
+        // SmartDashboard.putNumber("encoder", elevator.leftSpoolMotor.getSelectedSensorPosition());
+        // SmartDashboard.putNumber("error", elevator.leftSpoolMotor.getClosedLoopError());
+        // SmartDashboard.putNumber("input", elevator.leftSpoolMotor.getSupplyCurrent());
+        // SmartDashboard.putNumber("output", elevator.leftSpoolMotor.getStatorCurrent());
+        // if(xbox.getAButton()){
+        //     elevator.setHeight(1);
+        // } else if(xbox.getBButton()){
+        //     elevator.setHeight(0);
+        // } else {
+        //     elevator.leftSpoolMotor.set(ControlMode.PercentOutput, 0.2*(xbox.getLeftTriggerAxis() - xbox.getRightTriggerAxis()));
+        // }
+        // if(xbox.getXButton()){
+        //     intake.intake();
+        //     indexer.intake();
+        // } else {
+        //     intake.stop();
+        // }
+        // if(xbox.getRightBumper()){
+        //     elevator.leftSpoolMotor.setSelectedSensorPosition(0.0);
+        // }
+        // if(xbox.getLeftBumper()){
+        //     indexer.reverse();
+        // }
+        // if(!xbox.getLeftBumper() && !xbox.getXButton()){
+        //     indexer.stop();
+        // }
 
                 // break;
         // }

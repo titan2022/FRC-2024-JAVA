@@ -39,7 +39,7 @@ public class ToggleRotateShooterCommand extends Command {
             toggleOn = !toggleOn;
 
         if (toggleOn)
-            shooter.setRotation(angle);
+            shooter.setRotation(angle.getRadians());
     }
 
     // Called once the command ends or is interrupted.
