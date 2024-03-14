@@ -78,6 +78,8 @@ public class Robot extends TimedRobot {
     public void teleopPeriodic() {
         if (xbox2.getAButton()) {
             intake.setWheelSpeed(0.45);
+        } else if (xbox2.getYButton()) {
+            intake.setWheelSpeed(-0.45);
         } else {
             intake.setWheelSpeed(0);
         }
@@ -86,16 +88,6 @@ public class Robot extends TimedRobot {
             indexer.index(0.7);
         } else {
             indexer.index(0);
-        }
-
-        if (xbox2.getXButton()) {
-            shooterDir = -1;
-        } else {
-            shooterDir = 1;
-        }
-
-        if (xbox2.getYButton()) {
-            intake.setWheelSpeed(-0.45);
         }
     }
 }

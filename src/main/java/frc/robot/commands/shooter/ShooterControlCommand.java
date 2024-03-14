@@ -14,6 +14,7 @@ public class ShooterControlCommand extends Command {
     private double shooterAngle = ShooterSubsystem.ANGLE_OFFSET;
     private boolean isCoasting = false;
     private int coastTimer = 0;
+    private int shooterDir = 1;
 
     public ShooterControlCommand(ShooterSubsystem shooter, XboxController xbox) {
         this.shooter = shooter;
@@ -33,7 +34,13 @@ public class ShooterControlCommand extends Command {
         shooterAngle = Math.max(shooterAngle, ShooterSubsystem.MIN_ANGLE);
         shooter.setRotation(shooterAngle);
 
-        shooter.shoot(xbox.getRightTriggerAxis() * 0.8);
+        if (xbox.getXButton()) {
+            shooterDir = -1;
+        } else {
+            shooterDir = 1;
+        }
+
+        shooter.shoot(xbox.getRightTriggerAxis() * 0.8 * shooterDir);
 
         if (xbox.getRightBumperPressed()) {
             shooter.index(0.5);
