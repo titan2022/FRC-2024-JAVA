@@ -21,6 +21,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 /** An example command that uses an example subsystem. */
 public class SimpleAutoPlanOne extends SequentialCommandGroup {
@@ -39,6 +40,7 @@ public class SimpleAutoPlanOne extends SequentialCommandGroup {
         addCommands(
             new RotateShooterCommand(SHOOT_ANGLE, shooter),
             new SimpleShootCommand(SHOOT_SPEAKER_SPEED, shooter, indexer),
+            new WaitCommand(1.0),
             new TranslationCommand(new Translation2d(sign * 0, 3), 1, translational)
             // new ShooterAlignSpeakerCommand(shooter, localizer)
         );

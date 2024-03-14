@@ -166,20 +166,8 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
     private final TranslationalDrivebase translationalLock = new TranslationalDrivebase() {
         @Override
         public void setVelocity(Translation2d velocity) {
-
-            Translation2d velocityNew;//getVelocity().plus(velocity.minus(getVelocity()).times(0.8)); // Low-pass filter
-
-            // if (velocity.getNorm() < 0.1 && getVelocity().getNorm() > 0.1) {
-            //     velocityNew = getVelocity().times(0.75);
-            // } else {
-            //     velocityNew = velocity;
-            // }
-
-            velocityNew = velocity;
-
-
-            lastVelocity.vxMetersPerSecond = velocityNew.getX();
-            lastVelocity.vyMetersPerSecond = velocityNew.getY();
+            lastVelocity.vxMetersPerSecond = velocity.getX();
+            lastVelocity.vyMetersPerSecond = velocity.getY();
             setVelocities(lastVelocity);
         }
 
@@ -235,9 +223,9 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
         rotatorConfig.supplyCurrLimit.enable = true;
         rotatorConfig.supplyCurrLimit.triggerThresholdCurrent = 30;
         rotatorConfig.supplyCurrLimit.triggerThresholdTime = 0.0;
-        mainConfig.supplyCurrLimit.currentLimit = 50;
+        mainConfig.supplyCurrLimit.currentLimit = 40;
         mainConfig.supplyCurrLimit.enable = true;
-        mainConfig.supplyCurrLimit.triggerThresholdCurrent = 60;
+        mainConfig.supplyCurrLimit.triggerThresholdCurrent = 50;
         mainConfig.supplyCurrLimit.triggerThresholdTime = 0.01;
         // mainConfig.closedloopRamp = 0.5;
         // SmartDashboard.putNumber("cur lim", 20);
