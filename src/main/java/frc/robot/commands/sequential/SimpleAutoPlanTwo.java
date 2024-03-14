@@ -29,10 +29,9 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 /** An example command that uses an example subsystem. */
 public class SimpleAutoPlanTwo extends SequentialCommandGroup {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
-    public static double SHOOT_SPEAKER_SPEED = 0.8;
+    public static double SHOOT_SPEAKER_SPEED = 0.5;
     public static final double SPEAKER_HEIGHT = 2 * METERS;
-    public static Rotation2d DRIVE_ANGLE = Rotation2d.fromDegrees(45);
-    public static Rotation2d SHOOT_ANGLE = Rotation2d.fromDegrees(30);
+    public static Rotation2d SHOOT_ANGLE = Rotation2d.fromDegrees(70);
 
     public SimpleAutoPlanTwo(TranslationalDrivebase translational, RotationalDrivebase rotational, ShooterSubsystem shooter, IndexerSubsystem indexer, IntakeSubsystem intake, ElevatorSubsystem elevator, Localizer localizer) {
         double sign;
@@ -42,14 +41,11 @@ public class SimpleAutoPlanTwo extends SequentialCommandGroup {
             sign = -1;
         
         addCommands(
-            new ParallelCommandGroup(
-                new RotationCommand(DRIVE_ANGLE.times(sign), rotational, localizer),
-                new RotateShooterCommand(SHOOT_ANGLE, shooter)
-            ),
+            new RotateShooterCommand(SHOOT_ANGLE, shooter),
             new SimpleShootCommand(SHOOT_SPEAKER_SPEED, shooter, indexer),
-            new RotationCommand(DRIVE_ANGLE.times(-sign), rotational, localizer),
+            new TranslationCommand(new Translation2d(sign * 0, 0.5), 1, translational),
+            new RotationCommand(Rotation2d.fromDegrees(45).times(-sign), rotational, localizer),
             new TranslationCommand(new Translation2d(sign * 0, 3), 1, translational)
-            // new ShooterAlignSpeakerCommand(shooter, localizer)
         );
 
         addRequirements(rotational, translational, shooter, indexer, elevator, intake);
