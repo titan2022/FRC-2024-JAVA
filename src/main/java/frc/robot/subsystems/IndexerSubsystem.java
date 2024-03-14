@@ -14,7 +14,7 @@ public class IndexerSubsystem extends SubsystemBase {
 	private static final int BREAK_TIMEOUT = 1; // In frames (20ms)
 
 	private final WPI_TalonFX intakeMotor = new WPI_TalonFX(22);
-	private final AnalogInput beamBreakerInput = new AnalogInput(1);
+	private final AnalogInput beamBreakerInput = new AnalogInput(0);
 
 	private boolean noteStatus = false;
 	private int noteStatusTimer = 0;
