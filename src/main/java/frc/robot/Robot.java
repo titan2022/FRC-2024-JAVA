@@ -19,7 +19,7 @@ public class Robot extends TimedRobot {
     private final XboxController xbox1 = new XboxController(0);
     private final XboxController xbox2 = new XboxController(1);
     private Localizer localizer = new Localizer();
-    private SwerveDriveSubsystem drive = new SwerveDriveSubsystem(localizer);
+    private SwerveDriveSubsystem drive = new SwerveDriveSubsystem();
     private ElevatorSubsystem elevator = new ElevatorSubsystem();
     private IntakeSubsystem intake = new IntakeSubsystem();
     private ShooterSubsystem shooter = new ShooterSubsystem();
@@ -28,6 +28,7 @@ public class Robot extends TimedRobot {
     @Override
     public void robotInit() {
         elevator.leftSpoolMotor.setSelectedSensorPosition(0.0);
+        elevator.config();
     }
 
     @Override
@@ -59,7 +60,6 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopInit() {
         localizer.setup();
-        elevator.config();
 
         // Main driver
         drive.getTranslational().setDefaultCommand(new TranslationalDriveCommand(drive.getTranslational(), localizer, xbox1, 2));

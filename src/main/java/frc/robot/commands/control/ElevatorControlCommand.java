@@ -24,11 +24,23 @@ public class ElevatorControlCommand extends Command {
 
     @Override
     public void execute() {
-        elevatorPos += xbox.getLeftY() * 0.3 * 0.02;
-        elevatorPos = Math.min(elevatorPos, 1);
-        elevatorPos = Math.max(elevatorPos, 0);
-        elevator.setHeight(elevatorPos);
-        SmartDashboard.putNumber("Elevator Target Pos", elevatorPos);
+
+        if (-xbox.getLeftY() > 0.6) {
+            elevator.setHeight(1);
+        } else if (-xbox.getLeftY() < -0.6) {
+            elevator.setHeight(0);
+        } else {
+            elevator.hold();
+        }
+
+        SmartDashboard.putBoolean("canRun", elevator.canRun());
+
+        // elevatorPos = Math.abs(xbox.getLeftY());
+        // // elevatorPos = Math.min(elevatorPos, 1);
+        // // elevatorPos = Math.max(elevatorPos, 0);
+        // elevator.setHeight(elevatorPos);
+        // elevator.
+        // SmartDashboard.putNumber("EleTargetPos", elevatorPos);
     }
 
     @Override

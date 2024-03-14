@@ -3,6 +3,7 @@ package frc.robot.commands.shooter;
 import static frc.robot.utility.Constants.Unit.DEG;
 
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.ShooterSubsystem;
 
@@ -24,12 +25,12 @@ public class ShooterControlCommand extends Command {
 
     @Override
     public void initialize() {
-
+        SmartDashboard.putNumber("targetAngle", ShooterSubsystem.MIN_ANGLE);
     }
 
     @Override
     public void execute() {
-        shooterAngle += xbox.getRightY() * 5 * DEG * 0.02;
+        shooterAngle = SmartDashboard.getNumber("targetAngle", ShooterSubsystem.MIN_ANGLE);//+= xbox.getRightY() * 5 * DEG * 0.02;
         shooterAngle = Math.min(shooterAngle, ShooterSubsystem.MAX_ANGLE);
         shooterAngle = Math.max(shooterAngle, ShooterSubsystem.MIN_ANGLE);
         shooter.setRotation(shooterAngle);

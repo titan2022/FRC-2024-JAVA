@@ -24,7 +24,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 	private static final double GEAR_RATIO = 28;
 	private static final double TICKS_PER_METER = FALCON_CPR * GEAR_RATIO / (10 * SPOOL_RADIUS * 2 * Math.PI);
 	private static final double WINCH_SPEED = -0.5;
-	public static int TOP_ENCODER_VALUE = 196000;
+	public static int TOP_ENCODER_VALUE = 193000;
 	public static final int BOT_ENCODER_VALUE = 1000;
 	private static final double VELOCITY_STALL_LIMIT = 1000;
 	private static final double GRAVITY_CURRENT = 0.3;
@@ -112,7 +112,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 			setPoint = 0;
 		}
 			
-		if (!isStalling()) {
+		if (canRun()) {
 			leftSpoolMotor.set(ControlMode.Position, setPoint * TOP_ENCODER_VALUE);
 		} else {
 			leftSpoolMotor.set(ControlMode.Velocity, 0);
@@ -176,6 +176,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 	@Override
 	public void periodic() {
 		// SmartDashboard.putNumber("STALL TIMER", stallTimer);
+		SmartDashboard.putNumber("eleEncoder", getEncoder());
 		if (isStalling()) {
 			hold();
 			stallTimer += 10;
