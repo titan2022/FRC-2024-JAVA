@@ -78,16 +78,20 @@ public class Robot extends TimedRobot {
     public void teleopPeriodic() {
         if (xbox2.getAButton()) {
             intake.setWheelSpeed(0.45);
+            indexer.intake();
         } else if (xbox2.getYButton()) {
             intake.setWheelSpeed(-0.45);
+            indexer.reverse();
         } else {
-            intake.setWheelSpeed(0);
+            intake.stop();
         }
 
         if (xbox2.getBButton()) {
             indexer.index(0.7);
-        } else {
-            indexer.index(0);
+        }
+        
+        if (!xbox2.getBButton() && !xbox2.getAButton() && !xbox2.getYButton()) {
+            indexer.stop();
         }
     }
 }

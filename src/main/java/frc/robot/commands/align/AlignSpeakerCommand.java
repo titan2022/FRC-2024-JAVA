@@ -1,6 +1,7 @@
 package frc.robot.commands.align;
 
 import static frc.robot.utility.Constants.Unit.DEG;
+import static frc.robot.utility.Constants.Unit.METERS;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -25,7 +26,7 @@ public class AlignSpeakerCommand extends Command {
     // public static final double TRANSLATIONAL_SPEED = 1;
     public static final double ROTATIONAL_SPEED = 25 * DEG;
     public static final double ANGLE_DEADBAND = 5 * DEG;
-    public static final double SUBWOOFER_LENGTH = 0.91;
+    public static final double SUBWOOFER_LENGTH = 0.91 * METERS;
     public RotationalDrivebase rotational;
     public Localizer localizer;
     public Rotation2d aprilTagAngle;
