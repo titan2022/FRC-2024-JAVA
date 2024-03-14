@@ -5,6 +5,7 @@ import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import edu.wpi.first.wpilibj.AnalogInput;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 @SuppressWarnings({"deprecated", "removal"})
@@ -39,9 +40,9 @@ public class IndexerSubsystem extends SubsystemBase {
 		index(-INTAKE_SPEED);
 	}
 
-	public boolean hasNote() {
-		return noteStatus;
-	}
+	// public boolean hasNote() {
+	// 	return noteStatus;
+	// }
 
     // public void amp(boolean reverse) {
     //     motor.set(ControlMode.Velocity, (reverse ? -1 : 1) * AMP_VELOCITY);

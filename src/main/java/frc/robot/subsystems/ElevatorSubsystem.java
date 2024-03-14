@@ -28,7 +28,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 	private static final double WINCH_SPEED = -0.5;
 	public static int TOP_ENCODER_VALUE = 196000;
 	public static final int BOT_ENCODER_VALUE = 1000;
-	private static final double VELOCITY_STALL_LIMIT = 5000;
+	private static final double VELOCITY_STALL_LIMIT = 1000;
 	private static final double GRAVITY_CURRENT = 0.3;
 	private static final double GRAVITY_FEEDFOWARD = 0.00022;
 
@@ -40,10 +40,10 @@ public class ElevatorSubsystem extends SubsystemBase {
     public static TalonFXConfiguration getSpoolTalonConfig() {
         TalonFXConfiguration talon = new TalonFXConfiguration();
         // Add configs here: 
-        talon.slot0.kP = SmartDashboard.getNumber("A", 0.0);
-        talon.slot0.kI = SmartDashboard.getNumber("B", 0.0);
-        talon.slot0.kD = SmartDashboard.getNumber("C", 0.0);
-        talon.slot0.kF = SmartDashboard.getNumber("D", 0.0);
+        talon.slot0.kP = 0.05;
+        talon.slot0.kI = 0.0;
+        talon.slot0.kD = 0.00022;
+        talon.slot0.kF = 0;
         talon.slot0.integralZone = 75;
         talon.slot0.allowableClosedloopError = 5;
         talon.slot0.maxIntegralAccumulator = 5120;
@@ -74,6 +74,8 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     public void config() {
         leftSpoolMotor.configAllSettings(getSpoolTalonConfig());
+        rightSpoolMotor.configAllSettings(getSpoolTalonConfig());
+
         rightSpoolMotor.follow(leftSpoolMotor);
         leftSpoolMotor.setInverted(true);
         rightSpoolMotor.setSensorPhase(true);
