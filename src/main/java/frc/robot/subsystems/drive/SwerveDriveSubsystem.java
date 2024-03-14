@@ -227,6 +227,9 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
         mainConfig.supplyCurrLimit.enable = true;
         mainConfig.supplyCurrLimit.triggerThresholdCurrent = 50;
         mainConfig.supplyCurrLimit.triggerThresholdTime = 0.01;
+        mainConfig.openloopRamp = 1;
+        mainConfig.closedloopRamp = 1;
+
         // mainConfig.closedloopRamp = 0.5;
         // SmartDashboard.putNumber("cur lim", 20);
 
