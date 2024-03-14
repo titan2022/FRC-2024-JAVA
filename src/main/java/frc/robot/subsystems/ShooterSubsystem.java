@@ -31,13 +31,13 @@ public class ShooterSubsystem extends SubsystemBase {
 	private static final double LINKAGE_LONG_ARM_LENGTH = 6.375*IN;
 	private static final double LINKAGE_SHORT_ARM_LENGTH = 2.0*IN;
 	// the distance of the motor axis from the shooter pivot
-	private static final double LINKAGE_PIVOT_DX = 1.0;
-	private static final double LINKAGE_PIVOT_DY = 1.0;
+	private static final double LINKAGE_PIVOT_DX = 5.270846 * IN;
+	private static final double LINKAGE_PIVOT_DY = -0.57172 * IN;
     public static final double ANGLE_OFFSET  = 16.9 * DEG;
     public static final double ENCODER_ABSOLUTE_ZERO = 0;
     public static final double INTAKE_SPEED = 0.6;
-    public static final Rotation2d OMEGA = Rotation2d.fromDegrees(20);
-    private static double DEADZONE = 1 * DEG; 
+    public static Rotation2d OMEGA = Rotation2d.fromDegrees(20);
+    private static double DEADZONE = 2.5 * DEG; 
 
 //   //kP, kI, kD, kF
 // 	public static final double[] shooterPID = {0, 0, 0, 0};
@@ -78,7 +78,7 @@ public class ShooterSubsystem extends SubsystemBase {
 	 * @return Angle in radians (zero is ground, positive is up)
 	 */
 	public Rotation2d getRotation() {
-		return new Rotation2d(linkageEncoder.getAbsolutePosition()*2.0*Math.PI + SmartDashboard.getNumber("Encoder_Offset", 0));
+		return new Rotation2d(linkageEncoder.getAbsolutePosition()*2.0*Math.PI - 2.55);
 	}
 
 	private double lawOfCosines(double a, double b, double c){
@@ -92,7 +92,7 @@ public class ShooterSubsystem extends SubsystemBase {
 	 */
 	public boolean setRotation(Rotation2d theta) {
         double angle = theta.getRadians();
-		SmartDashboard.putNumber("Counter", SmartDashboard.getNumber("counter2", 0.0) + 1);    
+		SmartDashboard.putNumber("Counter", SmartDashboard.getNumber("Counter", 0.0) + 1);    
 		// if(angle < MIN_ANGLE || angle > MAX_ANGLE) {
 		// 	return;
 		// }
@@ -118,12 +118,14 @@ public class ShooterSubsystem extends SubsystemBase {
         //Actual movement part
 		if(targetRotation - DEADZONE < getRotation().getRadians() && getRotation().getRadians() < targetRotation + DEADZONE){
 			holdAngle();
-			SmartDashboard.putBoolean("Dead", true);
+			SmartDashboard.putBoolean("HitTarget", true);
 			return true;
 		} else {
             //Backup
             Rotation2d delta = new Rotation2d(targetRotation).minus(getRotation());
+            SmartDashboard.putNumber("Delta Rotation", delta.getDegrees());
             linkageMotor.set(ControlMode.Velocity, 0, DemandType.ArbitraryFeedForward, Math.copySign(OMEGA.getDegrees(), delta.getRadians()));
+            SmartDashboard.putBoolean("HitTarget", false);
             return false;
         }
 		// SmartDashboard.putBoolean("Dead", false);

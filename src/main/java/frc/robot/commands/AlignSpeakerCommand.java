@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.utility.Constants;
 import frc.robot.subsystems.RotationalDrivebase;
+import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.TranslationalDrivebase;
 import frc.robot.utility.Localizer;
 
@@ -24,25 +25,23 @@ public class AlignSpeakerCommand extends SequentialCommandGroup {
 
     public static final double SUBWOOFER_LENGTH = 0.91;
 
-    public AlignSpeakerCommand(TranslationalDrivebase translationalDrive, RotationalDrivebase rotationalDrive, Localizer localizer) {
-        Translation2d distanceFromAprilTag;
-        Rotation2d angleOfAprilTag;
+    public AlignSpeakerCommand(RotationalDrivebase rotational, ShooterSubsystem shooter, Localizer localizer) {
+        // Translation2d distanceFromAprilTag;
+        // Rotation2d angleOfAprilTag;
 
-        if (Constants.getColor() == Alliance.Blue) {
-            distanceFromAprilTag = localizer.getTagPosition(BLUE_SPEAKER_APRILTAG);
-            angleOfAprilTag = localizer.getTagHeading(BLUE_SPEAKER_APRILTAG);
-        } else {
-            distanceFromAprilTag = localizer.getTagPosition(RED_SPEAKER_APRILTAG);
-            angleOfAprilTag = localizer.getTagHeading(RED_SPEAKER_APRILTAG);
-        }
+        // if (Constants.getColor() == Alliance.Blue) {
+        //     distanceFromAprilTag = localizer.getTagPosition(BLUE_SPEAKER_APRILTAG);
+        //     angleOfAprilTag = localizer.getTagHeading(BLUE_SPEAKER_APRILTAG);
+        // } else {
+        //     distanceFromAprilTag = localizer.getTagPosition(RED_SPEAKER_APRILTAG);
+        //     angleOfAprilTag = localizer.getTagHeading(RED_SPEAKER_APRILTAG);
+        // }
 
-        distanceFromAprilTag.minus(new Translation2d(0, SUBWOOFER_LENGTH));
+        // distanceFromAprilTag.minus(new Translation2d(0, SUBWOOFER_LENGTH));
 
     addCommands(
-      new RotationCommand(angleOfAprilTag, ROTATIONAL_SPEED, rotationalDrive, localizer),
-      new TranslationCommand(distanceFromAprilTag, TRANSLATIONAL_SPEED, translationalDrive)
+        new AlignRobotSpeakerCommand(rotational, localizer),
+        new ShooterSpeakerAlignCommand(shooter, localizer)
     );
-    
-    addRequirements(translationalDrive, rotationalDrive);
   }
 }

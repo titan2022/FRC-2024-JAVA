@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 
 /** An example command that uses an example subsystem. */
-public class ShootSpeakerCommand extends Command {
+public class ShootCommand extends Command {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
     // public static final double RAMP_TIME = 1;
     // public static final double SHOOT_DURATION = 0.25;
@@ -27,7 +27,7 @@ public class ShootSpeakerCommand extends Command {
     // public double rampTime;
     public double endTime; 
     
-    public ShootSpeakerCommand(ShooterSubsystem shooter, IndexerSubsystem indexer) {
+    public ShootCommand(ShooterSubsystem shooter, IndexerSubsystem indexer) {
         // this.speed = speed;
         this.shooter = shooter;
         this.indexer = indexer;
