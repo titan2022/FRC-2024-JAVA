@@ -87,7 +87,11 @@ public class TranslationalDriveCommand extends Command {
     }
 
     private double scaleVelocity(double joy) {
-        return Math.signum(joy) * joy * joy * maxVel;
+        double scaledVel = Math.signum(joy) * joy * joy * maxVel;
+        if (xbox.getLeftBumper()) {
+            scaledVel *= 0.3;
+        }
+        return scaledVel;
     }
 
     @Override

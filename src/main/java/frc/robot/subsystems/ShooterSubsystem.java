@@ -65,6 +65,8 @@ public class ShooterSubsystem extends SubsystemBase {
 		bottomShooterMotor.follow(topShooterMotor);
 		bottomShooterMotor.setInverted(true);
 		linkageEncoder.reset();
+
+		// topShooterMotor.configSupplyCurrentLimit(null)
 	}
 
 	/**

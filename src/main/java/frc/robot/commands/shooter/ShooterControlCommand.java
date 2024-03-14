@@ -31,11 +31,11 @@ public class ShooterControlCommand extends Command {
 
     @Override
     public void execute() {
-        shooterAngle = SmartDashboard.getNumber("targetAngle", ShooterSubsystem.MIN_ANGLE);//+= xbox.getRightY() * 5 * DEG * 0.02;
+        shooterAngle += xbox.getRightY() * 5 * DEG * 0.02;// = SmartDashboard.getNumber("targetAngle", ShooterSubsystem.MIN_ANGLE);
         shooterAngle = Math.min(shooterAngle, ShooterSubsystem.MAX_ANGLE);
         shooterAngle = Math.max(shooterAngle, ShooterSubsystem.MIN_ANGLE);
-        // shooter.setRotation(shooterAngle);
-        shooter.setRotation(65 * DEG);
+        shooter.setRotation(shooterAngle);
+        // shooter.setRotation(65 * DEG);
         // shooter.holdAngle();
 
         if (xbox.getXButton()) {
