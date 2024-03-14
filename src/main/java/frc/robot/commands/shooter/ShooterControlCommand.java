@@ -17,8 +17,6 @@ public class ShooterControlCommand extends Command {
     private XboxController xbox;
 
     private double shooterAngle = ShooterSubsystem.ANGLE_OFFSET;
-    private boolean isCoasting = false;
-    private int coastTimer = 0;
     private int shooterDir = 1;
 
     public ShooterControlCommand(ShooterSubsystem shooter, IndexerSubsystem indexer, XboxController xbox) {
@@ -50,22 +48,6 @@ public class ShooterControlCommand extends Command {
         }
 
         shooter.shoot(xbox.getRightTriggerAxis() * 0.5 * shooterDir);
-
-        if (xbox.getRightBumperPressed()) {
-            shooter.index(0.5);
-            indexer.intake();
-        } else if (xbox.getRightBumperReleased()) {
-            isCoasting = true;
-        } else if (!xbox.getRightBumper() && coastTimer > COAST_TIME) {
-            coastTimer = 0;
-            isCoasting = false;
-            shooter.index(0);
-            indexer.stop();
-        }
-
-        if (isCoasting) {
-            coastTimer++;
-        }
     }
 
     @Override

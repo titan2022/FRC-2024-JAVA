@@ -32,10 +32,10 @@ public class Robot extends TimedRobot {
     public void robotInit() {
         elevator.leftSpoolMotor.setSelectedSensorPosition(0.0);
         elevator.config();
-        SmartDashboard.putNumber("swkP", 0.0);
+        SmartDashboard.putNumber("swkP", 0.0055);
         SmartDashboard.putNumber("swkI", 0.0);
-        SmartDashboard.putNumber("swkD", 0.0);
-        SmartDashboard.putNumber("swkF", 0.0);
+        SmartDashboard.putNumber("swkD", 0.06);
+        SmartDashboard.putNumber("swkF", 0.02);
     }
 
     @Override
@@ -90,7 +90,12 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopPeriodic() {
-
+        if (xbox2.getRightBumper()) {
+            shooter.index(0.5);
+            indexer.intake();
+        } else {
+            shooter.index(0);
+        }
 
         if (xbox2.getAButton()) {
             intake.setWheelSpeed(0.45);
@@ -106,7 +111,7 @@ public class Robot extends TimedRobot {
             indexer.reverse();
         }
 
-        if (!xbox2.getBButton() && !xbox2.getAButton() && !xbox2.getYButton()) {
+        if (!xbox2.getBButton() && !xbox2.getAButton() && !xbox2.getYButton() && !xbox2.getRightBumper()) {
             indexer.stop();
         }
     }
