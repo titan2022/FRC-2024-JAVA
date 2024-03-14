@@ -1,5 +1,6 @@
 package frc.robot.commands.sequential;
 
+import frc.robot.utility.Constants;
 import frc.robot.utility.Localizer;
 import frc.robot.utility.Constants.Unit.*;
 import frc.robot.commands.align.AlignSpeakerCommand;
@@ -20,6 +21,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.units.Unit;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
 /** An example command that uses an example subsystem. */
@@ -39,10 +41,16 @@ public class SimpleAutoPlan extends SequentialCommandGroup {
     }
 
     public SimpleAutoPlan(TranslationalDrivebase translational, RotationalDrivebase rotational, ShooterSubsystem shooter, IndexerSubsystem indexer, IntakeSubsystem intake, ElevatorSubsystem elevator, Localizer localizer) {
+        double sign;
+        if (Constants.getColor() == Alliance.Blue) {    
+            sign = 1;
+        } else 
+            sign = -1;
+        
         addCommands(
             new RotateShooterCommand(Rotation2d.fromDegrees(30), shooter),
             new SimpleShootCommand(SHOOT_SPEAKER_SPEED, shooter, indexer),
-            new TranslationCommand(new Translation2d(0, 3), 1, translational)
+            new TranslationCommand(new Translation2d(sign * 0, 3), 1, translational)
             // new ShooterAlignSpeakerCommand(shooter, localizer)
         );
 
