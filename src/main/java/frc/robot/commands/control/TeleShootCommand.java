@@ -23,13 +23,9 @@ public class TeleShootCommand extends Command {
     public static final double SPEED = 1;
     public XboxController xbox;
     public ShooterSubsystem shooter;
-    public IndexerSubsystem indexer; 
     
-    public TeleShootCommand(ShooterSubsystem shooter, IndexerSubsystem indexer, XboxController xbox) {
+    public TeleShootCommand(ShooterSubsystem shooter, XboxController xbox) {
         this.shooter = shooter;
-        this.indexer = indexer;
-
-        addRequirements(shooter, indexer);
     }
 
     @Override
@@ -40,7 +36,17 @@ public class TeleShootCommand extends Command {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        
+        // if (xbox.getRightBumper()) {
+        //     shooter.intake();
+        // }
+        // else 
+        //     shooter.holdIndex();
+
+        if (xbox.getRightTriggerAxis() > 0.05) {
+            shooter.shoot(SPEED);
+        } else {
+            shooter.shoot(0);
+        }
     }
 
     // Called once the command ends or is interrupted.

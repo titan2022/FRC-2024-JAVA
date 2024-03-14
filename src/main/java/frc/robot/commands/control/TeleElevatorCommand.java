@@ -15,6 +15,7 @@ public class TeleElevatorCommand extends Command {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
     // public static final double RAISE_SPEED = 0.1;
     // public static final double LOWER_SPEED = -0.1;
+    public static final double DEADZONE = 0.5;
     public XboxController xbox;
     public ElevatorSubsystem elevator;
     public double highSpeedTime;
@@ -37,11 +38,12 @@ public class TeleElevatorCommand extends Command {
     @Override
     public void execute() {
         SmartDashboard.putNumber("TeleEle", SmartDashboard.getNumber("TeleEle", 0) + 1);
-        if (xbox.getRightBumper())
+        if (xbox.getLeftY() > DEADZONE)
             elevator.raise();
-        else if (xbox.getLeftBumper())
+        else if (xbox.getLeftY() < -DEADZONE)
             elevator.lower();
-        else if (xbox.getRightTriggerAxis() > 0.05)
+        else if (xbox.getXButton())
+            // elevator.elevate(-SmartDashboard.getNumber("A", highSpeedTime) * xbox.getRightTriggerAxis());
             elevator.elevate(-SmartDashboard.getNumber("A", highSpeedTime) * xbox.getRightTriggerAxis());
         else 
             elevator.hold();

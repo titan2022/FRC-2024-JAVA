@@ -11,17 +11,17 @@ import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 
 /** An example command that uses an example subsystem. */
-public class TeleIntakeCommand extends Command {
+public class TeleIndexCommand extends Command {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
     public XboxController xbox;
-    public IntakeSubsystem intake;
+    public IndexerSubsystem indexer;
 
 
-    public TeleIntakeCommand(IntakeSubsystem intake, XboxController xbox) {
+    public TeleIndexCommand(IndexerSubsystem indexer, XboxController xbox) {
         this.xbox = xbox;
-        this.intake = intake;
+        this.indexer = indexer;
 
-        addRequirements(intake);
+        addRequirements(indexer);
     }
 
     // Called when the command is initially scheduled.
@@ -33,17 +33,17 @@ public class TeleIntakeCommand extends Command {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        if (xbox.getAButton()) {
-            intake.intake();
+        if (xbox.getAButton() || xbox.getRightBumper()) {
+            indexer.intake();
         } else {
-            intake.stop();
+            indexer.stop();
         }
     }
 
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
-        intake.stop();
+        indexer.stop();
     }
 
     // Returns true when the command should end.

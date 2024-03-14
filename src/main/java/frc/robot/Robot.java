@@ -23,9 +23,13 @@ import frc.robot.commands.RotateShooterCommand;
 import frc.robot.commands.RotationCommand;
 import frc.robot.commands.RotationalDriveCommand;
 import frc.robot.commands.ShootAMPCommand;
+import frc.robot.commands.ShootSpeakerCommand;
 import frc.robot.commands.TranslationCommand;
 import frc.robot.commands.TranslationalDriveCommand;
 import frc.robot.commands.control.TeleElevatorCommand;
+import frc.robot.commands.control.TeleIndexCommand;
+import frc.robot.commands.control.TeleIntakeCommand;
+import frc.robot.commands.control.TeleShootCommand;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -40,6 +44,7 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 
 public class Robot extends TimedRobot {
     private final XboxController xbox = new XboxController(0);
+    private final XboxController xboxTwo = new XboxController(1);
     private Localizer localizer = new Localizer();
     private SwerveDriveSubsystem drive = new SwerveDriveSubsystem(localizer);
     private ElevatorSubsystem elevator = new ElevatorSubsystem();
@@ -52,13 +57,13 @@ public class Robot extends TimedRobot {
 
     @Override
     public void robotInit() {
-        SmartDashboard.putNumber("Command Test", 0);
+        // SmartDashboard.putNumber("Command Test", 0);
         // SmartDashboard.putNumber("Subsystem Test", 0);
 
-        SmartDashboard.putNumber("A", 0.25);
-        SmartDashboard.putNumber("B",0);
-        SmartDashboard.putNumber("C", 0);
-        SmartDashboard.putNumber("D", 0);
+        // SmartDashboard.putNumber("A", 0.25);
+        // SmartDashboard.putNumber("B",0);
+        // SmartDashboard.putNumber("C", 0);
+        // SmartDashboard.putNumber("D", 0);
         
         //These speeds are temporary
         // NamedCommands.registerCommand("Shoot Speaker", new ShootSpeakerCommand(60, shooter, indexer, elevator));
@@ -132,10 +137,20 @@ public class Robot extends TimedRobot {
         drive.getTranslational()
                 .setDefaultCommand(new TranslationalDriveCommand(drive.getTranslational(), localizer, xbox, 2));
         drive.getRotational()
-                .setDefaultCommand(new RotationalDriveCommand(drive.getRotational(), localizer, xbox, Math.PI));  
+                .setDefaultCommand(new RotationalDriveCommand(drive.getRotational(), localizer, xbox, Math.PI)); 
+
         CommandScheduler.getInstance().schedule(
-            new TeleElevatorCommand(elevator, xbox)
+            new TeleElevatorCommand(elevator, xboxTwo), 
+            new TeleIntakeCommand(intake, xboxTwo),
+            new TeleIndexCommand(indexer, xboxTwo),
+            new TeleShootCommand(shooter, xboxTwo)
         );      
+
+        // if (xbox.getRightBumper() && ShootSpeakerCommand.TIMER <= 0) {
+        //     CommandScheduler.getInstance().schedule(
+        //         new ShootSpeakerCommand(shooter, indexer)
+        //     );
+        // }
         // MoveElevatorCommand.LOW_SPEED = SmartDashboard.getNumber("A", 0);
         // MoveElevatorCommand.HIGH_SPEED = SmartDashboard.getNumber("A", 0);
         // MoveElevatorCommand.HIGH_SPEED_TIME = SmartDashboard.getNumber("B", 0);
@@ -151,6 +166,17 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopPeriodic() {
+        if (xboxTwo.getRightBumper() && ShootSpeakerCommand.TIMER <= 0) {
+            CommandScheduler.getInstance().schedule(
+                new ShootSpeakerCommand(shooter, indexer)
+            );
+        } 
+
+        if (xboxTwo.getBButton() && ShootAMPCommand.TIMER <= 0) {
+            CommandScheduler.getInstance().schedule(
+                new ShootAMPCommand(indexer)
+            );
+        } 
         // if (xbox.getYButton()) {
         //     elevator.raise();
         // } else if (xbox.getBButton()) {

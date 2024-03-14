@@ -15,14 +15,13 @@ import edu.wpi.first.wpilibj.Timer;
 public class ShootAMPCommand extends Command {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
     public static final double DURATION = 1;
-    public static final double SPEED = 0.7;
+    public static double TIMER = 0;
     public IndexerSubsystem indexer;
     public double endTime;
 
     public ShootAMPCommand(IndexerSubsystem indexer) {
         this.indexer = indexer;
-
-        addRequirements(indexer);
+        TIMER += 5;
     }
 
     // Called when the command is initially scheduled.
@@ -34,13 +33,15 @@ public class ShootAMPCommand extends Command {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        indexer.index(SPEED);
+        indexer.reverse();
+        if (TIMER > 0)
+            TIMER--;
     }
 
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
-        indexer.index(0);
+        indexer.stop();
     }
 
     // Returns true when the command should end.
