@@ -351,7 +351,7 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
         for (WPI_TalonFX motor : motors)
             motor.configSupplyCurrentLimit(currentLimit);
         curLim = limit;
-        SmartDashboard.putNumber("cur lim", curLim);
+        // SmartDashboard.putNumber("cur lim", curLim);
     }
 
     public double getCurLimit() {
@@ -370,7 +370,7 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
     private void applyModuleState(SwerveModuleState state, int module, boolean forceOrient) {
         double velTicks = state.speedMetersPerSecond / (10 * METERS_PER_TICKS);
         double feedForwardTicks = motorFeedfoward.calculate(state.speedMetersPerSecond);
-        SmartDashboard.putNumber("Desired Speed", state.speedMetersPerSecond);
+        // SmartDashboard.putNumber("Desired Speed", state.speedMetersPerSecond);
         if (velTicks == 0 && !forceOrient) {
             motors[module].set(ControlMode.Velocity, 0);
             return;
@@ -391,8 +391,8 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
             velTicks *= -1;
             feedForwardTicks *= -1;
         }
-        SmartDashboard.putNumber("VelTicks", velTicks);
-        SmartDashboard.putNumber("Feedforward", feedForwardTicks);
+        // SmartDashboard.putNumber("VelTicks", velTicks);
+        // SmartDashboard.putNumber("Feedforward", feedForwardTicks);
         motors[module].set(ControlMode.Velocity, velTicks, DemandType.ArbitraryFeedForward, feedForwardTicks);
         // motors[module].set(ControlMode.Velocity, velTicks);
         rotators[module].set(ControlMode.Position, currTicks + deltaTicks + OFFSETS[module]);

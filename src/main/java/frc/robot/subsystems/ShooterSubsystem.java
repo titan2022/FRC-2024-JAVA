@@ -27,7 +27,7 @@ public class ShooterSubsystem extends SubsystemBase {
 	// The distance of the motor axis from the shooter pivot
 	private static final double LINKAGE_PIVOT_DX = 5.270846*IN;
 	private static final double LINKAGE_PIVOT_DY = -0.57172*IN;
-	private static final double ANGLE_OFFSET = 16.9 * DEG;
+	public static final double ANGLE_OFFSET = 16.9 * DEG;
 	private static final double ENCODER_ABSOLUTE_ZERO = 0;
 	private static final double INTAKE_SPEED = 0.6;
 	private static final double DEADZONE = 0.1 * DEG;
@@ -39,8 +39,8 @@ public class ShooterSubsystem extends SubsystemBase {
 	private final WPI_TalonFX bottomShooterMotor = new WPI_TalonFX(5, "CANivore");
 	private final WPI_TalonFX indexerMotor = new WPI_TalonFX(16, "CANivore");
 	private final DutyCycleEncoder linkageEncoder = new DutyCycleEncoder(9);
-	private final double MIN_ANGLE = 15*DEG;
-	private final double MAX_ANGLE = 65*DEG;
+	public static final double MIN_ANGLE = 15*DEG;
+	public static final double MAX_ANGLE = 65*DEG;
 
 
 	public ShooterSubsystem() {
@@ -67,8 +67,7 @@ public class ShooterSubsystem extends SubsystemBase {
 	 * @return Angle in radians (zero is ground, positive is up)
 	 */
 	public double getRotation() {
-		SmartDashboard.putNumber("test123", linkageEncoder.getAbsolutePosition());
-		return linkageEncoder.getAbsolutePosition() * 2.0 * Math.PI + SmartDashboard.getNumber("Encoder_Offset", 0);
+		return linkageEncoder.getAbsolutePosition() * 2.0 * Math.PI + -2.55;
 	}
 
 	private double lawOfCosines(double a, double b, double c) {
@@ -107,10 +106,10 @@ public class ShooterSubsystem extends SubsystemBase {
 		double in_rotation = lawOfCosines(LINKAGE_LONG_ARM_LENGTH, LINKAGE_SHORT_ARM_LENGTH, d);
 		if(targetRotation - deadzone < getRotation() && getRotation() < targetRotation + deadzone){
 			linkageMotor.set(0.061 * Math.sin(in_rotation));
-			SmartDashboard.putBoolean("Dead", true);
+			// SmartDashboard.putBoolean("Dead", true);
 			return;
 		}
-		SmartDashboard.putBoolean("Dead", false);
+		// SmartDashboard.putBoolean("Dead", false);
 		
 		double linkageMag = rotationPID.calculate(getRotation(), targetRotation);
         double PID = Math.copySign(Math.min(Math.abs(linkageMag), 40 / FALCON_TICKS), linkageMag);
@@ -118,9 +117,9 @@ public class ShooterSubsystem extends SubsystemBase {
 		linkageMotor.set(ControlMode.Velocity, PID,
 			DemandType.ArbitraryFeedForward, FF
 		);
-		SmartDashboard.putNumber("target", targetRotation * 180 / Math.PI);
-		SmartDashboard.putNumber("FF", FF);
-		SmartDashboard.putNumber("PID", PID);
+		SmartDashboard.putNumber("Target Shooter Angle", targetRotation / DEG);
+		SmartDashboard.putNumber("Shooter PID", PID);
+		SmartDashboard.putNumber("Shooter FF", FF);
 	}
 	
 

@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import static frc.robot.utility.Constants.Unit.FALCON_CPR;
 import static frc.robot.utility.Constants.Unit.IN;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
@@ -10,9 +11,6 @@ import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 
-import edu.wpi.first.units.Unit;
-import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -40,28 +38,15 @@ public class ElevatorSubsystem extends SubsystemBase {
     public static TalonFXConfiguration getSpoolTalonConfig() {
         TalonFXConfiguration talon = new TalonFXConfiguration();
         // Add configs here: 
-        talon.slot0.kP = SmartDashboard.getNumber("A", 0.0);
-        talon.slot0.kI = SmartDashboard.getNumber("B", 0.0);
-        talon.slot0.kD = SmartDashboard.getNumber("C", 0.0);
-        talon.slot0.kF = SmartDashboard.getNumber("D", 0.0);
+        talon.slot0.kP = 7500;
+        talon.slot0.kI = 0;
+        talon.slot0.kD = 5;
+        talon.slot0.kF = 30;
         talon.slot0.integralZone = 75;
         talon.slot0.allowableClosedloopError = 5;
         talon.slot0.maxIntegralAccumulator = 5120;
         return talon;
 	}
-
-    // public static TalonFXConfiguration getIndexerTalonConfig() {
-    //     TalonFXConfiguration talon = new TalonFXConfiguration();
-    //     // Add configs here: 
-    //     talon.slot0.kP = 0.0;
-    //     talon.slot0.kI = 0.0;
-    //     talon.slot0.kD = 0.0;
-    //     talon.slot0.kF = 0;
-    //     talon.slot0.integralZone = 75;
-    //     talon.slot0.allowableClosedloopError = 5;
-    //     talon.slot0.maxIntegralAccumulator = 5120;
-    //     return talon;
-	// }
 
 
     public ElevatorSubsystem(){
@@ -188,7 +173,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 	
 	@Override
 	public void periodic() {
-		SmartDashboard.putNumber("STALL TIMER", stallTimer);
+		// SmartDashboard.putNumber("STALL TIMER", stallTimer);
 		if (isStalling()) {
 			hold();
 			stallTimer += 50;

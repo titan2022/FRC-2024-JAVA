@@ -15,7 +15,7 @@ public class TranslationalDriveCommand extends Command {
     private XboxController xbox;
     private Localizer localizer;
     private double maxVel;
-    private boolean isFieldOriented = false;
+    private boolean isFieldOriented = true;
     private Rotation2d phiOffset = new Rotation2d(0);
 
     /**
@@ -92,7 +92,7 @@ public class TranslationalDriveCommand extends Command {
 
     @Override
     public void execute() {
-        if (xbox.getBButtonPressed() && localizer != null) {
+        if (xbox.getStartButtonPressed() && localizer != null) {
             isFieldOriented = !isFieldOriented;
             SmartDashboard.putBoolean("isFieldOriented", isFieldOriented);
         }

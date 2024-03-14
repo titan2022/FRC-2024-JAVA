@@ -211,7 +211,7 @@ public class Localizer {
 
         if (server != null) {
             server.subscribe("pose", (NetworkingCall<NetworkingPose>)(NetworkingPose pose) -> {
-                SmartDashboard.putNumber("poseX", pose.position.getX());
+                // SmartDashboard.putNumber("poseX", pose.position.getX());
                 globalPosition = pose.position.toTranslation2d();
                 globalOrientationFromTags = pose.rotation;
             });

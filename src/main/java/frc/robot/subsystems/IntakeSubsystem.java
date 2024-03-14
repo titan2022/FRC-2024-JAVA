@@ -11,14 +11,14 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 @SuppressWarnings({"deprecated", "removal"})
 public class IntakeSubsystem extends SubsystemBase {
-	private static final double INTAKE_SPEED = -0.45;
+	private static final double INTAKE_SPEED = 0.45;
 	
 	private static final WPI_TalonFX wheelMotor = new WPI_TalonFX(19);
 
 	public IntakeSubsystem() {
 		wheelMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
 		wheelMotor.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
-		wheelMotor.setInverted(true);
+		wheelMotor.setInverted(false);
 		wheelMotor.setNeutralMode(NeutralMode.Brake);
 	}
 

@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 @SuppressWarnings({"deprecated", "removal"})
 public class IndexerSubsystem extends SubsystemBase {
-	private static final double INTAKE_SPEED = -0.7;
+	private static final double INTAKE_SPEED = 0.7;
 	private static final int BREAK_TIMEOUT = 1; // In frames (20ms)
 
 	private final WPI_TalonFX intakeMotor = new WPI_TalonFX(22);
@@ -21,6 +21,7 @@ public class IndexerSubsystem extends SubsystemBase {
 
 	public IndexerSubsystem() {
 		intakeMotor.setNeutralMode(NeutralMode.Brake);
+		intakeMotor.setInverted(true);
 	}
 
 	public void stop() {
