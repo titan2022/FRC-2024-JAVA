@@ -30,7 +30,31 @@ public class ShooterSpeakerAlgCommand extends SequentialCommandGroup {
     public static final int BLUE_SPEAKER_APRILTAG = 7;
     public static final int RED_SPEAKER_APRILTAG = 4;
 
+    public static double[] getQuarticCoefficients(double x, double y, double velocity, double armLength, double gravity) {
+        double[] coeffcients = new double[5];
+        coeffcients[0] = gravity * gravity * Math.pow(x, 4) / (4 * Math.pow(velocity, 4));
+        coeffcients[1] = -(gravity * Math.pow(x, 3) / (velocity * velocity));
+        coeffcients[2] = (x * x - ((5 * gravity * gravity * x * x * (armLength - x * x - 2 * y * velocity * velocity)) / (4 * Math.pow(velocity, 4))));
+        coeffcients[3] = x * gravity * (armLength - x * x - 2 * y * velocity) / (velocity * velocity);
+        coeffcients[4] = ((Math.pow(gravity, 2) * Math.pow((armLength - x * x - 2 * y * velocity * velocity), 2)) - x * x * armLength * armLength) / (4 * Math.pow(velocity, 4));
+        return coeffcients;
+    }
     //Assume vector from note in shooter
+    public static double approximateQuartic(double[] coefficients) {
+        double error = Double.MAX_VALUE;
+        double currentTheta = 65 * Unit.DEG;
+        for (double theta = 15*Unit.DEG; theta < 65 *Unit.DEG; theta += 1 * Unit.DEG) {
+            double tan = Math.tan(theta);
+            double quatric = coefficients[0] * Math.pow(tan, 4) + coefficients[1] * Math.pow(tan, 3) + coefficients[2] * Math.pow(tan,2) + coefficients[3] * tan + coefficients[4];
+            if (Math.abs(quatric) < error) {
+                error = quatric;
+                currentTheta = theta;
+            } else if (Math.abs(quatric) > error) {
+                break;
+            }
+        }
+        return currentTheta;
+    }
     public static Rotation2d calculateAngle(double speed, Translation2d shootTarget) {
         double x = shootTarget.getX();
         double y = shootTarget.getY();
