@@ -8,6 +8,7 @@ import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 
+import static frc.robot.utility.Constants.Unit.IN;
 import static frc.robot.utility.Constants.Unit.METERS;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -23,7 +24,7 @@ public class ShooterAlignSpeakerCommand extends Command {
     // public static final double RAMP_TIME = 1;
     // public static final double SHOOT_DURATION = 0.25;
     // public static final double INDEX_SPEED = 0.5;
-    public static final double SPEAKER_HEIGHT = 2 * METERS;
+    public static final double SPEAKER_HEIGHT = 70.25 * IN;
     public static final int BLUE_SPEAKER_APRILTAG = 7;
     public static final int RED_SPEAKER_APRILTAG = 4;
 
@@ -46,13 +47,19 @@ public class ShooterAlignSpeakerCommand extends Command {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        double horizontalDistance = localizer.getSpeakerDistance();
+        Translation2d aprilTagDistance;
+        if (Constants.getColor() == Alliance.Blue) {
+            aprilTagDistance = localizer.getTagPosition(BLUE_SPEAKER_APRILTAG);
+        } else {
+            aprilTagDistance = localizer.getTagPosition(RED_SPEAKER_APRILTAG);
+        }
+        double horizontalDistance = aprilTagDistance.getNorm();
         Translation2d shootVector = new Translation2d(horizontalDistance, SPEAKER_HEIGHT);
         Rotation2d shootAngle = shootVector.getAngle();
 
         reachedAngle = shooter.setRotation(shootAngle.getRadians());
-        // SmartDashboard.putBoolean("Shoot Angle Reached", reachedAngle);
-        // SmartDashboard.putNumber("Shoot Align Angle", shootAngle.getDegrees());
+        SmartDashboard.putBoolean("Shoot Angle Reached", reachedAngle);
+        SmartDashboard.putNumber("Shoot Align Angle", shootAngle.getDegrees());
     }
 
     // Called once the command ends or is interrupted.
