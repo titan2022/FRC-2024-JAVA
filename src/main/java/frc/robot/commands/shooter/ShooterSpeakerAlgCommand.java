@@ -57,7 +57,8 @@ public class ShooterSpeakerAlgCommand extends SequentialCommandGroup {
         Translation2d shootVector = robotDistanceToAprilTag.minus(SHOOTER_PIVOT_OFFSET);
         Rotation2d dynamicStartAngle = Rotation2d.fromDegrees(45);
         Translation2d dynamicShooterStartPoint = new Translation2d(dynamicStartAngle.getCos() * SHOOTER_ARM_LENGTH, dynamicStartAngle.getSin() * SHOOTER_ARM_LENGTH);
-        return robotDistanceToAprilTag.plus(TARGET_OFFSET).minus(dynamicShooterStartPoint);
+        Translation2d trueShootVector = shootVector.minus(dynamicShooterStartPoint);
+        return shootVector.plus(TARGET_OFFSET);
     }
 
     public ShooterSpeakerAlgCommand(double speed, ShooterSubsystem shooter, IndexerSubsystem indexer, Localizer localizer) {
