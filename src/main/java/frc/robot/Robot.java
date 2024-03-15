@@ -6,7 +6,6 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.commands.auto.SimpleAutoPlanLeft;
 import frc.robot.commands.control.ElevatorControlCommand;
 import frc.robot.commands.drive.RotationalDriveCommand;
 import frc.robot.commands.drive.TranslationalDriveCommand;
@@ -19,8 +18,8 @@ import frc.robot.subsystems.drive.SwerveDriveSubsystem;
 import frc.robot.utility.Localizer;
 
 public class Robot extends TimedRobot {
-    private final XboxController xbox1 = new XboxController(0);
-    private final XboxController xbox2 = new XboxController(2);
+    private final XboxController xbox1 = new XboxController(2);
+    private final XboxController xbox2 = new XboxController(0);
     private SwerveDriveSubsystem drive = new SwerveDriveSubsystem();
     private Localizer localizer = new Localizer(drive, false, 5804); 
     private ElevatorSubsystem elevator = new ElevatorSubsystem();
@@ -61,12 +60,25 @@ public class Robot extends TimedRobot {
     @Override
     public void autonomousInit() {
         localizer.setup();
-        new SimpleAutoPlanLeft(drive.getTranslational(), drive.getRotational(), shooter, indexer, intake, elevator, localizer).schedule();
+        // new SequentialCommandGroup(
+        //     new NewShooterCommand(shooter, indexer),
+
+        // ).schedule();
     }
+
+    int t = 0;
 
     @Override
     public void autonomousPeriodic() {
+        shooter.setRotation(65);
+        shooter.shoot(0.7);
+
+        if (t == 200) {
+            indexer.intake();
+            shooter.intake();
+        }
         
+        t++;
     }
 
     @Override
@@ -85,7 +97,7 @@ public class Robot extends TimedRobot {
 
         // Second driver
         shooter.setDefaultCommand(new ShooterControlCommand(shooter, indexer, xbox2, log));
-        elevator.setDefaultCommand(new ElevatorControlCommand(elevator, xbox2));
+        elevator.setDefaultCommand(new ElevatorControlCommand(elevator, xbox2,  xbox1));
         // Trigger xboxTrigger = new JoystickButton(xbox1, XboxController.Button.kY.value);
         // xboxTrigger.onTrue(new PreSpeakerAlignCommand(drive, localizer, new Rotation2d(0), 0.2 * Math.PI));
     }
@@ -94,6 +106,41 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopPeriodic() {
+        // if (xbox1.getLeftBumperPressed()) {
+        //     for (int i = 0; i < drive.motors.length; i++) {
+        //         SupplyCurrentLimitConfiguration currConfig = new SupplyCurrentLimitConfiguration();
+        //         currConfig.currentLimit = 70;
+        //         currConfig.enable = true;
+        //         currConfig.triggerThresholdCurrent = 80;
+        //         currConfig.triggerThresholdTime = 0.01;
+        //         drive.motors[i].configSupplyCurrentLimit(currConfig);
+                
+        //         SupplyCurrentLimitConfiguration rotatorConfig = new SupplyCurrentLimitConfiguration();
+        //         rotatorConfig.currentLimit = 40;
+        //         rotatorConfig.enable = true;
+        //         rotatorConfig.triggerThresholdCurrent = 50;
+        //         rotatorConfig.triggerThresholdTime = 0.01;
+        //         drive.rotators[i].configSupplyCurrentLimit(currConfig);
+        //     }
+        // } else if (xbox1.getLeftBumperReleased()) {
+        //     for (int i = 0; i < drive.motors.length; i++) {
+        //         SupplyCurrentLimitConfiguration currConfig = new SupplyCurrentLimitConfiguration();
+        //         currConfig.currentLimit = 30;
+        //         currConfig.enable = true;
+        //         currConfig.triggerThresholdCurrent = 40;
+        //         currConfig.triggerThresholdTime = 0.01;
+        //         drive.motors[i].configSupplyCurrentLimit(currConfig);
+                
+        //         SupplyCurrentLimitConfiguration rotatorConfig = new SupplyCurrentLimitConfiguration();
+        //         rotatorConfig.currentLimit = 20;
+        //         rotatorConfig.enable = true;
+        //         rotatorConfig.triggerThresholdCurrent = 30;
+        //         rotatorConfig.triggerThresholdTime = 0.01;
+        //         drive.rotators[i].configSupplyCurrentLimit(currConfig);
+        //     }
+        // }
+
+
         if (xbox2.getRightBumper()) {
             shooter.index(0.5);
             indexer.intake();

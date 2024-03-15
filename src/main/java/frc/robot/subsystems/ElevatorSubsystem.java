@@ -34,6 +34,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 	public final WPI_TalonFX rightSpoolMotor = new WPI_TalonFX(14, "CANivore");
 
 	private int stallTimer = 0;
+	public boolean unlocked = false;
 
     public static TalonFXConfiguration getSpoolTalonConfig() {
         TalonFXConfiguration talon = new TalonFXConfiguration();
@@ -46,10 +47,10 @@ public class ElevatorSubsystem extends SubsystemBase {
         talon.slot0.allowableClosedloopError = 5;
         talon.slot0.maxIntegralAccumulator = 5120;
 
-        talon.supplyCurrLimit.currentLimit = 25;
+        talon.supplyCurrLimit.currentLimit = 40;//25
         talon.supplyCurrLimit.enable = true;
-        talon.supplyCurrLimit.triggerThresholdCurrent = 30;
-        talon.supplyCurrLimit.triggerThresholdTime = 0.0;
+        talon.supplyCurrLimit.triggerThresholdCurrent = 50;
+        talon.supplyCurrLimit.triggerThresholdTime = 0.1;
 
         return talon;
 	}
@@ -118,10 +119,14 @@ public class ElevatorSubsystem extends SubsystemBase {
 			setPoint = 0;
 		}
 			
-		if (canRun()) {
-			leftSpoolMotor.set(ControlMode.Position, setPoint * TOP_ENCODER_VALUE);
+		if (!unlocked) {
+			if (canRun()) {
+				leftSpoolMotor.set(ControlMode.Position, setPoint * TOP_ENCODER_VALUE);
+			} else {
+				leftSpoolMotor.set(ControlMode.Velocity, 0);
+			}
 		} else {
-			leftSpoolMotor.set(ControlMode.Velocity, 0);
+			leftSpoolMotor.set(ControlMode.Position, setPoint * TOP_ENCODER_VALUE);
 		}
 	}
 
@@ -178,16 +183,29 @@ public class ElevatorSubsystem extends SubsystemBase {
 	public double getEncoder() {
 		return leftSpoolMotor.getSelectedSensorPosition();
 	}
+
+	public void setMotors(double percent) {
+		unlocked = true;
+		leftSpoolMotor.set(ControlMode.Velocity, percent);
+	}
+
+	public void unlock() {
+		unlocked = true;
+	}
+
+	public void lock() {
+		unlocked = false;
+	}
 	
 	@Override
 	public void periodic() {
-		// SmartDashboard.putNumber("STALL TIMER", stallTimer);
-		// SmartDashboard.putNumber("eleEncoder", getEncoder());
-		if (isStalling()) {
-			hold();
-			stallTimer += 10;
-		} else if (stallTimer > 0) {
-			stallTimer--;
+		if (!unlocked) {
+			if (isStalling()) {
+				hold();
+				stallTimer += 10;
+			} else if (stallTimer > 0) {
+				stallTimer--;
+			}
 		}
 	}
 }

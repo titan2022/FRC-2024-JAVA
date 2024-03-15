@@ -133,7 +133,7 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
             new WPI_TalonFX(RIGHT_FRONT_MOTOR_PORT),
             new WPI_TalonFX(RIGHT_BACK_MOTOR_PORT)
     };
-    private final WPI_TalonFX[] rotators = new WPI_TalonFX[] {
+    public final WPI_TalonFX[] rotators = new WPI_TalonFX[] {
             new WPI_TalonFX(LEFT_FRONT_MOTOR_ROTATOR_PORT),
             new WPI_TalonFX(LEFT_BACK_MOTOR_ROTATOR_PORT),
             new WPI_TalonFX(RIGHT_FRONT_MOTOR_ROTATOR_PORT),
@@ -219,13 +219,13 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
         // Current limits
         // rotatorConfig.supplyCurrLimit = supplyCurrentLimit;
         // mainConfig.supplyCurrLimit = supplyCurrentLimit;
-        rotatorConfig.supplyCurrLimit.currentLimit = 40;
+        rotatorConfig.supplyCurrLimit.currentLimit = 20;
         rotatorConfig.supplyCurrLimit.enable = true;
-        rotatorConfig.supplyCurrLimit.triggerThresholdCurrent = 50;
+        rotatorConfig.supplyCurrLimit.triggerThresholdCurrent = 30;
         rotatorConfig.supplyCurrLimit.triggerThresholdTime = 0.01;
-        mainConfig.supplyCurrLimit.currentLimit = 80;
+        mainConfig.supplyCurrLimit.currentLimit = 30;
         mainConfig.supplyCurrLimit.enable = true;
-        mainConfig.supplyCurrLimit.triggerThresholdCurrent = 90;
+        mainConfig.supplyCurrLimit.triggerThresholdCurrent = 40;
         mainConfig.supplyCurrLimit.triggerThresholdTime = 0.01;
         // mainConfig.closedloopRamp = 0.5;
         // mainConfig.openloopRamp = 0.5;

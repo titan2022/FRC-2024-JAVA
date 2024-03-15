@@ -1,12 +1,7 @@
 package frc.robot.utility;
 
-import static frc.robot.utility.Constants.Unit.DEG;
-
 import java.util.Dictionary;
 import java.util.Hashtable;
-
-import org.photonvision.PhotonCamera;
-import org.photonvision.targeting.PhotonTrackedTarget;
 
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import com.kauailabs.navx.frc.AHRS;
@@ -14,13 +9,11 @@ import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
-import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.drive.SwerveDriveSubsystem;
 import frc.robot.utility.localization.AprilTag;
@@ -39,7 +32,7 @@ import frc.robot.utility.networking.types.NetworkingTag;
  * robot-relative coorditate plane
  */
 public class Localizer {
-    private PhotonCamera camera = new PhotonCamera("photonvision");
+    // private PhotonCamera camera = new PhotonCamera("photonvision");
     private NetworkingServer server;
     private SwerveDriveSubsystem drive;
     private WPI_Pigeon2 pigeon = new WPI_Pigeon2(15);
@@ -237,21 +230,21 @@ public class Localizer {
         globalHeading = pigeon.getRotation2d().minus(pigeonOffset);
         globalOrientation = globalHeading.minus(new Rotation2d(Math.PI / 2));
         SmartDashboard.putNumber("heading", globalHeading.getRadians());
-        var result = camera.getLatestResult();
-        if (result.hasTargets()) {
-            PhotonTrackedTarget target = result.getBestTarget();
-            int targetID = target.getFiducialId();
+        // var result = camera.getLatestResult();
+        // if (result.hasTargets()) {
+        //     PhotonTrackedTarget target = result.getBestTarget();
+        //     int targetID = target.getFiducialId();
             
-            double poseAmbiguity = target.getPoseAmbiguity();
-            Transform3d bestCameraToTarget = target.getBestCameraToTarget();
-            Rotation3d toRobotRotation = new Rotation3d((90-50.5)*DEG, 1, -16.94*DEG);
-            Translation3d translation = bestCameraToTarget.getTranslation();
-            translation.rotateBy(toRobotRotation);
-            Translation2d t2d = translation.toTranslation2d();
-            t2d.rotateBy(globalHeading);
-            t2d.plus((new Translation2d(-9.628, -11.624).rotateBy(globalHeading)));
-            globalPosition = idToTag(targetID).getPosition().minus(t2d);
-        }
+        //     double poseAmbiguity = target.getPoseAmbiguity();
+        //     Transform3d bestCameraToTarget = target.getBestCameraToTarget();
+        //     Rotation3d toRobotRotation = new Rotation3d((90-50.5)*DEG, 1, -16.94*DEG);
+        //     Translation3d translation = bestCameraToTarget.getTranslation();
+        //     translation.rotateBy(toRobotRotation);
+        //     Translation2d t2d = translation.toTranslation2d();
+        //     t2d.rotateBy(globalHeading);
+        //     t2d.plus((new Translation2d(-9.628, -11.624).rotateBy(globalHeading)));
+        //     globalPosition = idToTag(targetID).getPosition().minus(t2d);
+        // }
 
         // Integrating robot position using swerve pose
         ChassisSpeeds swerveSpeeds = drive.getVelocities();

@@ -43,21 +43,22 @@ public class ShooterControlCommand extends Command {
 
     @Override
     public void execute() {
-        if (xbox.getXButton()) {
-            shooterAngle = 65;
-        } else if (Math.abs(xbox.getRightY()) > 0.1) {
-            shooterAngle += -xbox.getRightY() * 80 * DEG * 0.02;// = SmartDashboard.getNumber("targetAngle", ShooterSubsystem.MIN_ANGLE);
-            shooterAngle = Math.min(shooterAngle, ShooterSubsystem.MAX_ANGLE);
-            shooterAngle = Math.max(shooterAngle, ShooterSubsystem.MIN_ANGLE);
+        // if (xbox.getXButton()) {
+        //     shooterAngle = 65;
+        // } else if (Math.abs(xbox.getRightY()) > 0.1) {
+        //     shooterAngle += -xbox.getRightY() * 80 * DEG * 0.02;// = SmartDashboard.getNumber("targetAngle", ShooterSubsystem.MIN_ANGLE);
+        //     shooterAngle = Math.min(shooterAngle, ShooterSubsystem.MAX_ANGLE);
+        //     shooterAngle = Math.max(shooterAngle, ShooterSubsystem.MIN_ANGLE);
             
-            // shooter.setRotation(55 * DEG);
-            // shooter.holdAngle();
-        }
+        //     // shooter.setRotation(55 * DEG);
+        //     // shooter.holdAngle();
+        // }
+        shooterAngle = 65;
         shooter.setRotation(shooterAngle);
         
 
         if (xbox.getRightTriggerAxis() > 0.5) {
-            double shooterMag = 0.7;//xbox.getRightTriggerAxis() * 0.5 * shooterDir;
+            double shooterMag = 0.8;//xbox.getRightTriggerAxis() * 0.5 * shooterDir;
             shooter.shoot(shooterMag);
             shotLog.append(true);
             angleLog.append(shooterAngle);
