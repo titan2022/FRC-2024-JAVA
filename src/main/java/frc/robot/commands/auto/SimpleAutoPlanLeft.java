@@ -28,12 +28,11 @@ public class SimpleAutoPlanLeft extends SequentialCommandGroup {
     public static Rotation2d SHOOT_ANGLE = Rotation2d.fromDegrees(65);
 
     public SimpleAutoPlanLeft(TranslationalDrivebase translational, RotationalDrivebase rotational, ShooterSubsystem shooter, IndexerSubsystem indexer, IntakeSubsystem intake, ElevatorSubsystem elevator, Localizer localizer) {
-        double sign;
-        if (Constants.getColor() == Alliance.Blue) {    
-            sign = 1;
-        } else 
-            sign = -1;
-        }
+        double sign = 1;
+        // if (Constants.getColor() == Alliance.Blue) {    
+        //     sign = 1;
+        // } else 
+        //     sign = -1;
         
         addCommands(
             new RotateShooterCommand(SHOOT_ANGLE, shooter),
