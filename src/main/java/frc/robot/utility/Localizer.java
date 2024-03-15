@@ -1,7 +1,12 @@
 package frc.robot.utility;
 
+import static frc.robot.utility.Constants.Unit.DEG;
+
 import java.util.Dictionary;
 import java.util.Hashtable;
+
+import org.photonvision.PhotonCamera;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import com.kauailabs.navx.frc.AHRS;
@@ -9,10 +14,16 @@ import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.drive.SwerveDriveSubsystem;
+import frc.robot.utility.localization.AprilTag;
 import frc.robot.utility.networking.NetworkingCall;
 import frc.robot.utility.networking.NetworkingServer;
 import frc.robot.utility.networking.types.NetworkingPose;
@@ -28,14 +39,14 @@ import frc.robot.utility.networking.types.NetworkingTag;
  * robot-relative coorditate plane
  */
 public class Localizer {
-    // private PhotonCamera camera = new PhotonCamera("photonvision");
+    private PhotonCamera camera = new PhotonCamera("photonvision");
     private NetworkingServer server;
     private SwerveDriveSubsystem drive;
     private WPI_Pigeon2 pigeon = new WPI_Pigeon2(15);
     public static final AHRS navxGyro = new AHRS(SPI.Port.kMXP);
 
-    // private DoubleLogEntry xLog;
-    // private DoubleLogEntry yLog;
+    private DoubleLogEntry xLog;
+    private DoubleLogEntry yLog;
 
 
     private Rotation2d pigeonOffset = new Rotation2d(0);
@@ -49,6 +60,7 @@ public class Localizer {
     private double speakerDist;
     private Rotation2d speakerHeading;
     private Dictionary<Integer, NetworkingTag> tags = new Hashtable<>();
+    private Translation2d[] speaker_location = {new Translation2d(-1.50, 218.42), new Translation2d(652.73, 218.42)};
 
     private Pose2d startingPose2d = new Pose2d(); 
     /**
@@ -189,6 +201,33 @@ public class Localizer {
         }
     }
 
+    private AprilTag idToTag(int id){
+        AprilTag arr[] = new AprilTag[]{
+            AprilTag.BLUE_SOURCE_SOUTH,
+            AprilTag.BLUE_SOURCE_NORTH,
+            AprilTag.RED_SOURCE_SOUTH, 
+            AprilTag.RED_SOURCE_NORTH,
+            AprilTag.RED_SPEAKER_SOUTH, 
+            AprilTag.RED_SPEAKER_CENTER,
+            AprilTag.BLUE_SPEAKER_SOUTH, 
+            AprilTag.BLUE_SPEAKER_NORTH,
+            AprilTag.RED_AMP, 
+            AprilTag.BLUE_AMP,
+            AprilTag.RED_STAGE_SOUTH, 
+            AprilTag.RED_STAGE_NORTH, 
+            AprilTag.RED_STAGE_WEST,
+            AprilTag.BLUE_STAGE_SOUTH, 
+            AprilTag.BLUE_STAGE_NORTH, 
+            AprilTag.BLUE_STAGE_EAST,
+        };
+        for(AprilTag aprilTag : arr){
+            if(aprilTag.getID() == id){
+                return aprilTag;
+            }
+        }
+        return null;
+    }
+
     /**
      * Updates the state of the localization estimates
      * 
@@ -197,17 +236,22 @@ public class Localizer {
     public synchronized void step(double dt) {
         globalHeading = pigeon.getRotation2d().minus(pigeonOffset);
         globalOrientation = globalHeading.minus(new Rotation2d(Math.PI / 2));
-
-        // var result = camera.getLatestResult();
-        // if (result.hasTargets()) {
-        //     PhotonTrackedTarget target = result.getBestTarget();
-        //     int targetID = target.getFiducialId();
-        //     double poseAmbiguity = target.getPoseAmbiguity();
-        //     Transform3d bestCameraToTarget = target.getBestCameraToTarget();
-        //     double yaw = target.getYaw();
-        //     double pitch = target.getPitch();
-        //     double area = target.getArea();
-        // }
+        SmartDashboard.putNumber("heading", globalHeading.getRadians());
+        var result = camera.getLatestResult();
+        if (result.hasTargets()) {
+            PhotonTrackedTarget target = result.getBestTarget();
+            int targetID = target.getFiducialId();
+            
+            double poseAmbiguity = target.getPoseAmbiguity();
+            Transform3d bestCameraToTarget = target.getBestCameraToTarget();
+            Rotation3d toRobotRotation = new Rotation3d((90-50.5)*DEG, 1, -16.94*DEG);
+            Translation3d translation = bestCameraToTarget.getTranslation();
+            translation.rotateBy(toRobotRotation);
+            Translation2d t2d = translation.toTranslation2d();
+            t2d.rotateBy(globalHeading);
+            t2d.plus((new Translation2d(-9.628, -11.624).rotateBy(globalHeading)));
+            globalPosition = idToTag(targetID).getPosition().minus(t2d);
+        }
 
         // Integrating robot position using swerve pose
         ChassisSpeeds swerveSpeeds = drive.getVelocities();
@@ -217,6 +261,14 @@ public class Localizer {
         globalPosition = globalPosition.plus(odometryVel.times(0.02));
 
         
+    }
+    
+    public Translation2d getSpeakerLocation(){
+        if(Constants.getColor().equals(Alliance.Blue)){
+            return speaker_location[0].minus(globalPosition);
+        } else {
+            return speaker_location[1].minus(globalPosition);
+        }
     }
 
     /**
