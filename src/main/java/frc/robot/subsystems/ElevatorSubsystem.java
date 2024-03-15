@@ -100,11 +100,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 	 * @param speed in Falcon ticks per 100ms (?)
 	 */
 	public void elevate(double speed) {
-		if (canRun()) {
-			leftSpoolMotor.set(ControlMode.Velocity, 0, DemandType.ArbitraryFeedForward, speed);
-		} else {
-			leftSpoolMotor.set(ControlMode.Velocity, 0);
-		}
+		leftSpoolMotor.set(ControlMode.Velocity, 0, DemandType.ArbitraryFeedForward, speed);
 	}
 
 	/**
@@ -189,7 +185,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 		leftSpoolMotor.set(ControlMode.Velocity, percent);
 	}
 
-	public void unlock() {
+	public void unlock() {	
 		unlocked = true;
 	}
 

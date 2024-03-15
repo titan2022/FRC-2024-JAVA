@@ -25,7 +25,7 @@ public class ElevatorControlCommand extends Command {
 
     @Override
     public void execute() {
-        int pov = driveXbox.getPOV();
+        int pov = xbox.getPOV();
         if (pov != -1) {
             int manualVel = 0;
             if (pov == 0) {
@@ -36,19 +36,15 @@ public class ElevatorControlCommand extends Command {
             elevator.setMotors(manualVel);
             return;
         }
+        
 
-        // if (driveXbox.getStartButtonPressed()) {
-        //     if (elevator.unlocked) {
-        //         elevator.lock();
-        //     } else {
-        //         elevator.unlock();
-        //     }
-        // }
 
         if (-xbox.getLeftY() > 0.6) {
             elevator.setHeight(1);
         } else if (-xbox.getLeftY() < -0.6) {
             elevator.setHeight(0);
+        } else if (xbox.getXButton()) {
+            elevator.elevate(-.4);
         } else {
             elevator.hold();
         }

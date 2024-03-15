@@ -25,30 +25,31 @@ import frc.robot.utility.Localizer;
 public class SimpleAutoPlanStraight extends SequentialCommandGroup {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
     public static double SHOOT_SPEAKER_SPEED = 0.8;
-    public static Rotation2d SHOOT_ANGLE = Rotation2d.fromDegrees(65);
+    public static Rotation2d SHOOT_ANGLE = Rotation2d.fromDegrees(60);
     public static final double SPEAKER_HEIGHT = 2 * METERS;
 
     public SimpleAutoPlanStraight(TranslationalDrivebase translational, RotationalDrivebase rotational, ShooterSubsystem shooter, IndexerSubsystem indexer, IntakeSubsystem intake, ElevatorSubsystem elevator, Localizer localizer) {
         double sign;
-        if (Constants.getColor() == Alliance.Blue) {    
+        if (Constants.getColor() == Alliance.Blue) {
             sign = 1;
         } else 
             sign = -1;
         
         addCommands(
             new RotateShooterCommand(SHOOT_ANGLE, shooter),
-            new SimpleShootCommand(SHOOT_SPEAKER_SPEED, shooter, indexer),
             new WaitCommand(1.0),
-            new ParallelCommandGroup(
-                new NoteIntakeCommand(indexer, intake, shooter),
-                new TranslationCommand(new Translation2d(sign * 0, 3), 1, translational)
-            ),
-            new RotateShooterCommand(Rotation2d.fromDegrees(45), shooter),
             new SimpleShootCommand(SHOOT_SPEAKER_SPEED, shooter, indexer)
+            // new WaitCommand(1.0),
+            // new ParallelCommandGroup(
+            //     new NoteIntakeCommand(indexer, intake, shooter),
+            //     new TranslationCommand(new Translation2d(sign * 0, 3), 1, translational)
+            // ),
+            // new RotateShooterCommand(Rotation2d.fromDegrees(45), shooter),
+            // new SimpleShootCommand(SHOOT_SPEAKER_SPEED, shooter, indexer)
             // new ShooterAlignSpeakerCommand(shooter, localizer)
         );
 
-        addRequirements(rotational, translational, shooter, indexer, elevator, intake);
+        // addRequirements(rotational, translational, shooter, indexer, elevator, intake);
     }
 
 }
