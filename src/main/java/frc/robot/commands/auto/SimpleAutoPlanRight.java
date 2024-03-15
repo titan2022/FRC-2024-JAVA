@@ -20,13 +20,13 @@ import frc.robot.utility.Constants;
 import frc.robot.utility.Localizer;
 
 /** An example command that uses an example subsystem. */
-public class SimpleAutoPlanTwo extends SequentialCommandGroup {
+public class SimpleAutoPlanRight extends SequentialCommandGroup {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
     public static double SHOOT_SPEAKER_SPEED = 0.5;
     public static final double SPEAKER_HEIGHT = 2 * METERS;
     public static Rotation2d SHOOT_ANGLE = Rotation2d.fromDegrees(65);
 
-    public SimpleAutoPlanTwo(TranslationalDrivebase translational, RotationalDrivebase rotational, ShooterSubsystem shooter, IndexerSubsystem indexer, IntakeSubsystem intake, ElevatorSubsystem elevator, Localizer localizer) {
+    public SimpleAutoPlanRight(TranslationalDrivebase translational, RotationalDrivebase rotational, ShooterSubsystem shooter, IndexerSubsystem indexer, IntakeSubsystem intake, ElevatorSubsystem elevator, Localizer localizer) {
         double sign;
         if (Constants.getColor() == Alliance.Blue) {    
             sign = 1;
@@ -37,7 +37,7 @@ public class SimpleAutoPlanTwo extends SequentialCommandGroup {
             new RotateShooterCommand(SHOOT_ANGLE, shooter),
             new SimpleShootCommand(SHOOT_SPEAKER_SPEED, shooter, indexer),
             new TranslationCommand(new Translation2d(sign * 0, 0.5), 1, translational),
-            new RotationCommand(Rotation2d.fromDegrees(45).times(-sign), rotational, localizer),
+            new RotationCommand(Rotation2d.fromDegrees(45).times(sign), rotational, localizer),
             new TranslationCommand(new Translation2d(sign * 0, 2), 1, translational)
         );
 

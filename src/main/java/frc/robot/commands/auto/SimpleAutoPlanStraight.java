@@ -26,13 +26,13 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 /** An example command that uses an example subsystem. */
-public class SimpleAutoPlanOne extends SequentialCommandGroup {
+public class SimpleAutoPlanStraight extends SequentialCommandGroup {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
     public static double SHOOT_SPEAKER_SPEED = 0.8;
     public static Rotation2d SHOOT_ANGLE = Rotation2d.fromDegrees(65);
     public static final double SPEAKER_HEIGHT = 2 * METERS;
 
-    public SimpleAutoPlanOne(TranslationalDrivebase translational, RotationalDrivebase rotational, ShooterSubsystem shooter, IndexerSubsystem indexer, IntakeSubsystem intake, ElevatorSubsystem elevator, Localizer localizer) {
+    public SimpleAutoPlanStraight(TranslationalDrivebase translational, RotationalDrivebase rotational, ShooterSubsystem shooter, IndexerSubsystem indexer, IntakeSubsystem intake, ElevatorSubsystem elevator, Localizer localizer) {
         double sign;
         if (Constants.getColor() == Alliance.Blue) {    
             sign = 1;
