@@ -2,9 +2,8 @@ package frc.robot.commands.drive;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.util.datalog.DataLog;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
@@ -31,7 +30,7 @@ public class TranslationalDriveCommand extends Command {
      *                  meters per second.
      */
     public TranslationalDriveCommand(TranslationalDrivebase drive, Localizer localizer, XboxController xbox,
-            double maxVe, DataLog log) {
+            double maxVel) {
         this.drive = drive;
         this.localizer = localizer;
         this.xbox = xbox;
@@ -41,7 +40,7 @@ public class TranslationalDriveCommand extends Command {
 
     @Override
     public void initialize() {
-
+        
     }
 
     private static double applyDeadband(double joy, double deadband) {
@@ -67,6 +66,11 @@ public class TranslationalDriveCommand extends Command {
             phiOffset = localizer.getOrientation();
         }
 
+        double speedMult = 1;
+        if (xbox.getRightBumper()) {
+            speedMult = 0.25;
+        }
+
         double joyX = applyDeadband(xbox.getLeftX(), 0.15);
         double joyY = applyDeadband(-xbox.getLeftY(), 0.15);
         Translation2d velocity = new Translation2d(scaleVelocity(joyX), scaleVelocity(joyY));
@@ -78,7 +82,7 @@ public class TranslationalDriveCommand extends Command {
 
         SmartDashboard.putNumber("Target Velocity X", velocity.getX());
         SmartDashboard.putNumber("Target Velocity Y", velocity.getY());
-        drive.setVelocity(velocity);
+        drive.setVelocity(velocity.times(speedMult));
     }
 
     @Override

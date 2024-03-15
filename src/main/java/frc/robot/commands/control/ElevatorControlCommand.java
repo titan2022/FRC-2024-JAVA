@@ -33,7 +33,7 @@ public class ElevatorControlCommand extends Command {
             elevator.hold();
         }
 
-        SmartDashboard.putBoolean("canRun", elevator.canRun());
+        // SmartDashboard.putBoolean("canRun", elevator.canRun());
 
         // elevatorPos = Math.abs(xbox.getLeftY());
         // // elevatorPos = Math.min(elevatorPos, 1);

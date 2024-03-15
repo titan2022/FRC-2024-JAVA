@@ -49,7 +49,7 @@ public class TranslationCommand extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    SmartDashboard.putBoolean("Reached end()", true);
+    // SmartDashboard.putBoolean("Reached end()", true);
     driveBase.setVelocity(new Translation2d(0, 0));
     // SmartDashboard.putBoolean("Reached end() 2", true);
   }

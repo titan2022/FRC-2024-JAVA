@@ -4,7 +4,8 @@ import static frc.robot.utility.Constants.Unit.METERS;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.util.datalog.DataLog;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.drive.RotationCommand;
@@ -17,7 +18,6 @@ import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.drive.RotationalDrivebase;
 import frc.robot.subsystems.drive.TranslationalDrivebase;
-import frc.robot.utility.Constants;
 import frc.robot.utility.Localizer;
 
 /** An example command that uses an example subsystem. */
@@ -33,6 +33,8 @@ public class SimpleAutoPlanLeft extends SequentialCommandGroup {
         //     sign = 1;
         // } else 
         //     sign = -1;
+
+        SmartDashboard.putBoolean("1", true);
         
         addCommands(
             new RotateShooterCommand(SHOOT_ANGLE, shooter),

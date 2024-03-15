@@ -96,9 +96,9 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
 		// talon.slot0.kD = 1.0;
 		// talon.slot0.kF = 0;
 		// talon.slot0.kP = 0.1;
-        talon.slot0.kP = SmartDashboard.getNumber("swkP", 0.0);
-		talon.slot0.kI = SmartDashboard.getNumber("swkI", 0.0);
-		talon.slot0.kD = SmartDashboard.getNumber("swkD", 0.0);
+        talon.slot0.kP = 0;//SmartDashboard.getNumber("swkP", 0.0);
+		talon.slot0.kI = 0;//SmartDashboard.getNumber("swkI", 0.0);
+		talon.slot0.kD = 0;//SmartDashboard.getNumber("swkD", 0.0);
 		talon.slot0.kF = 0;
 		talon.slot0.integralZone = 900;
 		talon.slot0.allowableClosedloopError = 20;
@@ -219,14 +219,14 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
         // Current limits
         // rotatorConfig.supplyCurrLimit = supplyCurrentLimit;
         // mainConfig.supplyCurrLimit = supplyCurrentLimit;
-        rotatorConfig.supplyCurrLimit.currentLimit = 15;
+        rotatorConfig.supplyCurrLimit.currentLimit = 40;
         rotatorConfig.supplyCurrLimit.enable = true;
-        rotatorConfig.supplyCurrLimit.triggerThresholdCurrent = 25;
-        rotatorConfig.supplyCurrLimit.triggerThresholdTime = 0.1;
-        mainConfig.supplyCurrLimit.currentLimit = 30;
+        rotatorConfig.supplyCurrLimit.triggerThresholdCurrent = 50;
+        rotatorConfig.supplyCurrLimit.triggerThresholdTime = 0.01;
+        mainConfig.supplyCurrLimit.currentLimit = 80;
         mainConfig.supplyCurrLimit.enable = true;
-        mainConfig.supplyCurrLimit.triggerThresholdCurrent = 50;
-        mainConfig.supplyCurrLimit.triggerThresholdTime = 0.1;
+        mainConfig.supplyCurrLimit.triggerThresholdCurrent = 90;
+        mainConfig.supplyCurrLimit.triggerThresholdTime = 0.01;
         // mainConfig.closedloopRamp = 0.5;
         // mainConfig.openloopRamp = 0.5;
 
@@ -306,7 +306,7 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
         for (WPI_TalonFX motor : motors)
             motor.configSupplyCurrentLimit(currentLimit);
         curLim = limit;
-        SmartDashboard.putNumber("cur lim", curLim);
+        // SmartDashboard.putNumber("cur lim", curLim);
     }
 
     public double getCurLimit() {
@@ -324,7 +324,7 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
 
     private void applyModuleState(SwerveModuleState state, int module, boolean forceOrient) {
         double velTicks = state.speedMetersPerSecond / (10 * METERS_PER_TICKS);
-        // double feedForwardTicks = motorFeedfoward.calculate(state.speedMetersPerSecond);
+        double feedForwardTicks = motorFeedfoward.calculate(state.speedMetersPerSecond);
         // SmartDashboard.putNumber("Feedforward input Y", feedForwardTicks);
         if (velTicks == 0 && !forceOrient) {
             motors[module].set(ControlMode.Velocity, 0);
@@ -341,11 +341,11 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
         if (deltaTicks >= CANCODER_CPR / 4) {
             deltaTicks -= CANCODER_CPR / 2;
             velTicks *= -1;
-            // feedForwardTicks *= -1;
+            feedForwardTicks *= -1;
         } else if (deltaTicks <= -CANCODER_CPR / 4) {
             deltaTicks += CANCODER_CPR / 2;
             velTicks *= -1;
-            // feedForwardTicks *= -1;
+            feedForwardTicks *= -1;
         }
         // SmartDashboard.putNumber("speed STATE " + module, state.speedMetersPerSecond);
         // SmartDashboard.putNumber("angle STATE " + module, state.angle.getDegrees());
@@ -355,7 +355,8 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
         // SmartDashboard.putNumber("cur rot " + module, currTicks);
         // SmartDashboard.putNumber("delta rot" + module, deltaTicks);
         // SmartDashboard.putNumber("target rot " + module, targetTicks);
-        motors[module].set(ControlMode.Velocity, velTicks);
+        motors[module].set(ControlMode.Velocity, velTicks, DemandType.ArbitraryFeedForward, feedForwardTicks);
+        // motors[module].set(ControlMode.Velocity, velTicks, DemandType.ArbitraryFeedForward, feedForwardTicks);
         // motors[module].set(ControlMode.Velocity, velTicks);
         rotators[module].set(ControlMode.Position, currTicks + deltaTicks + OFFSETS[module]);
     }

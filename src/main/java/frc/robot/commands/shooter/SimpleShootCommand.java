@@ -4,13 +4,11 @@
 
 package frc.robot.commands.shooter;
 
-import frc.robot.subsystems.ElevatorSubsystem;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj2.command.Command;
 
 /** An example command that uses an example subsystem. */
 public class SimpleShootCommand extends Command {
@@ -36,6 +34,7 @@ public class SimpleShootCommand extends Command {
 
     @Override
     public void initialize() {
+        SmartDashboard.putBoolean("3start", true);
         rampTime = Timer.getFPGATimestamp() + RAMP_TIME;
         endTime = rampTime + SHOOT_DURATION;
     }
@@ -43,6 +42,8 @@ public class SimpleShootCommand extends Command {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
+        SmartDashboard.putNumber("endtime", endTime);
+        SmartDashboard.putNumber("ts fpga", Timer.getFPGATimestamp());
         if (Timer.getFPGATimestamp() < rampTime){
             shooter.shoot(speed);
         }

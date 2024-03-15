@@ -1,8 +1,6 @@
 package frc.robot;
 
-import edu.wpi.first.util.datalog.BooleanLogEntry;
 import edu.wpi.first.util.datalog.DataLog;
-import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
@@ -21,11 +19,6 @@ import frc.robot.subsystems.drive.SwerveDriveSubsystem;
 import frc.robot.utility.Localizer;
 
 public class Robot extends TimedRobot {
-    private DoubleLogEntry localX;
-    private DoubleLogEntry localY;
-    private DoubleLogEntry shooterAngle;
-    private BooleanLogEntry hasShot;
-
     private final XboxController xbox1 = new XboxController(0);
     private final XboxController xbox2 = new XboxController(2);
     private SwerveDriveSubsystem drive = new SwerveDriveSubsystem();
@@ -45,7 +38,6 @@ public class Robot extends TimedRobot {
         SmartDashboard.putNumber("swkD", 0.06);
         SmartDashboard.putNumber("swkF", 0.02);
 
-
         DataLogManager.start();
         log = DataLogManager.getLog();
     }
@@ -53,10 +45,10 @@ public class Robot extends TimedRobot {
     @Override
     public void robotPeriodic() {
         CommandScheduler.getInstance().run();
-        SmartDashboard.putNumber("Current X Velocity", drive.getTranslational().getVelocity().getX());
-        SmartDashboard.putNumber("Current Y Velocity", drive.getTranslational().getVelocity().getY());
-        SmartDashboard.putNumber("Current Speed", drive.getTranslational().getVelocity().getNorm());
-        SmartDashboard.putNumber("Swerve Heading", localizer.getHeading().getDegrees());
+        SmartDashboard.putNumber("X Velocity", drive.getTranslational().getVelocity().getX());
+        SmartDashboard.putNumber("Y Velocity", drive.getTranslational().getVelocity().getY());
+        SmartDashboard.putNumber("Speed", drive.getTranslational().getVelocity().getNorm());
+        SmartDashboard.putNumber("Heading", localizer.getHeading().getDegrees());
 
         localizer.step();
     }
@@ -79,20 +71,20 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopInit() {
-        for (int i = 0; i < drive.motors.length; i++) {
-            drive.motors[i].config_kP(0, SmartDashboard.getNumber("swkP", 0.0056));
-            drive.motors[i].config_kI(0, SmartDashboard.getNumber("swkI", 0.0));
-            drive.motors[i].config_kD(0, SmartDashboard.getNumber("swkD", 0.06));
-            drive.motors[i].config_kF(0, SmartDashboard.getNumber("swkF", 0.02));
-        }
+        // for (int i = 0; i < drive.motors.length; i++) {
+        //     drive.motors[i].config_kP(0, SmartDashboard.getNumber("swkP", 0.0056));
+        //     drive.motors[i].config_kI(0, SmartDashboard.getNumber("swkI", 0.0));
+        //     drive.motors[i].config_kD(0, SmartDashboard.getNumber("swkD", 0.06));
+        //     drive.motors[i].config_kF(0, SmartDashboard.getNumber("swkF", 0.02));
+        // }
         localizer.setup();
 
         // Main driver
-        drive.getTranslational().setDefaultCommand(new TranslationalDriveCommand(drive.getTranslational(), localizer, xbox1, 6, log));
-        drive.getRotational().setDefaultCommand(new RotationalDriveCommand(drive.getRotational(), localizer, xbox1, 2.5 * Math.PI, log));
+        drive.getTranslational().setDefaultCommand(new TranslationalDriveCommand(drive.getTranslational(), localizer, xbox1, 6));
+        drive.getRotational().setDefaultCommand(new RotationalDriveCommand(drive.getRotational(), localizer, xbox1, 2.5 * Math.PI));
 
         // Second driver
-        shooter.setDefaultCommand(new ShooterControlCommand(shooter, indexer, xbox2));
+        shooter.setDefaultCommand(new ShooterControlCommand(shooter, indexer, xbox2, log));
         elevator.setDefaultCommand(new ElevatorControlCommand(elevator, xbox2));
         // Trigger xboxTrigger = new JoystickButton(xbox1, XboxController.Button.kY.value);
         // xboxTrigger.onTrue(new PreSpeakerAlignCommand(drive, localizer, new Rotation2d(0), 0.2 * Math.PI));

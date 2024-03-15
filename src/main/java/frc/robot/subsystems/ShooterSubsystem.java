@@ -9,11 +9,8 @@ import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.networktables.BooleanEntry;
-import edu.wpi.first.util.datalog.BooleanLogEntry;
-import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -156,9 +153,9 @@ public class ShooterSubsystem extends SubsystemBase {
 			DemandType.ArbitraryFeedForward, FF
 		);
 		// angleLog.append(targetRotation / DEG);
-		SmartDashboard.putNumber("TargetShooterAngle", targetRotation / DEG);
-		SmartDashboard.putNumber("Shooter PID", PID);
-		SmartDashboard.putNumber("Shooter FF", FF);
+		SmartDashboard.putNumber("Target Shooter Angle", targetRotation / DEG);
+		// SmartDashboard.putNumber("Shooter PID", PID);
+		// SmartDashboard.putNumber("Shooter FF", FF);
 
 		return false;
 	}

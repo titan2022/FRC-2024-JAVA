@@ -182,7 +182,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 	@Override
 	public void periodic() {
 		// SmartDashboard.putNumber("STALL TIMER", stallTimer);
-		SmartDashboard.putNumber("eleEncoder", getEncoder());
+		// SmartDashboard.putNumber("eleEncoder", getEncoder());
 		if (isStalling()) {
 			hold();
 			stallTimer += 10;

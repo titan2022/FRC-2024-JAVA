@@ -51,8 +51,8 @@ public class ShooterAlignSpeakerCommand extends Command {
         Rotation2d shootAngle = shootVector.getAngle();
 
         reachedAngle = shooter.setRotation(shootAngle.getRadians());
-        SmartDashboard.putBoolean("Shoot Angle Reached", reachedAngle);
-        SmartDashboard.putNumber("Shoot Align Angle", shootAngle.getDegrees());
+        // SmartDashboard.putBoolean("Shoot Angle Reached", reachedAngle);
+        // SmartDashboard.putNumber("Shoot Align Angle", shootAngle.getDegrees());
     }
 
     // Called once the command ends or is interrupted.

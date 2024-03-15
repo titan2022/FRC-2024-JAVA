@@ -76,8 +76,15 @@ public class RotationalDriveCommand extends Command {
             drift = -localizer.getRate() * DEG / S - omega;
         }
         omega = -scaleVelocity(joy);
-        SmartDashboard.putNumber("Target Omega", new Rotation2d(omega - 0.5 * drift).getDegrees());
-        drive.setRotationalVelocity(new Rotation2d(omega - 0.5 * drift));
+        // SmartDashboard.putNumber("Target Omega", new Rotation2d(omega - 0.5 * drift).getDegrees());
+
+        
+        double speedMult = 1;
+        if (xbox.getRightBumper()) {
+            speedMult = 0.25;
+        }
+        
+        drive.setRotationalVelocity(new Rotation2d(omega - 0.5 * drift).times(speedMult));
     }
 
     @Override
