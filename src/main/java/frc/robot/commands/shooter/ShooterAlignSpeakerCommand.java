@@ -46,13 +46,7 @@ public class ShooterAlignSpeakerCommand extends Command {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        Translation2d aprilTagDistance;
-        if (Constants.getColor() == Alliance.Blue) {
-            aprilTagDistance = localizer.getTagPosition(BLUE_SPEAKER_APRILTAG);
-        } else {
-            aprilTagDistance = localizer.getTagPosition(RED_SPEAKER_APRILTAG);
-        }
-        double horizontalDistance = aprilTagDistance.getNorm();
+        double horizontalDistance = localizer.getSpeakerDistance();
         Translation2d shootVector = new Translation2d(horizontalDistance, SPEAKER_HEIGHT);
         Rotation2d shootAngle = shootVector.getAngle();
 

@@ -1,7 +1,9 @@
 package frc.robot;
 
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
-
+import edu.wpi.first.util.datalog.BooleanLogEntry;
+import edu.wpi.first.util.datalog.DataLog;
+import edu.wpi.first.util.datalog.DoubleLogEntry;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -19,23 +21,33 @@ import frc.robot.subsystems.drive.SwerveDriveSubsystem;
 import frc.robot.utility.Localizer;
 
 public class Robot extends TimedRobot {
+    private DoubleLogEntry localX;
+    private DoubleLogEntry localY;
+    private DoubleLogEntry shooterAngle;
+    private BooleanLogEntry hasShot;
+
     private final XboxController xbox1 = new XboxController(0);
-    private final XboxController xbox2 = new XboxController(1);
-    private Localizer localizer = new Localizer();
+    private final XboxController xbox2 = new XboxController(2);
     private SwerveDriveSubsystem drive = new SwerveDriveSubsystem();
+    private Localizer localizer = new Localizer(drive, false, 5804); 
     private ElevatorSubsystem elevator = new ElevatorSubsystem();
     private IntakeSubsystem intake = new IntakeSubsystem();
     private ShooterSubsystem shooter = new ShooterSubsystem();
     private IndexerSubsystem indexer = new IndexerSubsystem();
+    private DataLog log;
 
     @Override
     public void robotInit() {
         elevator.leftSpoolMotor.setSelectedSensorPosition(0.0);
         elevator.config();
-        SmartDashboard.putNumber("swkP", 0.0055);
+        SmartDashboard.putNumber("swkP", 0.0056);
         SmartDashboard.putNumber("swkI", 0.0);
         SmartDashboard.putNumber("swkD", 0.06);
         SmartDashboard.putNumber("swkF", 0.02);
+
+
+        DataLogManager.start();
+        log = DataLogManager.getLog();
     }
 
     @Override
@@ -57,7 +69,7 @@ public class Robot extends TimedRobot {
     @Override
     public void autonomousInit() {
         localizer.setup();
-        new SimpleAutoPlanTwo(drive.getTranslational(), drive.getRotational(), shooter, indexer, intake, elevator, localizer).schedule();
+        new SimpleAutoPlanTwo(drive.getTranslational(), drive.getRotational(), shooter, indexer, intake, elevator, localizer, true).schedule();
     }
 
     @Override
@@ -68,16 +80,16 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopInit() {
         for (int i = 0; i < drive.motors.length; i++) {
-            drive.motors[i].config_kP(0, SmartDashboard.getNumber("swkP", 0.0));
+            drive.motors[i].config_kP(0, SmartDashboard.getNumber("swkP", 0.0056));
             drive.motors[i].config_kI(0, SmartDashboard.getNumber("swkI", 0.0));
-            drive.motors[i].config_kD(0, SmartDashboard.getNumber("swkD", 0.0));
-            drive.motors[i].config_kF(0, SmartDashboard.getNumber("swkF", 0.0));
+            drive.motors[i].config_kD(0, SmartDashboard.getNumber("swkD", 0.06));
+            drive.motors[i].config_kF(0, SmartDashboard.getNumber("swkF", 0.02));
         }
         localizer.setup();
 
         // Main driver
-        drive.getTranslational().setDefaultCommand(new TranslationalDriveCommand(drive.getTranslational(), localizer, xbox1, 6));
-        drive.getRotational().setDefaultCommand(new RotationalDriveCommand(drive.getRotational(), localizer, xbox1, Math.PI));
+        drive.getTranslational().setDefaultCommand(new TranslationalDriveCommand(drive.getTranslational(), localizer, xbox1, 6, log));
+        drive.getRotational().setDefaultCommand(new RotationalDriveCommand(drive.getRotational(), localizer, xbox1, 2.5 * Math.PI, log));
 
         // Second driver
         shooter.setDefaultCommand(new ShooterControlCommand(shooter, indexer, xbox2));

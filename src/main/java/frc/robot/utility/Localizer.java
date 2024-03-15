@@ -3,14 +3,21 @@ package frc.robot.utility;
 import java.util.Dictionary;
 import java.util.Hashtable;
 
+import org.photonvision.PhotonCamera;
+import org.photonvision.targeting.PhotonTrackedTarget;
+
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
+import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.util.datalog.DoubleLogEntry;
+import edu.wpi.first.wpilibj.SPI;
+import frc.robot.subsystems.drive.SwerveDriveSubsystem;
 import frc.robot.utility.networking.NetworkingCall;
 import frc.robot.utility.networking.NetworkingServer;
 import frc.robot.utility.networking.types.NetworkingPose;
@@ -26,9 +33,15 @@ import frc.robot.utility.networking.types.NetworkingTag;
  * robot-relative coorditate plane
  */
 public class Localizer {
+    private PhotonCamera camera = new PhotonCamera("photonvision");
     private NetworkingServer server;
+    private SwerveDriveSubsystem drive;
     private WPI_Pigeon2 pigeon = new WPI_Pigeon2(15);
-    // public static final AHRS navxGyro = new AHRS(SPI.Port.kMXP);
+    public static final AHRS navxGyro = new AHRS(SPI.Port.kMXP);
+
+    private DoubleLogEntry xLog;
+    private DoubleLogEntry yLog;
+
 
     private Rotation2d pigeonOffset = new Rotation2d(0);
 
@@ -36,8 +49,10 @@ public class Localizer {
     private Rotation2d globalHeading = new Rotation2d();
     private Rotation2d globalOrientation = new Rotation2d();
     private Rotation3d globalOrientationFromTags = new Rotation3d();
-    private Translation3d notePosition = new Translation3d();
+    private double noteDistance = -1;
     private Rotation3d noteRotation = new Rotation3d();
+    private double speakerDist;
+    private Rotation2d speakerHeading;
     private Dictionary<Integer, NetworkingTag> tags = new Hashtable<>();
 
     private Pose2d startingPose2d = new Pose2d(); 
@@ -47,38 +62,11 @@ public class Localizer {
      * @param withCoprocessor Initiate coprocessor networking server
      * @param port Coprocessor port
      */
-    public Localizer(boolean withCoprocessor, int port) {
+    public Localizer(SwerveDriveSubsystem drive, boolean withCoprocessor, int port) {
+        this.drive = drive;
         if (withCoprocessor) {
             server = new NetworkingServer(port);
         }
-    }
-
-    /**
-     * Localizer constructor
-     * 
-     * @param withCoprocessor Initiate coprocessor networking server with default
-     *                        port
-     */
-    public Localizer(boolean withCoprocessor) {
-        if (withCoprocessor) {
-            server = new NetworkingServer();
-        }
-    }
-
-    /**
-     * Localizer constructor
-     * 
-     * @param port Coprocessor networking server specified port
-     */
-    public Localizer(int port) {
-        this(true, port);
-    }
-
-    /**
-     * Localizer constructor (initiates coprocessor networking server by default)
-     */
-    public Localizer() {
-        this(true);
     }
 
     /**
@@ -106,8 +94,8 @@ public class Localizer {
      * Resets rotational offset 
      */
     public void resetOrientation() {
-        // navxGyro.reset();
-        // navxGyro.resetDisplacement();
+        navxGyro.reset();
+        navxGyro.resetDisplacement();
     }
 
     /**
@@ -132,43 +120,12 @@ public class Localizer {
     }
 
     /**
-     * Gets robot position relative to specified tag
+     * Gets closest Note distance to the robot's intake
      * 
-     * @param id Apriltag ID
-     * @return Top-down (XY) robot position in M
+     * @return Top-down (XY) robot distance in M
      */
-    public Translation2d getTagPosition(int id) {
-        return tags.get(id).position.toTranslation2d();
-    }
-
-    /**
-     * Gets robot orientation relative to specified tag
-     * 
-     * @param id Apriltag ID
-     * @return Relative top-down robot orientation from its X-axis
-     */
-    public Rotation2d getTagRotation(int id) {
-        return tags.get(id).rotation.toRotation2d();
-    }
-
-    /**
-     * Gets robot heading relative to specified tag (useful for alignment, as zero
-     * is parallel)
-     * 
-     * @param id Apriltag ID
-     * @return Relative top-down robot heading from its Y-axis
-     */
-    public Rotation2d getTagHeading(int id) {
-        return tags.get(id).rotation.toRotation2d().minus(new Rotation2d(Math.PI / 2)).times(-1);
-    }
-
-    /**
-     * Gets closest Note position to the robot's intake
-     * 
-     * @return Top-down (XY) robot position in M
-     */
-    public Translation2d getNotePosition() {
-        return notePosition.toTranslation2d();
+    public double getNoteDistance() {
+        return noteDistance;
     }
 
     /**
@@ -194,14 +151,28 @@ public class Localizer {
         startingPose2d=pose;
     }
     /**
-     * Gets Pose2d based on translation and rotation
+     * Gets Pose2d based on translation and rotation for path planner
      * @return
      */
     public Pose2d getDisplacementPose2d() {
         return (new Pose2d(globalPosition,globalOrientation)).relativeTo(startingPose2d);
     }
 
+    /**
+     * Gets global rotation of speaker
+     * @return Rotation2d
+     */
+    public Rotation2d getSpeakerHeading() {
+        return speakerHeading;
+    }
 
+    /**
+     * Gets distance from shooter to speaker in meters
+     * @return meters
+     */
+    public double getSpeakerDistance() {
+        return speakerDist;
+    }
 
     /**
      * Updates first frame localization estimates
@@ -213,16 +184,12 @@ public class Localizer {
             server.subscribe("pose", (NetworkingCall<NetworkingPose>)(NetworkingPose pose) -> {
                 // SmartDashboard.putNumber("poseX", pose.position.getX());
                 globalPosition = pose.position.toTranslation2d();
-                globalOrientationFromTags = pose.rotation;
+                // globalOrientationFromTags = pose.rotation;
             });
     
             server.subscribe("note",  (NetworkingCall<NetworkingPose>)(NetworkingPose note) -> {
-                notePosition = note.position;
+                // noteDistance = `
                 noteRotation = note.rotation;
-            });
-    
-            server.subscribe("tag", (NetworkingCall<NetworkingTag>)(NetworkingTag tag) -> {
-                tags.put(tag.id, tag);
             });
         }
     }
@@ -235,6 +202,26 @@ public class Localizer {
     public synchronized void step(double dt) {
         globalHeading = pigeon.getRotation2d().minus(pigeonOffset);
         globalOrientation = globalHeading.minus(new Rotation2d(Math.PI / 2));
+
+        var result = camera.getLatestResult();
+        if (result.hasTargets()) {
+            PhotonTrackedTarget target = result.getBestTarget();
+            int targetID = target.getFiducialId();
+            double poseAmbiguity = target.getPoseAmbiguity();
+            Transform3d bestCameraToTarget = target.getBestCameraToTarget();
+            double yaw = target.getYaw();
+            double pitch = target.getPitch();
+            double area = target.getArea();
+        }
+
+        // Integrating robot position using swerve pose
+        ChassisSpeeds swerveSpeeds = drive.getVelocities();
+        Translation2d swerveVel = new Translation2d(swerveSpeeds.vxMetersPerSecond, swerveSpeeds.vyMetersPerSecond);
+        Translation2d navXVel = new Translation2d(navxGyro.getVelocityX(), navxGyro.getVelocityZ());
+        Translation2d odometryVel = swerveVel.plus(navXVel).times(0.5).rotateBy(globalHeading.times(-1));
+        globalPosition = globalPosition.plus(odometryVel.times(0.02));
+
+        
     }
 
     /**

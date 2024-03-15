@@ -11,6 +11,9 @@ import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.networktables.BooleanEntry;
+import edu.wpi.first.util.datalog.BooleanLogEntry;
+import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -34,6 +37,8 @@ public class ShooterSubsystem extends SubsystemBase {
 	private static final double DEADZONE = 0.1 * DEG;
 	
 	public final PIDController rotationPID = new PIDController(7500, 0, 5);
+	// private DoubleLogEntry angleLog;
+	// private BooleanLogEntry hasShot;
 
 	public final WPI_TalonFX linkageMotor = new WPI_TalonFX(12, "CANivore");
 	private final WPI_TalonFX topShooterMotor = new WPI_TalonFX(13, "CANivore");
@@ -65,6 +70,8 @@ public class ShooterSubsystem extends SubsystemBase {
 	}
 
 	public ShooterSubsystem() {
+		// this.angleLog = angleLog;
+		// this.hasShot = hasShot;
 		topShooterMotor.setNeutralMode(NeutralMode.Brake);
 		bottomShooterMotor.setNeutralMode(NeutralMode.Brake);
 		linkageMotor.setNeutralMode(NeutralMode.Brake);
@@ -146,6 +153,7 @@ public class ShooterSubsystem extends SubsystemBase {
 		linkageMotor.set(ControlMode.Velocity, PID,
 			DemandType.ArbitraryFeedForward, FF
 		);
+		// angleLog.append(targetRotation / DEG);
 		SmartDashboard.putNumber("TargetShooterAngle", targetRotation / DEG);
 		SmartDashboard.putNumber("Shooter PID", PID);
 		SmartDashboard.putNumber("Shooter FF", FF);
@@ -159,6 +167,7 @@ public class ShooterSubsystem extends SubsystemBase {
 	 * @param percent
 	 */
 	public void shoot(double percent) {
+		
 		topShooterMotor.set(ControlMode.PercentOutput, percent);
 	}
 

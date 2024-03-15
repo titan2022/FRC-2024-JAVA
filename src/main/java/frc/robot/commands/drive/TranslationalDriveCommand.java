@@ -2,6 +2,7 @@ package frc.robot.commands.drive;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -30,51 +31,12 @@ public class TranslationalDriveCommand extends Command {
      *                  meters per second.
      */
     public TranslationalDriveCommand(TranslationalDrivebase drive, Localizer localizer, XboxController xbox,
-            double maxVel) {
+            double maxVe, DataLog log) {
         this.drive = drive;
         this.localizer = localizer;
         this.xbox = xbox;
         this.maxVel = maxVel;
         addRequirements(drive);
-    }
-
-    /**
-     * Creates a new TranlationalDriveCommand using intrinsic orientation.
-     * 
-     * @param drivebase The drivebase to control.
-     * @param xbox      The joystick controller to use.
-     * @param velocity  The translational velocity represented by moving the
-     *                  translational joystick all the way towards a cardinal
-     *                  direction, in
-     *                  meters per second.
-     */
-    public TranslationalDriveCommand(TranslationalDrivebase drivebase, XboxController xbox, double velocity) {
-        this(drivebase, null, xbox, velocity);
-    }
-
-    /**
-     * Creates a new TranlationalDriveCommand with optional field orientation.
-     * 
-     * The maximum velocity in a cardinal direction defaults to 5 meters per second.
-     * 
-     * @param drivebase The drivebase to control.
-     * @param localizer The localizer to use for orientation correction.
-     * @param xbox      The joystick controller to use.
-     */
-    public TranslationalDriveCommand(TranslationalDrivebase drivebase, Localizer localizer, XboxController xbox) {
-        this(drivebase, localizer, xbox, 6.0);
-    }
-
-    /**
-     * Creates a new TranlationalDriveCommand using intrinsic orientation.
-     * 
-     * The maximum velocity in a cardinal direction defaults to 5 meters per second.
-     * 
-     * @param drivebase The drivebase to control.
-     * @param xbox      The joystick controller to use.
-     */
-    public TranslationalDriveCommand(TranslationalDrivebase drivebase, XboxController xbox) {
-        this(drivebase, null, xbox, 6.0);
     }
 
     @Override

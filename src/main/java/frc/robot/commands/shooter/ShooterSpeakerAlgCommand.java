@@ -45,13 +45,7 @@ public class ShooterSpeakerAlgCommand extends SequentialCommandGroup {
     }
 
     public static Translation2d getShootVector(Localizer localizer) {
-        Translation2d aprilTagPosition;
-        if (Constants.getColor() == Alliance.Blue) 
-            aprilTagPosition = localizer.getTagPosition(BLUE_SPEAKER_APRILTAG);
-        else
-            aprilTagPosition = localizer.getTagPosition(RED_SPEAKER_APRILTAG);
-
-        double horizontalDistance = aprilTagPosition.getNorm();
+        double horizontalDistance = localizer.getSpeakerDistance();
 
         Translation2d robotDistanceToAprilTag = new Translation2d(horizontalDistance, SPEAKER_HEIGHT);
         Translation2d shootVector = robotDistanceToAprilTag.minus(SHOOTER_PIVOT_OFFSET);

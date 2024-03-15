@@ -1,21 +1,5 @@
 package frc.robot.commands.auto;
 
-import frc.robot.utility.Constants;
-import frc.robot.utility.Localizer;
-import frc.robot.utility.Constants.Unit.*;
-import frc.robot.commands.align.AlignSpeakerCommand;
-import frc.robot.commands.control.NoteIntakeCommand;
-import frc.robot.commands.drive.TranslationCommand;
-import frc.robot.commands.shooter.RotateShooterCommand;
-import frc.robot.commands.shooter.ShooterAlignSpeakerCommand;
-import frc.robot.commands.shooter.SimpleShootCommand;
-import frc.robot.subsystems.ElevatorSubsystem;
-import frc.robot.subsystems.IndexerSubsystem;
-import frc.robot.subsystems.IntakeSubsystem;
-import frc.robot.subsystems.ShooterSubsystem;
-import frc.robot.subsystems.drive.RotationalDrivebase;
-import frc.robot.subsystems.drive.TranslationalDrivebase;
-
 import static frc.robot.utility.Constants.Unit.METERS;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -24,6 +8,18 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.robot.commands.control.NoteIntakeCommand;
+import frc.robot.commands.drive.TranslationCommand;
+import frc.robot.commands.shooter.RotateShooterCommand;
+import frc.robot.commands.shooter.SimpleShootCommand;
+import frc.robot.subsystems.ElevatorSubsystem;
+import frc.robot.subsystems.IndexerSubsystem;
+import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.ShooterSubsystem;
+import frc.robot.subsystems.drive.RotationalDrivebase;
+import frc.robot.subsystems.drive.TranslationalDrivebase;
+import frc.robot.utility.Constants;
+import frc.robot.utility.Localizer;
 
 /** An example command that uses an example subsystem. */
 public class SimpleAutoPlanOne extends SequentialCommandGroup {
