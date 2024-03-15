@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.commands.auto.SimpleAutoPlanTwo;
+import frc.robot.commands.auto.SimpleAutoPlanLeft;
 import frc.robot.commands.control.ElevatorControlCommand;
 import frc.robot.commands.drive.RotationalDriveCommand;
 import frc.robot.commands.drive.TranslationalDriveCommand;
@@ -69,7 +69,7 @@ public class Robot extends TimedRobot {
     @Override
     public void autonomousInit() {
         localizer.setup();
-        new SimpleAutoPlanTwo(drive.getTranslational(), drive.getRotational(), shooter, indexer, intake, elevator, localizer, true).schedule();
+        new SimpleAutoPlanLeft(drive.getTranslational(), drive.getRotational(), shooter, indexer, intake, elevator, localizer).schedule();
     }
 
     @Override
