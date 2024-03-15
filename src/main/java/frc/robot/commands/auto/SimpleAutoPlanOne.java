@@ -4,6 +4,7 @@ import frc.robot.utility.Constants;
 import frc.robot.utility.Localizer;
 import frc.robot.utility.Constants.Unit.*;
 import frc.robot.commands.align.AlignSpeakerCommand;
+import frc.robot.commands.control.NoteIntakeCommand;
 import frc.robot.commands.drive.TranslationCommand;
 import frc.robot.commands.shooter.RotateShooterCommand;
 import frc.robot.commands.shooter.ShooterAlignSpeakerCommand;
@@ -20,6 +21,7 @@ import static frc.robot.utility.Constants.Unit.METERS;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 
@@ -41,7 +43,12 @@ public class SimpleAutoPlanOne extends SequentialCommandGroup {
             new RotateShooterCommand(SHOOT_ANGLE, shooter),
             new SimpleShootCommand(SHOOT_SPEAKER_SPEED, shooter, indexer),
             new WaitCommand(1.0),
-            new TranslationCommand(new Translation2d(sign * 0, 3), 1, translational)
+            new ParallelCommandGroup(
+                new NoteIntakeCommand(indexer, intake, shooter),
+                new TranslationCommand(new Translation2d(sign * 0, 3), 1, translational)
+            ),
+            new RotateShooterCommand(Rotation2d.fromDegrees(45), shooter),
+            new SimpleShootCommand(SHOOT_SPEAKER_SPEED, shooter, indexer)
             // new ShooterAlignSpeakerCommand(shooter, localizer)
         );
 

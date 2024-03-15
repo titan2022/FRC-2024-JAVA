@@ -35,13 +35,10 @@ public class SimpleAutoPlanTwo extends SequentialCommandGroup {
         
         addCommands(
             new RotateShooterCommand(SHOOT_ANGLE, shooter),
-            new RotateShooterCommand(SHOOT_ANGLE, shooter),
             new SimpleShootCommand(SHOOT_SPEAKER_SPEED, shooter, indexer),
             new TranslationCommand(new Translation2d(sign * 0, 0.5), 1, translational),
             new RotationCommand(Rotation2d.fromDegrees(45).times(-sign), rotational, localizer),
-            new TranslationCommand(new Translation2d(sign * 0, 0.5), 1, translational),
-            new RotationCommand(Rotation2d.fromDegrees(45).times(-sign), rotational, localizer),
-            new TranslationCommand(new Translation2d(sign * 0, 3), 1, translational)
+            new TranslationCommand(new Translation2d(sign * 0, 2), 1, translational)
         );
 
         addRequirements(rotational, translational, shooter, indexer, elevator, intake);
