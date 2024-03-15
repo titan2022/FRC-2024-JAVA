@@ -120,6 +120,37 @@ public class Localizer {
     }
 
     /**
+     * Gets robot position relative to specified tag
+     * 
+     * @param id Apriltag ID
+     * @return Top-down (XY) robot position in M
+     */
+    public Translation2d getTagPosition(int id) {
+        return tags.get(id).position.toTranslation2d();
+    }
+
+    /**
+     * Gets robot orientation relative to specified tag
+     * 
+     * @param id Apriltag ID
+     * @return Relative top-down robot orientation from its X-axis
+     */
+    public Rotation2d getTagRotation(int id) {
+        return tags.get(id).rotation.toRotation2d();
+    }
+
+    /**
+     * Gets robot heading relative to specified tag (useful for alignment, as zero
+     * is parallel)
+     * 
+     * @param id Apriltag ID
+     * @return Relative top-down robot heading from its Y-axis
+     */
+    public Rotation2d getTagHeading(int id) {
+        return tags.get(id).rotation.toRotation2d().minus(new Rotation2d(Math.PI / 2)).times(-1);
+    }
+
+    /**
      * Gets closest Note distance to the robot's intake
      * 
      * @return Top-down (XY) robot distance in M
