@@ -91,7 +91,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 	 * Winches elevator
 	 */
 	public void winch() {
-		elevate(WINCH_SPEED);
+		leftSpoolMotor.set(ControlMode.Velocity, 0, DemandType.ArbitraryFeedForward, WINCH_SPEED);
 	}
 
 	/**
