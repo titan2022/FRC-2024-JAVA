@@ -248,8 +248,10 @@ public class Localizer {
             Translation3d translation = bestCameraToTarget.getTranslation();
             translation.rotateBy(toRobotRotation);
             Translation2d t2d = translation.toTranslation2d();
-            t2d.rotateBy(globalHeading);
             t2d.plus((new Translation2d(-9.628, -11.624).rotateBy(globalHeading)));
+            t2d.rotateBy(globalHeading.times(-1));
+            SmartDashboard.putNumber("Apriltag dx", t2d.getX());
+            SmartDashboard.putNumber("Apriltag dy", t2d.getY());
             globalPosition = idToTag(targetID).getPosition().minus(t2d);
         }
 

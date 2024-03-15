@@ -25,7 +25,7 @@ public class SimpleAutoPlanLeft extends SequentialCommandGroup {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
     public static double SHOOT_SPEAKER_SPEED = 0.5;
     public static final double SPEAKER_HEIGHT = 2 * METERS;
-    public static Rotation2d SHOOT_ANGLE = Rotation2d.fromDegrees(65);
+    public static Rotation2d SHOOT_ANGLE = Rotation2d.fromDegrees(64.9);
 
     public SimpleAutoPlanLeft(TranslationalDrivebase translational, RotationalDrivebase rotational, ShooterSubsystem shooter, IndexerSubsystem indexer, IntakeSubsystem intake, ElevatorSubsystem elevator, Localizer localizer) {
         double sign = 1;
@@ -45,7 +45,7 @@ public class SimpleAutoPlanLeft extends SequentialCommandGroup {
             new TranslationCommand(new Translation2d(sign * 0, 2), 1, translational)
         );
 
-        addRequirements(rotational, translational, shooter, indexer, elevator, intake);
+
     }
 
 }
