@@ -32,6 +32,8 @@ public class ShooterSubsystem extends SubsystemBase {
 	private static final double ENCODER_ABSOLUTE_ZERO = 0;
 	private static final double INTAKE_SPEED = 0.6;
 	private static final double DEADZONE = 0.1 * DEG;
+    private static final double SHOOTER_GEAR_RATIO = 1;
+    private static final double SHOOTER_WHEEL_RADIUS = 1 * IN;
 	
 	public final PIDController rotationPID = new PIDController(7500, 0, 5);
 
@@ -173,7 +175,10 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public double getShooterVelocity() {
-        return 0;
+        double averageMotorSpeed = (Math.abs(topShooterMotor.getSelectedSensorVelocity()) + Math.abs(topShooterMotor.getSelectedSensorVelocity())) / 2;
+        double rotationsPerSec = (averageMotorSpeed * 10) * FALCON_TICKS;
+        double metersPerSec = rotationsPerSec * SHOOTER_WHEEL_RADIUS / SHOOTER_GEAR_RATIO;
+        return metersPerSec;
     }
     // public void shoot(double speed) {
     //     //Converts from rotations / sec to ticks / 100ms
