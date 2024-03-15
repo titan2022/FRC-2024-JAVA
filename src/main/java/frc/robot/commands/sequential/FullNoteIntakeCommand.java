@@ -5,13 +5,12 @@ import frc.robot.commands.drive.TranslationCommand;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.drive.RotationalDrivebase;
 import frc.robot.subsystems.drive.TranslationalDrivebase;
 import frc.robot.utility.Localizer;
 
-
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
@@ -20,10 +19,10 @@ public class FullNoteIntakeCommand extends SequentialCommandGroup {
     public static final double MOVE_OVERSHOOT = 0.5;
     public static final double OVER_SHOOT_SPEED = 1;
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
-    public FullNoteIntakeCommand(TranslationalDrivebase translational, RotationalDrivebase rotational, IntakeSubsystem intake, IndexerSubsystem indexer, Localizer localizer) {
+    public FullNoteIntakeCommand(TranslationalDrivebase translational, RotationalDrivebase rotational, IntakeSubsystem intake, IndexerSubsystem indexer, ShooterSubsystem shooter, Localizer localizer) {
         addCommands(
             new ParallelDeadlineGroup(
-                new NoteIntakeCommand(indexer, intake),
+                new NoteIntakeCommand(indexer, intake, shooter),
                 new TranslationCommand(new Translation2d(0, MOVE_OVERSHOOT), OVER_SHOOT_SPEED, translational)
             )   
         );

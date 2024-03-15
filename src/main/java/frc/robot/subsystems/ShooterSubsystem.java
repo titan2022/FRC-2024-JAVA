@@ -94,6 +94,10 @@ public class ShooterSubsystem extends SubsystemBase {
 		return linkageEncoder.getAbsolutePosition() * 2.0 * Math.PI + -2.55;
 	}
 
+    public double calculateShooterRotation() {
+        return 0;
+    }
+
 	private double lawOfCosines(double a, double b, double c) {
 		return Math.acos((Math.pow(c, 2.0) - Math.pow(a, 2.0) - Math.pow(b, 2.0)) / (-2.0 * a * b));
 	}
@@ -158,6 +162,19 @@ public class ShooterSubsystem extends SubsystemBase {
 		topShooterMotor.set(ControlMode.PercentOutput, percent);
 	}
 
+    public void shootCoastToggle() {
+        topShooterMotor.setNeutralMode(NeutralMode.Coast);
+        bottomShooterMotor.setNeutralMode(NeutralMode.Coast);
+    }
+
+    public void shootBrakeToggle() {
+        topShooterMotor.setNeutralMode(NeutralMode.Brake);
+        bottomShooterMotor.setNeutralMode(NeutralMode.Brake);
+    }
+
+    public double getShooterVelocity() {
+        return 0;
+    }
     // public void shoot(double speed) {
     //     //Converts from rotations / sec to ticks / 100ms
     //     double motorSpeed = (speed / 10) / FALCON_TICKS;
