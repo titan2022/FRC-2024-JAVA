@@ -153,7 +153,7 @@ public class ShooterSubsystem extends SubsystemBase {
 			DemandType.ArbitraryFeedForward, FF
 		);
 		// angleLog.append(targetRotation / DEG);
-		SmartDashboard.putNumber("Target Shooter Angle", targetRotation / DEG);
+		SmartDashboard.putNumber("Target Shooter Angle", angle / DEG);
 		// SmartDashboard.putNumber("Shooter PID", PID);
 		// SmartDashboard.putNumber("Shooter FF", FF);
 
