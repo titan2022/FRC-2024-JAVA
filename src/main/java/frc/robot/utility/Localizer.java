@@ -49,7 +49,8 @@ public class Localizer {
     private DoubleLogEntry xLog;
     private DoubleLogEntry yLog;
     //Vector from the center of robot to camera
-    private Translation3d CAMERA_VECTOR = new Translation3d(9.628 * IN, -11.624 * IN, 3.316 * IN);
+    //The discord said "it is 11.867 inches back, 9.607 inches right, and 3.468 up"
+    private static final Translation3d CAMERA_VECTOR = new Translation3d(9.628 * IN, -11.624 * IN, 3.316 * IN);
     private Rotation2d pigeonOffset = new Rotation2d(0);
 
     private Translation2d globalPosition = new Translation2d();
@@ -260,6 +261,7 @@ public class Localizer {
             Translation3d trueCameraToAprilTag = new Translation3d(-cameraToApriltag.getY(), cameraToApriltag.getX(), cameraToApriltag.getZ());
 
             //Rotates the vector to the point where camera is facing forward with the front of robot
+            //The discord said "50.5 up 16.94 to right" so I assume degrees
             Rotation3d toRobotRotation = new Rotation3d(-50.5*DEG, 0, -16.94*DEG);
             trueCameraToAprilTag = trueCameraToAprilTag.rotateBy(toRobotRotation);
             //Transforms to robot frame
