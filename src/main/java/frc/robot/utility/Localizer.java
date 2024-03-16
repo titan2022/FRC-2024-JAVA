@@ -70,7 +70,9 @@ public class Localizer {
     private Dictionary<Integer, NetworkingTag> tags = new Hashtable<>();
     // (Speaker 4, new Translation3d(16.579342, 5.547868, 1.981327), new Rotation2d(3.14159265358979))
     // (Speaker 7, new Translation3d(-0.0381, 5.547868, 1.981327), new Rotation2d(0))
-    private Translation2d[] speaker_location = {new Translation2d(16.579342, 5.547868), new Translation2d(-0.0381, 5.547868)};
+    private static final Translation3d BLUE_SPEAKER = new Translation3d(-0.0381, 5.547868, 1.981327);
+    private static final Translation3d RED_SPEAKER = new Translation3d(16.579342, 5.547868, 1.981327);
+
 
     private Pose2d startingPose2d = new Pose2d(); 
     /**
