@@ -128,6 +128,9 @@ public class Robot extends TimedRobot {
             config.enable = true;
             config.triggerThresholdCurrent = 40;
             config.triggerThresholdTime = 0.01;
+            for (int i = 0; i < drive.motors.length; i++) {
+                drive.motors[i].configSupplyCurrentLimit(config);
+            }
             SwerveDriveSubsystem.motorFeedfoward = new SimpleMotorFeedforward(SwerveDriveSubsystem.TranslationalFeedForward.kS, 0.175);
             highSpeed = false;
         }

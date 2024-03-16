@@ -61,11 +61,6 @@ public class TranslationalDriveCommand extends Command {
             isFieldOriented = !isFieldOriented;
             SmartDashboard.putBoolean("isFieldOriented", isFieldOriented);
         }
-
-        if (isFieldOriented)
-            xbox.setRumble(RumbleType.kBothRumble, 0.25);
-        else    
-            xbox.setRumble(RumbleType.kBothRumble, 0);
         
         if (xbox.getAButtonPressed()) {
             phiOffset = localizer.getOrientation();
