@@ -52,15 +52,6 @@ public class AutomaticShooterControlCommand extends Command {
 
     @Override
     public void execute() {
-        // if (Math.abs(xbox.getRightY()) > 0.1) {
-        //     shooterAngle += -xbox.getRightY() * 80 * DEG * 0.02;// = SmartDashboard.getNumber("targetAngle", ShooterSubsystem.MIN_ANGLE);
-        //     shooterAngle = Math.min(shooterAngle, ShooterSubsystem.MAX_ANGLE);
-        //     shooterAngle = Math.max(shooterAngle, ShooterSubsystem.MIN_ANGLE);
-            
-        //     // shooter.setRotation(55 * DEG);
-        //     // shooter.holdAngle();
-        // }
-
         // Offsets from d-pad
         int dpad = xbox.getPOV();
         if(isReadingOffsetIncrements) {
@@ -82,12 +73,8 @@ public class AutomaticShooterControlCommand extends Command {
             offset = 0;
         }
 
-        // double finalAngle = shooterAngle + offset;
-        // // shooterAngle = 65;
-        // shooter.setRotation(finalAngle);
-
         if (xbox.getLeftTriggerAxis() > 0.5) {
-            new ShooterSpeakerAlgCommand(SHOOTER_SPEED, shooter, indexer, localizer).alongWith(new RevShooterCommand(SHOOTER_SPEED, shooter));
+            new ShooterSpeakerAlignCommand(SHOOTER_SPEED, shooter, localizer).alongWith(new RevShooterCommand(SHOOTER_SPEED, shooter));
         }
     }
 
