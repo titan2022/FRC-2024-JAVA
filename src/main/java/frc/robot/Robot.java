@@ -37,7 +37,7 @@ public class Robot extends TimedRobot {
         SmartDashboard.putNumber("swkI", 0.0);
         SmartDashboard.putNumber("swkD", 0.06);
         SmartDashboard.putNumber("swkF", 0.02);
-
+        SmartDashboard.putNumber("auto_start_degrees", 0.0);
         DataLogManager.start();
         log = DataLogManager.getLog();
     }
@@ -61,6 +61,7 @@ public class Robot extends TimedRobot {
     @Override
     public void autonomousInit() {
         localizer.setup();
+        localizer.setPigeon(SmartDashboard.getNumber("auto_start_degrees", 0.0));
         new SimpleAutoPlanLeft(drive.getTranslational(), drive.getRotational(), shooter, indexer, intake, elevator, localizer).schedule();
     }
 

@@ -77,6 +77,14 @@ public class Localizer {
     }
 
     /**
+     * Used to initalize the pigeon. Only use for the beginning of the auto.
+     * @param rotation
+     */
+    public void setPigeon(double rotation){
+        pigeon.setAccumZAngle(rotation);
+    }
+
+    /**
      * Gets the current global position
      * 
      * @return Position in meters from bottom left corner
