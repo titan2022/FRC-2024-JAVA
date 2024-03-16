@@ -1,5 +1,8 @@
 package frc.robot;
 
+import static frc.robot.utility.Constants.Unit.METERS;
+import static frc.robot.utility.Constants.Unit.SECONDS;
+
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -9,11 +12,14 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.commands.align.AlignSpeakerCommand;
 import frc.robot.commands.auto.SimpleAutoPlanLeft;
 import frc.robot.commands.control.ElevatorControlCommand;
 import frc.robot.commands.drive.RotationalDriveCommand;
 import frc.robot.commands.drive.TranslationalDriveCommand;
+import frc.robot.commands.shooter.RevShooterCommand;
 import frc.robot.commands.shooter.ShooterControlCommand;
+import frc.robot.commands.shooter.ShooterSpeakerAlignCommand;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -34,6 +40,8 @@ public class Robot extends TimedRobot {
     private IndexerSubsystem indexer = new IndexerSubsystem();
     private DataLog log;
     private boolean highSpeed = false;
+    private static final double SHOOTER_SPEED = 5 * METERS / SECONDS;
+
 
     @Override
     public void robotInit() {
@@ -194,7 +202,13 @@ public class Robot extends TimedRobot {
         if (!xbox2.getBButton() && !xbox2.getAButton() && !xbox2.getYButton() && !xbox2.getRightBumper()) {
             indexer.stop();
         }
+
+        // Left trigger -> auto-align speaker
         
+        // if (xbox2.getLeftTriggerAxis() > 0.5) {
+        //     new ShooterSpeakerAlignCommand(SHOOTER_SPEED, shooter, localizer).alongWith(new RevShooterCommand(SHOOTER_SPEED, shooter)).alongWith(new AlignSpeakerCommand(drive.getRotational(), localizer));
+        // }
+
         // if (xbox1.getStartButtonPressed()) {
         //     if (!elevator.unlocked) {
         //        shooter.linkageMotor.disable();
