@@ -283,9 +283,7 @@ public class Localizer {
         Translation2d swerveVel = new Translation2d(swerveSpeeds.vxMetersPerSecond, swerveSpeeds.vyMetersPerSecond);
         Translation2d navXVel = new Translation2d(navxGyro.getVelocityX(), navxGyro.getVelocityZ());
         Translation2d odometryVel = swerveVel.plus(navXVel).times(0.5).rotateBy(globalHeading.times(-1));
-        globalPosition = globalPosition.plus(odometryVel.times(0.02));
-
-        
+        // globalPosition = globalPosition.plus(odometryVel.times(0.02));
     }
     
     public Translation2d getSpeakerLocation(){
