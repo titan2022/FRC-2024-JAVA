@@ -53,7 +53,7 @@ public class Localizer {
     private DoubleLogEntry yLog;
     //Vector from the center of robot to camera
     //The discord said "it is 11.867 inches back, 9.607 inches right, and 3.468 up"
-    private static final Translation3d CAMERA_VECTOR = new Translation3d(9.628 * IN, -11.624 * IN, 3.316 * IN);
+    private static final Translation3d CAMERA_VECTOR = new Translation3d(-9.628 * IN, 11.624 * IN, 3.316 * IN);
     private Rotation2d pigeonOffset = new Rotation2d(0);
 
     private Translation2d globalPosition = new Translation2d();
