@@ -22,7 +22,9 @@ import frc.robot.subsystems.drive.SwerveDriveSubsystem;
 import frc.robot.utility.Localizer;
 
 public class Robot extends TimedRobot {
+    // Nate's controller - drivebase
     private final XboxController xbox1 = new XboxController(2);
+    // Keegan's controller - all other systems
     private final XboxController xbox2 = new XboxController(0);
     private SwerveDriveSubsystem drive = new SwerveDriveSubsystem();
     private Localizer localizer = new Localizer(drive, false, 5804); 
@@ -189,13 +191,11 @@ public class Robot extends TimedRobot {
         if (!xbox2.getBButton() && !xbox2.getAButton() && !xbox2.getYButton() && !xbox2.getRightBumper()) {
             indexer.stop();
         }
-
         
-
-        if (xbox1.getStartButtonPressed()) {
-            if (!elevator.unlocked) {
-               shooter.linkageMotor.disable();
-            }
-        }
+        // if (xbox1.getStartButtonPressed()) {
+        //     if (!elevator.unlocked) {
+        //        shooter.linkageMotor.disable();
+        //     }
+        // }
     }
 }
