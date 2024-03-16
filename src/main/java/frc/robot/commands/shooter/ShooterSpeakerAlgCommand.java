@@ -70,6 +70,7 @@ public class ShooterSpeakerAlgCommand extends SequentialCommandGroup {
     }
 
     public static Translation2d getShootVector(Localizer localizer) {
+        Translation3d speakerDisplacement = localizer.getBlueSpeaker();
         if (Constants.getColor() == Alliance.Blue) {
         } else {
 

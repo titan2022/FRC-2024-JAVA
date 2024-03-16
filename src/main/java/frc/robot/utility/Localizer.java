@@ -185,20 +185,16 @@ public class Localizer {
         return (new Pose2d(globalPosition,globalOrientation)).relativeTo(startingPose2d);
     }
 
-    /**
-     * Gets global rotation of speaker
-     * @return Rotation2d
-     */
-    public Rotation2d getSpeakerHeading() {
-        return speakerHeading;
+    public Translation3d getBlueSpeaker() {
+        //Top down displacement
+        Translation2d displacement = BLUE_SPEAKER.toTranslation2d().minus(globalPosition);
+        return new Translation3d(displacement.getX(), displacement.getY(), BLUE_SPEAKER.getZ());
     }
 
-    /**
-     * Gets distance from shooter to speaker in meters
-     * @return meters
-     */
-    public double getSpeakerDistance() {
-        return speakerDist;
+    public Translation3d getRedSpeakerVector() {
+        //Top down displacement
+        Translation2d displacement = RED_SPEAKER.toTranslation2d().minus(globalPosition);
+        return new Translation3d(displacement.getX(), displacement.getY(), RED_SPEAKER.getZ());
     }
 
     /**
@@ -290,13 +286,13 @@ public class Localizer {
         // globalPosition = globalPosition.plus(odometryVel.times(0.02));
     }
     
-    public Translation2d getSpeakerLocation(){
-        if(Constants.getColor().equals(Alliance.Blue)){
-            return speaker_location[0].minus(globalPosition);
-        } else {
-            return speaker_location[1].minus(globalPosition);
-        }
-    }
+    // public Translation2d getSpeakerLocation(){
+    //     if(Constants.getColor().equals(Alliance.Blue)){
+    //         return speaker_location[0].minus(globalPosition);
+    //     } else {
+    //         return speaker_location[1].minus(globalPosition);
+    //     }
+    // }
 
     /**
      * Updates the state of the localization estimates
