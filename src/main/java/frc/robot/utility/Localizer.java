@@ -1,6 +1,7 @@
 package frc.robot.utility;
 
 import static frc.robot.utility.Constants.Unit.DEG;
+import static frc.robot.utility.Constants.Unit.IN;
 
 import java.util.Dictionary;
 import java.util.Hashtable;
@@ -47,8 +48,8 @@ public class Localizer {
 
     private DoubleLogEntry xLog;
     private DoubleLogEntry yLog;
-
-
+    //Vector from the center of robot to camera
+    private Translation3d CAMERA_VECTOR = new Translation3d(9.628 * IN, -11.624 * IN, 3.316 * IN);
     private Rotation2d pigeonOffset = new Rotation2d(0);
 
     private Translation2d globalPosition = new Translation2d();
@@ -250,15 +251,23 @@ public class Localizer {
             PhotonTrackedTarget target = result.getBestTarget();
             int targetID = target.getFiducialId();
             
-            double poseAmbiguity = target.getPoseAmbiguity();
-            Transform3d bestCameraToTarget = target.getBestCameraToTarget();
-            Rotation3d toRobotRotation = new Rotation3d((90-50.5)*DEG, 1, -16.94*DEG);
-            Translation3d translation = bestCameraToTarget.getTranslation();
-            translation.rotateBy(toRobotRotation);
-            Translation2d t2d = translation.toTranslation2d();
-            t2d.rotateBy(globalHeading);
-            t2d.plus((new Translation2d(-9.628, -11.624).rotateBy(globalHeading)));
-            globalPosition = idToTag(targetID).getPosition().minus(t2d);
+            // double poseAmbiguity = target.getPoseAmbiguity();
+
+            //Vector to target april tag relative to camera
+            //X forward, Y left, Z up
+            Transform3d cameraToApriltag = target.getBestCameraToTarget();
+            //Transforms to X right, Y forward, Z up
+            Translation3d trueCameraToAprilTag = new Translation3d(-cameraToApriltag.getY(), cameraToApriltag.getX(), cameraToApriltag.getZ());
+
+            //Rotates the vector to the point where camera is facing forward with the front of robot
+            Rotation3d toRobotRotation = new Rotation3d(-50.5*DEG, 0, -16.94*DEG);
+            trueCameraToAprilTag = trueCameraToAprilTag.rotateBy(toRobotRotation);
+            //Transforms to robot frame
+            Translation3d robotToApriltag = trueCameraToAprilTag.minus(CAMERA_VECTOR);
+            //Top down view of camera to april tag vector
+            Translation2d robotToAprilTagTopDown = robotToApriltag.toTranslation2d();
+            //Finally gets the robot vector to camera
+            globalPosition = idToTag(targetID).getPosition().minus(robotToAprilTagTopDown);
         }
 
         // Integrating robot position using swerve pose
