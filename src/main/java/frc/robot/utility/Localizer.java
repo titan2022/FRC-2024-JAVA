@@ -5,6 +5,9 @@ import static frc.robot.utility.Constants.Unit.DEG;
 import java.util.Dictionary;
 import java.util.Hashtable;
 
+import org.photonvision.PhotonCamera;
+import org.photonvision.targeting.PhotonTrackedTarget;
+
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import com.kauailabs.navx.frc.AHRS;
 
