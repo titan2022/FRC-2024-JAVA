@@ -54,7 +54,13 @@ public class Localizer {
     private Rotation2d pigeonOffset = new Rotation2d(0);
 
     private Translation2d globalPosition = new Translation2d();
+    /** The heading of the robot where 0 represents facing "east" (along the x-axis)
+     *  and increasing the heading means turning counterclockwise.
+     */
     private Rotation2d globalHeading = new Rotation2d();
+    /** The heading of the robot where 0 represents facing "north" (along the y-axis)
+     *  and increasing the heading means turning counterclockwise.
+     */
     private Rotation2d globalOrientation = new Rotation2d();
     private Rotation3d globalOrientationFromTags = new Rotation3d();
     private double noteDistance = -1;
