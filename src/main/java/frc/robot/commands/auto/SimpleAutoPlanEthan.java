@@ -1,5 +1,6 @@
 package frc.robot.commands.auto;
 
+import static frc.robot.utility.Constants.Unit.DEG;
 import static frc.robot.utility.Constants.Unit.METERS;
 import static frc.robot.utility.Constants.Unit.SECONDS;
 
@@ -23,7 +24,7 @@ import frc.robot.subsystems.drive.TranslationalDrivebase;
 import frc.robot.utility.Constants;
 import frc.robot.utility.Localizer;
 
-/** An example command that uses an example subsystem. */
+/** Starting from the subwoofer on the source side, shoot two notes. */
 public class SimpleAutoPlanEthan extends SequentialCommandGroup {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
     public static final double SHOOT_SPEAKER_SPEED = 0.5;
@@ -31,9 +32,25 @@ public class SimpleAutoPlanEthan extends SequentialCommandGroup {
     public static final Rotation2d SHOOT_ANGLE = Rotation2d.fromDegrees(64.9);
     public static final double WAIT_LENGTH = 1 * SECONDS;
 
+    TranslationalDrivebase translational;
+    RotationalDrivebase rotational; 
+    ShooterSubsystem shooter; 
+    IndexerSubsystem indexer; 
+    IntakeSubsystem intake; 
+    ElevatorSubsystem elevator; 
+    Localizer localizer;
+
+    double sign;
+
     public SimpleAutoPlanEthan(TranslationalDrivebase translational, RotationalDrivebase rotational, ShooterSubsystem shooter, IndexerSubsystem indexer, IntakeSubsystem intake, ElevatorSubsystem elevator, Localizer localizer) {
-        // double sign = 1;
-        double sign;
+        this.translational = translational;
+        this.rotational = rotational;
+        this.shooter = shooter;
+        this.indexer = indexer;
+        this.intake = intake;
+        this.elevator = elevator;
+        this.localizer = localizer;
+
         if (Constants.getColor() == Alliance.Blue) {    
             sign = 1;
         } else 
@@ -41,53 +58,58 @@ public class SimpleAutoPlanEthan extends SequentialCommandGroup {
 
         SmartDashboard.putBoolean("1", true);
         
+        shootNote();
+        translateRotateTranslateInOut(3*METERS, 120*DEG, 3.5*METERS, this::intakeNote);
+        shootNote();
+        translateRotateTranslateInOut(3*METERS, 95*DEG, 3.5*METERS, this::intakeNote);
+    }
+
+    public interface InternalCommand {
+        void add();
+    }
+
+    public void shootNote() {
         addCommands(
-            //// Shoot the preloaded note ////
-            new RotateShooterCommand(SHOOT_ANGLE, shooter),
-            new SimpleShootCommand(SHOOT_SPEAKER_SPEED, shooter, indexer),
-            new WaitCommand(WAIT_LENGTH),
-            //// Eat 1st note ////
-            new TranslationCommand(new Translation2d(sign * 0, 0.5), 1, translational),
-            // Turn 30 degrees clockwise
-            new RotationCommand(Rotation2d.fromDegrees(30).times(sign), rotational, localizer),
-            new TranslationCommand(new Translation2d(sign * 0, 2), 1, translational),
-            new NoteIntakeCommand(indexer, intake, shooter),
-            new TranslationCommand(new Translation2d(sign * 0, -2), 1, translational),
-            new RotationCommand(Rotation2d.fromDegrees(30).times(-sign), rotational, localizer),
-            new TranslationCommand(new Translation2d(sign * 0, 0.5), 1, translational),
-            //// Shoot 1st note ////
-            new RotateShooterCommand(SHOOT_ANGLE, shooter),
-            new SimpleShootCommand(SHOOT_SPEAKER_SPEED, shooter, indexer),
-            new WaitCommand(WAIT_LENGTH),
-            //// Eat 2nd note ////
-            new TranslationCommand(new Translation2d(sign * 0, 0.5), 1, translational),
-            new RotationCommand(Rotation2d.fromDegrees(45).times(sign), rotational, localizer),
-            new TranslationCommand(new Translation2d(sign * 0, 2), 1, translational),
-            new NoteIntakeCommand(indexer, intake, shooter),
-            new TranslationCommand(new Translation2d(sign * 0, -2), 1, translational),
-            new RotationCommand(Rotation2d.fromDegrees(45).times(-sign), rotational, localizer),
-            new TranslationCommand(new Translation2d(sign * 0, 0.5), 1, translational),
-            //// Shoot 2nd note ////
-            new RotateShooterCommand(SHOOT_ANGLE, shooter),
-            new SimpleShootCommand(SHOOT_SPEAKER_SPEED, shooter, indexer),
-            new WaitCommand(WAIT_LENGTH),
-            //// Eat 3rd note ////
-            new TranslationCommand(new Translation2d(sign * 0, 0.5), 1, translational),
-            new RotationCommand(Rotation2d.fromDegrees(45).times(sign), rotational, localizer),
-            new TranslationCommand(new Translation2d(sign * 0, 1.8), 1, translational),
-            new RotationCommand(Rotation2d.fromDegrees(30).times(sign), rotational, localizer),
-            new NoteIntakeCommand(indexer, intake, shooter),
-            new TranslationCommand(new Translation2d(sign * 0, -1.8), 1, translational),
-            new RotationCommand(Rotation2d.fromDegrees(45).times(-sign), rotational, localizer),
-            new RotationCommand(Rotation2d.fromDegrees(30).times(-sign), rotational, localizer),
-            new TranslationCommand(new Translation2d(sign * 0, 0.5), 1, translational),
-            //// Shoot 3rd note ////
             new RotateShooterCommand(SHOOT_ANGLE, shooter),
             new SimpleShootCommand(SHOOT_SPEAKER_SPEED, shooter, indexer),
             new WaitCommand(WAIT_LENGTH)
         );
+    }
 
+    public void rotateIn(double degrees) {
+        // Since we start from the source side, inwards is counterclockwise on the blue side and clockwise on the red side.
+        addCommands(
+            new RotationCommand(Rotation2d.fromDegrees(degrees).times(sign), rotational, localizer)
+        );
+    }
 
+    public void rotateOut(double degrees) {
+        // Since we start from the source side, outwards is clockwise on the blue side and countercockwise on the red side.
+        addCommands(
+            new RotationCommand(Rotation2d.fromDegrees(degrees).times(-sign), rotational, localizer)
+        );
+    }
+
+    public void moveForward(double translation) {
+        addCommands(
+            new TranslationCommand(new Translation2d(0, translation), 1, translational)
+        );
+    }
+
+    public void intakeNote() {
+        addCommands(
+            new NoteIntakeCommand(indexer, intake, shooter)
+        );
+    }
+
+    public void translateRotateTranslateInOut(double translation1, double rotation, double translation2, InternalCommand command) {
+        moveForward(translation1);
+        rotateIn(rotation);
+        moveForward(translation2);
+        command.add();
+        moveForward(-translation2);
+        rotateOut(rotation);
+        moveForward(-translation1);
     }
 
 }
