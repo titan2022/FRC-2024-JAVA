@@ -31,6 +31,7 @@ public class Robot extends TimedRobot {
     private ShooterSubsystem shooter = new ShooterSubsystem();
     private IndexerSubsystem indexer = new IndexerSubsystem();
     private DataLog log;
+    private boolean highSpeed = false;
 
     @Override
     public void robotInit() {
@@ -107,7 +108,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopPeriodic() {
-        if (xbox1.getLeftBumperPressed() && SwerveDriveSubsystem.motorFeedfoward.kv == 0.175) {
+        if (xbox1.getLeftBumperPressed() && !highSpeed) {
             SupplyCurrentLimitConfiguration config = new SupplyCurrentLimitConfiguration();
             config.currentLimit = 60;
             config.enable = true;
@@ -117,13 +118,15 @@ public class Robot extends TimedRobot {
                 drive.motors[i].configSupplyCurrentLimit(config);
             }
             SwerveDriveSubsystem.motorFeedfoward = new SimpleMotorFeedforward(SwerveDriveSubsystem.TranslationalFeedForward.kS, 0.25);
-        } else if (xbox1.getLeftBumperPressed() && SwerveDriveSubsystem.motorFeedfoward.kv == 0.25) {
+            highSpeed = true;
+        } else if (xbox1.getLeftBumperPressed() && highSpeed) {
             SupplyCurrentLimitConfiguration config = new SupplyCurrentLimitConfiguration();
             config.currentLimit = 30;
             config.enable = true;
             config.triggerThresholdCurrent = 40;
             config.triggerThresholdTime = 0.01;
             SwerveDriveSubsystem.motorFeedfoward = new SimpleMotorFeedforward(SwerveDriveSubsystem.TranslationalFeedForward.kS, 0.175);
+            highSpeed = false;
         }
         
         // if (xbox1.getLeftBumperPressed()) {
