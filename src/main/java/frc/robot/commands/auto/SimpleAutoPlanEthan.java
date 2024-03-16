@@ -53,8 +53,11 @@ public class SimpleAutoPlanEthan extends SequentialCommandGroup {
 
         if (Constants.getColor() == Alliance.Blue) {    
             sign = 1;
-        } else 
+            localizer.setPigeon(-Math.PI / 4);
+        } else {
             sign = -1;
+            localizer.setPigeon(5 * Math.PI / 4);
+        }
 
         SmartDashboard.putBoolean("1", true);
         

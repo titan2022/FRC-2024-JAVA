@@ -38,6 +38,9 @@ import frc.robot.utility.networking.types.NetworkingTag;
  * <p>
  * Positive Y and positive X are robot's front and right sides respectively in
  * robot-relative coorditate plane
+ * 
+ * When resetting the robot rotation at match start, make sure to set
+ * the global orientation or angle of the robot front relative to positive x axis
  */
 public class Localizer {
     private PhotonCamera camera = new PhotonCamera("photonvision");
@@ -114,7 +117,19 @@ public class Localizer {
      */
     public Rotation2d getOrientation() {
         // return Rotation2d.fromDegrees(-navxGyro.getAngle() + 90);
-        return globalOrientation;
+        return pigeon.getRotation2d();
+    }
+
+    /**
+     * Returns orientation but bounded between (0, 2pi)
+     * @return
+     */
+    public Rotation2d getBoundedOrientation() {
+        Rotation2d boundedTheta = new Rotation2d(pigeon.getRotation2d().getRadians() % (2 * Math.PI));
+        if (boundedTheta.getRadians() < 0)
+            return boundedTheta.plus(new Rotation2d(2 * Math.PI));
+        else 
+            return boundedTheta;
     }
 
     /**
@@ -143,7 +158,7 @@ public class Localizer {
      */
     public Rotation2d getHeading() {
         // return Rotation2d.fromDegrees(navxGyro.getAngle());
-        return globalHeading;
+        return new Rotation2d(pigeon.getRotation2d().getRadians() + (Math.PI / 2));
     }
 
     /**
@@ -191,7 +206,7 @@ public class Localizer {
         return new Translation3d(displacement.getX(), displacement.getY(), BLUE_SPEAKER.getZ());
     }
 
-    public Translation3d getRedSpeakerVector() {
+    public Translation3d getRedSpeaker() {
         //Top down displacement
         Translation2d displacement = RED_SPEAKER.toTranslation2d().minus(globalPosition);
         return new Translation3d(displacement.getX(), displacement.getY(), RED_SPEAKER.getZ());

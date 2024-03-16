@@ -32,8 +32,11 @@ public class SimpleAutoPlanStraight extends SequentialCommandGroup {
         double sign;
         if (Constants.getColor() == Alliance.Blue) {
             sign = 1;
-        } else 
+            localizer.setPigeon(0);
+        } else {
             sign = -1;
+            localizer.setPigeon(Math.PI);
+        }
         
         addCommands(
             new RotateShooterCommand(SHOOT_ANGLE, shooter),
