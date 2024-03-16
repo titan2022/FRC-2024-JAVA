@@ -65,6 +65,7 @@ public class SimpleAutoPlanEthan extends SequentialCommandGroup {
         translateRotateTranslateInOut(3*METERS, 120*DEG, 3.5*METERS, this::intakeNote);
         shootNote();
         translateRotateTranslateInOut(3*METERS, 95*DEG, 3.5*METERS, this::intakeNote);
+        shootNote();
     }
 
     public interface InternalCommand {
