@@ -53,7 +53,7 @@ public class Robot extends TimedRobot {
         SmartDashboard.putNumber("Y Velocity", drive.getTranslational().getVelocity().getY());
         SmartDashboard.putNumber("Speed", drive.getTranslational().getVelocity().getNorm());
         SmartDashboard.putNumber("Heading", localizer.getHeading().getDegrees());
-
+        SmartDashboard.putBoolean("High Speed On", highSpeed);
         localizer.step();
     }
 
