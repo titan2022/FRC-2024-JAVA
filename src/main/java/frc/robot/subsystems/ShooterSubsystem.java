@@ -60,9 +60,9 @@ public class ShooterSubsystem extends SubsystemBase {
 		// talon.slot0.allowableClosedloopError = 5;// 217;
 		// talon.slot0.maxIntegralAccumulator = 5120;
 
-        talon.supplyCurrLimit.currentLimit = 20;
+        talon.supplyCurrLimit.currentLimit = 70;
         talon.supplyCurrLimit.enable = true;
-        talon.supplyCurrLimit.triggerThresholdCurrent = 30;
+        talon.supplyCurrLimit.triggerThresholdCurrent = 80;
         talon.supplyCurrLimit.triggerThresholdTime = 0.1;
 
 		return talon;
@@ -153,7 +153,7 @@ public class ShooterSubsystem extends SubsystemBase {
 			DemandType.ArbitraryFeedForward, FF
 		);
 		// angleLog.append(targetRotation / DEG);
-		SmartDashboard.putNumber("Target Shooter Angle", targetRotation / DEG);
+		SmartDashboard.putNumber("Target Shooter Angle", angle / DEG);
 		// SmartDashboard.putNumber("Shooter PID", PID);
 		// SmartDashboard.putNumber("Shooter FF", FF);
 

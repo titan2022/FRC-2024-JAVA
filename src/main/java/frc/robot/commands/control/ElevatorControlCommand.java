@@ -1,19 +1,20 @@
 package frc.robot.commands.control;
 
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.ElevatorSubsystem;
 
 public class ElevatorControlCommand extends Command {
     private ElevatorSubsystem elevator;
     private XboxController xbox;
+    private XboxController driveXbox;
 
     private double elevatorPos = 0;
 
-    public ElevatorControlCommand(ElevatorSubsystem elevator, XboxController xbox) {
+    public ElevatorControlCommand(ElevatorSubsystem elevator, XboxController xbox, XboxController driveXbox) {
         this.elevator = elevator;
         this.xbox = xbox;
+        this.driveXbox = driveXbox;
         addRequirements(elevator);
     }
 
@@ -24,23 +25,29 @@ public class ElevatorControlCommand extends Command {
 
     @Override
     public void execute() {
+        int pov = xbox.getPOV();
+        if (pov != -1) {
+            int manualVel = 0;
+            if (pov == 0) {
+                manualVel = 1;
+            } else if (pov == 180) {
+                manualVel = -1;
+            }
+            elevator.setMotors(manualVel);
+            return;
+        }
+        
+
 
         if (-xbox.getLeftY() > 0.6) {
             elevator.setHeight(1);
         } else if (-xbox.getLeftY() < -0.6) {
             elevator.setHeight(0);
+        } else if (xbox.getXButton()) {
+            elevator.elevate(-.4);
         } else {
             elevator.hold();
         }
-
-        // SmartDashboard.putBoolean("canRun", elevator.canRun());
-
-        // elevatorPos = Math.abs(xbox.getLeftY());
-        // // elevatorPos = Math.min(elevatorPos, 1);
-        // // elevatorPos = Math.max(elevatorPos, 0);
-        // elevator.setHeight(elevatorPos);
-        // elevator.
-        // SmartDashboard.putNumber("EleTargetPos", elevatorPos);
     }
 
     @Override
