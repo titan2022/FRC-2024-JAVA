@@ -5,6 +5,7 @@
 package frc.robot.commands.shooter;
 
 import frc.robot.utility.Constants.Unit;
+import frc.robot.utility.localization.AprilTag;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
@@ -69,13 +70,10 @@ public class ShooterSpeakerAlgCommand extends SequentialCommandGroup {
     }
 
     public static Translation2d getShootVector(Localizer localizer) {
-        double horizontalDistance = localizer.getSpeakerDistance();
+        if (Constants.getColor() == Alliance.Blue) {
+        } else {
 
-        Translation2d robotDistanceToAprilTag = new Translation2d(horizontalDistance, SPEAKER_HEIGHT);
-        Translation2d shootVector = robotDistanceToAprilTag.minus(SHOOTER_PIVOT_OFFSET);
-        Rotation2d dynamicStartAngle = Rotation2d.fromDegrees(45);
-        Translation2d dynamicShooterStartPoint = new Translation2d(dynamicStartAngle.getCos() * SHOOTER_ARM_LENGTH, dynamicStartAngle.getSin() * SHOOTER_ARM_LENGTH);
-        Translation2d trueShootVector = shootVector.minus(dynamicShooterStartPoint);
+        }
         return shootVector.plus(TARGET_OFFSET);
     }
 
