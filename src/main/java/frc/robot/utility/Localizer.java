@@ -268,7 +268,7 @@ public class Localizer {
 
             //Rotates the vector to the point where camera is facing forward with the front of robot
             //The discord said "50.5 up 16.94 to right" so I assume degrees
-            Rotation3d toRobotRotation = new Rotation3d(-50.5*DEG, 0, -16.94*DEG);
+            Rotation3d toRobotRotation = new Rotation3d(-50.5*DEG, 0, 16.94*DEG);
             trueCameraToAprilTag = trueCameraToAprilTag.rotateBy(toRobotRotation);
             //Transforms to robot frame
             Translation3d robotToApriltag = trueCameraToAprilTag.minus(CAMERA_VECTOR);
@@ -276,7 +276,7 @@ public class Localizer {
             Translation2d robotToAprilTagTopDown = robotToApriltag.toTranslation2d();
             //Finally gets the robot vector to camera
             globalPosition = idToTag(targetID).getPosition().minus(robotToAprilTagTopDown);
-        }
+        } 
 
         // Integrating robot position using swerve pose
         ChassisSpeeds swerveSpeeds = drive.getVelocities();
