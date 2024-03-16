@@ -5,9 +5,6 @@ import static frc.robot.utility.Constants.Unit.DEG;
 import java.util.Dictionary;
 import java.util.Hashtable;
 
-import org.photonvision.PhotonCamera;
-import org.photonvision.targeting.PhotonTrackedTarget;
-
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import com.kauailabs.navx.frc.AHRS;
 
@@ -19,8 +16,8 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
-import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.drive.SwerveDriveSubsystem;
 import frc.robot.utility.localization.AprilTag;
@@ -248,10 +245,8 @@ public class Localizer {
             Translation3d translation = bestCameraToTarget.getTranslation();
             translation.rotateBy(toRobotRotation);
             Translation2d t2d = translation.toTranslation2d();
+            t2d.rotateBy(globalHeading);
             t2d.plus((new Translation2d(-9.628, -11.624).rotateBy(globalHeading)));
-            t2d.rotateBy(globalHeading.times(-1));
-            SmartDashboard.putNumber("Apriltag dx", t2d.getX());
-            SmartDashboard.putNumber("Apriltag dy", t2d.getY());
             globalPosition = idToTag(targetID).getPosition().minus(t2d);
         }
 

@@ -13,8 +13,8 @@ import frc.robot.subsystems.ShooterSubsystem;
 /** An example command that uses an example subsystem. */
 public class SimpleShootCommand extends Command {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
-    public static final double RAMP_TIME = 1;
-    public static final double SHOOT_DURATION = 0.25;
+    public static final double RAMP_TIME = 3;
+    public static final double SHOOT_DURATION = 3;
     public static final double SHOOTER_INDEX_SPEED = 0.6;
     public static final double ELEVATOR_INDEX_SPEED = -0.6;
 
