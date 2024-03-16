@@ -22,6 +22,8 @@ public class ShooterControlCommand extends Command {
     private BooleanLogEntry shotLog;
 
     private double shooterAngle = ShooterSubsystem.ANGLE_OFFSET;
+    private double offset = 0;
+    private boolean isReadingOffsetIncrements = false;
     // private int shooterDir = 1;
 
     public ShooterControlCommand(ShooterSubsystem shooter, IndexerSubsystem indexer, XboxController xbox, DataLog log) {
@@ -29,6 +31,7 @@ public class ShooterControlCommand extends Command {
         this.indexer = indexer;
         this.xbox = xbox;
         this.log = log;
+        this.offset = 0;
         addRequirements(shooter, indexer);
     }
 
@@ -51,15 +54,36 @@ public class ShooterControlCommand extends Command {
             // shooter.setRotation(55 * DEG);
             // shooter.holdAngle();
         }
+
+        int dpad = xbox.getPOV();
+        if(isReadingOffsetIncrements) {
+            // If not pressed
+            if(dpad < 0) {
+                isReadingOffsetIncrements = false;
+            }
+        } else {
+            // Up
+            if(dpad > 270 || (dpad < 90 && dpad > 0)) {
+                offset += 1 * DEG;
+            // Down
+            } else if(dpad < 270 && dpad > 90) {
+                offset -= 1 * DEG;
+            }
+        }
+        // Reset
+        if(xbox.getLeftBumper()) {
+            offset = 0;
+        }
+
+        double finalAngle = shooterAngle + offset;
         // shooterAngle = 65;
-        shooter.setRotation(shooterAngle);
-        
+        shooter.setRotation(finalAngle);
 
         if (xbox.getRightTriggerAxis() > 0.5) {
             double shooterMag = 0.5;//xbox.getRightTriggerAxis() * 0.5 * shooterDir;
             shooter.shoot(shooterMag);
             shotLog.append(true);
-            angleLog.append(shooterAngle);
+            angleLog.append(finalAngle);
         } else {
             shooter.shoot(0);
         }
