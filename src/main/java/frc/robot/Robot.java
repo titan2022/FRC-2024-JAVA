@@ -1,5 +1,6 @@
 package frc.robot;
 
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -104,6 +105,12 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopPeriodic() {
+        if (xbox1.getLeftBumperPressed() && SwerveDriveSubsystem.motorFeedfoward.kv == 0.175) {
+            SwerveDriveSubsystem.motorFeedfoward = new SimpleMotorFeedforward(SwerveDriveSubsystem.TranslationalFeedForward.kS, 0.25);
+        } else if (xbox1.getLeftBumperPressed() && SwerveDriveSubsystem.motorFeedfoward.kv == 0.25) {
+            SwerveDriveSubsystem.motorFeedfoward = new SimpleMotorFeedforward(SwerveDriveSubsystem.TranslationalFeedForward.kS, 0.175);
+        }
+        
         // if (xbox1.getLeftBumperPressed()) {
         //     for (int i = 0; i < drive.motors.length; i++) {
         //         SupplyCurrentLimitConfiguration currConfig = new SupplyCurrentLimitConfiguration();

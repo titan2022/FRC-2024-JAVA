@@ -78,10 +78,10 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
     public static class TranslationalFeedForward 
 	{
         // public static final double kS = 0.025;
-		public static final double kS = 0.015;
+		public static double kS = 0.015;
 		// public static final double kV = 0.175;
-        public static final double kV = 0.175;
-		public static final double kA = 0;
+        public static double kV = 0.175;
+		public static double kA = 0;
     }
     /**
 	 * Contains a velocity based PID configuration.
@@ -125,7 +125,7 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
 	}
 
     public static SimpleMotorFeedforward motorFeedfoward = new SimpleMotorFeedforward(TranslationalFeedForward.kS, TranslationalFeedForward.kV, TranslationalFeedForward.kA);
-
+    
     // Physical Hardware
     public final WPI_TalonFX[] motors = new WPI_TalonFX[] {
             new WPI_TalonFX(LEFT_FRONT_MOTOR_PORT),
