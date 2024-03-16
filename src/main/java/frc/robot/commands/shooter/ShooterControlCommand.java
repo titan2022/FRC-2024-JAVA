@@ -56,7 +56,7 @@ public class ShooterControlCommand extends Command {
         
 
         if (xbox.getRightTriggerAxis() > 0.5) {
-            double shooterMag = 0.8;//xbox.getRightTriggerAxis() * 0.5 * shooterDir;
+            double shooterMag = 0.5;//xbox.getRightTriggerAxis() * 0.5 * shooterDir;
             shooter.shoot(shooterMag);
             shotLog.append(true);
             angleLog.append(shooterAngle);
