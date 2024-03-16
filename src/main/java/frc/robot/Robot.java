@@ -1,5 +1,7 @@
 package frc.robot;
 
+import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
+
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -106,8 +108,21 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopPeriodic() {
         if (xbox1.getLeftBumperPressed() && SwerveDriveSubsystem.motorFeedfoward.kv == 0.175) {
+            SupplyCurrentLimitConfiguration config = new SupplyCurrentLimitConfiguration();
+            config.currentLimit = 60;
+            config.enable = true;
+            config.triggerThresholdCurrent = 80;
+            config.triggerThresholdTime = 0.01;
+            for (int i = 0; i < drive.motors.length; i++) {
+                drive.motors[i].configSupplyCurrentLimit(config);
+            }
             SwerveDriveSubsystem.motorFeedfoward = new SimpleMotorFeedforward(SwerveDriveSubsystem.TranslationalFeedForward.kS, 0.25);
         } else if (xbox1.getLeftBumperPressed() && SwerveDriveSubsystem.motorFeedfoward.kv == 0.25) {
+            SupplyCurrentLimitConfiguration config = new SupplyCurrentLimitConfiguration();
+            config.currentLimit = 30;
+            config.enable = true;
+            config.triggerThresholdCurrent = 40;
+            config.triggerThresholdTime = 0.01;
             SwerveDriveSubsystem.motorFeedfoward = new SimpleMotorFeedforward(SwerveDriveSubsystem.TranslationalFeedForward.kS, 0.175);
         }
         
