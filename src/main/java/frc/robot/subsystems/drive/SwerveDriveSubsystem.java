@@ -15,6 +15,8 @@ import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -145,6 +147,9 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
             new CANCoder(RIGHT_FRONT_ENCODER_ROTATOR_PORT),
             new CANCoder(RIGHT_BACK_ENCODER_ROTATOR_PORT)
     };
+
+    StructArrayPublisher<SwerveModuleState> publisher = NetworkTableInstance.getDefault()
+    .getStructArrayTopic("MyStates", SwerveModuleState.struct).publish();
 
     // PID slots
     private static final int ROTATOR_SLOT_IDX = 0;
@@ -386,11 +391,13 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
      */
     private void setVelocities(ChassisSpeeds inputChassisSpeeds) {
         SwerveModuleState[] modules = kinematics.toSwerveModuleStates(inputChassisSpeeds);
+        SwerveModuleState[] logStates = new SwerveModuleState[] {modules[0], modules[2], modules[1], modules[3]};
         SwerveDriveKinematics.desaturateWheelSpeeds(modules, MAX_WHEEL_SPEED);
         for (int i = 0; i < 4; i++) {
             // SwerveModuleState optimized = SwerveModuleState.optimize(modules[i], new Rotation2d(encoders[i].getAbsolutePosition()));
             // applyModuleState(optimized, i);
             applyModuleState(modules[i], i);
+            publisher.set(logStates);
         }
     }
 
