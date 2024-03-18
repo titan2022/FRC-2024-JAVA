@@ -11,6 +11,7 @@ import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -140,7 +141,7 @@ public class ShooterSubsystem extends SubsystemBase {
 		double in_rotation = lawOfCosines(LINKAGE_LONG_ARM_LENGTH, LINKAGE_SHORT_ARM_LENGTH, d);
 		if(targetRotation - deadzone < getRotation() && getRotation() < targetRotation + deadzone){
 			// linkageMotor.set(0.061 * Math.sin(in_rotation));
-			holdAngle();
+			holdAngle(angle, targetRotation, d);
 			// SmartDashboard.putBoolean("Dead", true);
 			return true;
 		}
@@ -194,10 +195,19 @@ public class ShooterSubsystem extends SubsystemBase {
 	// }
 
 	/**
-	 * Holds angle with brake mode
+	 * Holds angle with a set feed forward
 	 */
-	public void holdAngle() {
-		linkageMotor.set(ControlMode.Velocity, 0);
+	public void holdAngle(double shooter_angle, double target_angle, double d) {
+		double x = LINKAGE_PIVOT_DX + LINKAGE_SHORT_ARM_LENGTH*Math.cos(target_angle - Math.PI / 2);
+		double y = LINKAGE_PIVOT_DY + LINKAGE_SHORT_ARM_LENGTH*Math.sin(target_angle - Math.PI / 2);
+		double d2 = new Translation2d(x, y).getNorm();
+		double theta2 = lawOfCosines(LINKAGE_LONG_ARM_LENGTH, SHOOTER_LENGTH, d2);
+
+		double theta3 = lawOfCosines(LINKAGE_LONG_ARM_LENGTH, LINKAGE_SHORT_ARM_LENGTH, d);
+		linkageMotor.set(SmartDashboard.getNumber("A", 0.0) * Math.cos(shooter_angle) / Math.sin(theta2) * Math.sin(theta3));
+		// guys velocity = 0 doesn't work
+		// angle shifts down by a couple degrees, pls trust me on this
+		// linkageMotor.set(ControlMode.Velocity, 0);
 	}
 
 	/**
