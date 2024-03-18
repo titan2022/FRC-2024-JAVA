@@ -1,16 +1,25 @@
 package frc.robot;
 
+import static frc.robot.utility.Constants.Unit.METERS;
+import static frc.robot.utility.Constants.Unit.SECONDS;
+
+import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
+
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.commands.align.AlignSpeakerCommand;
 import frc.robot.commands.auto.SimpleAutoPlanLeft;
 import frc.robot.commands.control.ElevatorControlCommand;
 import frc.robot.commands.drive.RotationalDriveCommand;
 import frc.robot.commands.drive.TranslationalDriveCommand;
+import frc.robot.commands.shooter.RevShooterCommand;
 import frc.robot.commands.shooter.ShooterControlCommand;
+import frc.robot.commands.shooter.ShooterSpeakerAlignCommand;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -19,7 +28,9 @@ import frc.robot.subsystems.drive.SwerveDriveSubsystem;
 import frc.robot.utility.Localizer;
 
 public class Robot extends TimedRobot {
+    // Nate's controller - drivebase
     private final XboxController xbox1 = new XboxController(2);
+    // Keegan's controller - all other systems
     private final XboxController xbox2 = new XboxController(0);
     private SwerveDriveSubsystem drive = new SwerveDriveSubsystem();
     private Localizer localizer = new Localizer(drive, false, 5804); 
@@ -28,6 +39,9 @@ public class Robot extends TimedRobot {
     private ShooterSubsystem shooter = new ShooterSubsystem();
     private IndexerSubsystem indexer = new IndexerSubsystem();
     private DataLog log;
+    private boolean highSpeed = false;
+    private static final double SHOOTER_SPEED = 5 * METERS / SECONDS;
+
 
     @Override
     public void robotInit() {
@@ -37,7 +51,7 @@ public class Robot extends TimedRobot {
         SmartDashboard.putNumber("swkI", 0.0);
         SmartDashboard.putNumber("swkD", 0.06);
         SmartDashboard.putNumber("swkF", 0.02);
-
+        SmartDashboard.putNumber("auto_start_degrees", 0.0);
         DataLogManager.start();
         log = DataLogManager.getLog();
     }
@@ -49,7 +63,7 @@ public class Robot extends TimedRobot {
         SmartDashboard.putNumber("Y Velocity", drive.getTranslational().getVelocity().getY());
         SmartDashboard.putNumber("Speed", drive.getTranslational().getVelocity().getNorm());
         SmartDashboard.putNumber("Heading", localizer.getHeading().getDegrees());
-
+        SmartDashboard.putBoolean("High Speed On", highSpeed);
         localizer.step();
     }
 
@@ -61,6 +75,7 @@ public class Robot extends TimedRobot {
     @Override
     public void autonomousInit() {
         localizer.setup();
+        localizer.setPigeon(SmartDashboard.getNumber("auto_start_degrees", 0.0));
         new SimpleAutoPlanLeft(drive.getTranslational(), drive.getRotational(), shooter, indexer, intake, elevator, localizer).schedule();
     }
 
@@ -104,6 +119,30 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopPeriodic() {
+        if (xbox1.getLeftBumperPressed() && !highSpeed) {
+            SupplyCurrentLimitConfiguration config = new SupplyCurrentLimitConfiguration();
+            config.currentLimit = 60;
+            config.enable = true;
+            config.triggerThresholdCurrent = 80;
+            config.triggerThresholdTime = 0.01;
+            for (int i = 0; i < drive.motors.length; i++) {
+                drive.motors[i].configSupplyCurrentLimit(config);
+            }
+            SwerveDriveSubsystem.motorFeedfoward = new SimpleMotorFeedforward(SwerveDriveSubsystem.TranslationalFeedForward.kS, 0.25);
+            highSpeed = true;
+        } else if (xbox1.getLeftBumperPressed() && highSpeed) {
+            SupplyCurrentLimitConfiguration config = new SupplyCurrentLimitConfiguration();
+            config.currentLimit = 30;
+            config.enable = true;
+            config.triggerThresholdCurrent = 40;
+            config.triggerThresholdTime = 0.01;
+            for (int i = 0; i < drive.motors.length; i++) {
+                drive.motors[i].configSupplyCurrentLimit(config);
+            }
+            SwerveDriveSubsystem.motorFeedfoward = new SimpleMotorFeedforward(SwerveDriveSubsystem.TranslationalFeedForward.kS, 0.175);
+            highSpeed = false;
+        }
+        
         // if (xbox1.getLeftBumperPressed()) {
         //     for (int i = 0; i < drive.motors.length; i++) {
         //         SupplyCurrentLimitConfiguration currConfig = new SupplyCurrentLimitConfiguration();
@@ -164,12 +203,16 @@ public class Robot extends TimedRobot {
             indexer.stop();
         }
 
+        // Left trigger -> auto-align speaker
         
+        // if (xbox2.getLeftTriggerAxis() > 0.5) {
+        //     new ShooterSpeakerAlignCommand(SHOOTER_SPEED, shooter, localizer).alongWith(new RevShooterCommand(SHOOTER_SPEED, shooter)).alongWith(new AlignSpeakerCommand(drive.getRotational(), localizer));
+        // }
 
-        if (xbox1.getStartButtonPressed()) {
-            if (!elevator.unlocked) {
-               shooter.linkageMotor.disable();
-            }
-        }
+        // if (xbox1.getStartButtonPressed()) {
+        //     if (!elevator.unlocked) {
+        //        shooter.linkageMotor.disable();
+        //     }
+        // }
     }
 }

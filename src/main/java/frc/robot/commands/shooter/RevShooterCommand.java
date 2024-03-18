@@ -14,7 +14,7 @@ public class RevShooterCommand extends Command {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
     // public static final double RAMP_TIME = 1;
     // public static final double INDEX_SPEED = 0.5;
-    public static final double REV_DURATION = 0.5;
+    // public static final double REV_DURATION = 0.5;
     public static final double SHOOT_SPEED = 1;
     public ShooterSubsystem shooter;
     public double speed;

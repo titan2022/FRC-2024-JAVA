@@ -27,12 +27,11 @@ public class SimpleAutoPlanLeft extends SequentialCommandGroup {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
     public static double SHOOT_SPEAKER_SPEED = 0.7;
     public static final double SPEAKER_HEIGHT = 2 * METERS;
-    public static Rotation2d SHOOT_ANGLE = Rotation2d.fromDegrees(60);
-    public static double MOVE_SPEED = 1;
+    public static Rotation2d SHOOT_ANGLE = Rotation2d.fromDegrees(64.9);
 
     public SimpleAutoPlanLeft(TranslationalDrivebase translational, RotationalDrivebase rotational, ShooterSubsystem shooter, IndexerSubsystem indexer, IntakeSubsystem intake, ElevatorSubsystem elevator, Localizer localizer) {
         double sign = 1;
-        if (Constants.getColor() == Alliance.Blue) {    
+        if (Constants.getColor() == Alliance.Blue) {  
             sign = 1;
         } else 
             sign = -1;
@@ -51,8 +50,6 @@ public class SimpleAutoPlanLeft extends SequentialCommandGroup {
             // new RotationCommand(Rotation2d.fromDegrees(45).times(-sign), rotational, localizer),
             // new TranslationCommand(new Translation2d(sign * 0, 2), 1, translational)
         );
-
-        // addRequirements(rotational, translational, shooter, indexer, elevator, intake);
     }
 
 }

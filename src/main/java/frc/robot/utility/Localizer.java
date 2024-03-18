@@ -1,7 +1,13 @@
 package frc.robot.utility;
 
+import static frc.robot.utility.Constants.Unit.DEG;
+import static frc.robot.utility.Constants.Unit.IN;
+
 import java.util.Dictionary;
 import java.util.Hashtable;
+
+import org.photonvision.PhotonCamera;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
 import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import com.kauailabs.navx.frc.AHRS;
@@ -9,7 +15,9 @@ import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -30,9 +38,12 @@ import frc.robot.utility.networking.types.NetworkingTag;
  * <p>
  * Positive Y and positive X are robot's front and right sides respectively in
  * robot-relative coorditate plane
+ * 
+ * When resetting the robot rotation at match start, make sure to set
+ * the global orientation or angle of the robot front relative to positive x axis
  */
 public class Localizer {
-    // private PhotonCamera camera = new PhotonCamera("photonvision");
+    private PhotonCamera camera = new PhotonCamera("photonvision");
     private NetworkingServer server;
     private SwerveDriveSubsystem drive;
     private WPI_Pigeon2 pigeon = new WPI_Pigeon2(15);
@@ -40,12 +51,19 @@ public class Localizer {
 
     private DoubleLogEntry xLog;
     private DoubleLogEntry yLog;
-
-
+    //Vector from the center of robot to camera
+    //The discord said "it is 11.867 inches back, 9.607 inches right, and 3.468 up"
+    private static final Translation3d CAMERA_VECTOR = new Translation3d(-9.628 * IN, 11.624 * IN, 3.316 * IN);
     private Rotation2d pigeonOffset = new Rotation2d(0);
 
     private Translation2d globalPosition = new Translation2d();
+    /** The heading of the robot where 0 represents facing "east" (along the x-axis)
+     *  and increasing the heading means turning counterclockwise.
+     */
     private Rotation2d globalHeading = new Rotation2d();
+    /** The heading of the robot where 0 represents facing "north" (along the y-axis)
+     *  and increasing the heading means turning counterclockwise.
+     */
     private Rotation2d globalOrientation = new Rotation2d();
     private Rotation3d globalOrientationFromTags = new Rotation3d();
     private double noteDistance = -1;
@@ -53,7 +71,11 @@ public class Localizer {
     private double speakerDist;
     private Rotation2d speakerHeading;
     private Dictionary<Integer, NetworkingTag> tags = new Hashtable<>();
-    private Translation2d[] speaker_location = {new Translation2d(-1.50, 218.42), new Translation2d(652.73, 218.42)};
+    // (Speaker 4, new Translation3d(16.579342, 5.547868, 1.981327), new Rotation2d(3.14159265358979))
+    // (Speaker 7, new Translation3d(-0.0381, 5.547868, 1.981327), new Rotation2d(0))
+    private static final Translation3d BLUE_SPEAKER = new Translation3d(-0.0381, 5.547868, 1.981327);
+    private static final Translation3d RED_SPEAKER = new Translation3d(16.579342, 5.547868, 1.981327);
+
 
     private Pose2d startingPose2d = new Pose2d(); 
     /**
@@ -67,6 +89,14 @@ public class Localizer {
         if (withCoprocessor) {
             server = new NetworkingServer(port);
         }
+    }
+
+    /**
+     * Used to initalize the pigeon. Only use for the beginning of the auto.
+     * @param rotation
+     */
+    public void setPigeon(double rotation){
+        pigeon.setAccumZAngle(rotation);
     }
 
     /**
@@ -87,7 +117,19 @@ public class Localizer {
      */
     public Rotation2d getOrientation() {
         // return Rotation2d.fromDegrees(-navxGyro.getAngle() + 90);
-        return globalOrientation;
+        return pigeon.getRotation2d();
+    }
+
+    /**
+     * Returns orientation but bounded between (0, 2pi)
+     * @return
+     */
+    public Rotation2d getBoundedOrientation() {
+        Rotation2d boundedTheta = new Rotation2d(pigeon.getRotation2d().getRadians() % (2 * Math.PI));
+        if (boundedTheta.getRadians() < 0)
+            return boundedTheta.plus(new Rotation2d(2 * Math.PI));
+        else 
+            return boundedTheta;
     }
 
     /**
@@ -116,7 +158,7 @@ public class Localizer {
      */
     public Rotation2d getHeading() {
         // return Rotation2d.fromDegrees(navxGyro.getAngle());
-        return globalHeading;
+        return new Rotation2d(pigeon.getRotation2d().getRadians() + (Math.PI / 2));
     }
 
     /**
@@ -158,20 +200,16 @@ public class Localizer {
         return (new Pose2d(globalPosition,globalOrientation)).relativeTo(startingPose2d);
     }
 
-    /**
-     * Gets global rotation of speaker
-     * @return Rotation2d
-     */
-    public Rotation2d getSpeakerHeading() {
-        return speakerHeading;
+    public Translation3d getBlueSpeaker() {
+        //Top down displacement
+        Translation2d displacement = BLUE_SPEAKER.toTranslation2d().minus(globalPosition);
+        return new Translation3d(displacement.getX(), displacement.getY(), BLUE_SPEAKER.getZ());
     }
 
-    /**
-     * Gets distance from shooter to speaker in meters
-     * @return meters
-     */
-    public double getSpeakerDistance() {
-        return speakerDist;
+    public Translation3d getRedSpeaker() {
+        //Top down displacement
+        Translation2d displacement = RED_SPEAKER.toTranslation2d().minus(globalPosition);
+        return new Translation3d(displacement.getX(), displacement.getY(), RED_SPEAKER.getZ());
     }
 
     /**
@@ -230,39 +268,46 @@ public class Localizer {
         globalHeading = pigeon.getRotation2d().minus(pigeonOffset);
         globalOrientation = globalHeading.minus(new Rotation2d(Math.PI / 2));
         SmartDashboard.putNumber("heading", globalHeading.getRadians());
-        // var result = camera.getLatestResult();
-        // if (result.hasTargets()) {
-        //     PhotonTrackedTarget target = result.getBestTarget();
-        //     int targetID = target.getFiducialId();
+        var result = camera.getLatestResult();
+        if (result.hasTargets()) {
+            PhotonTrackedTarget target = result.getBestTarget();
+            int targetID = target.getFiducialId();
             
-        //     double poseAmbiguity = target.getPoseAmbiguity();
-        //     Transform3d bestCameraToTarget = target.getBestCameraToTarget();
-        //     Rotation3d toRobotRotation = new Rotation3d((90-50.5)*DEG, 1, -16.94*DEG);
-        //     Translation3d translation = bestCameraToTarget.getTranslation();
-        //     translation.rotateBy(toRobotRotation);
-        //     Translation2d t2d = translation.toTranslation2d();
-        //     t2d.rotateBy(globalHeading);
-        //     t2d.plus((new Translation2d(-9.628, -11.624).rotateBy(globalHeading)));
-        //     globalPosition = idToTag(targetID).getPosition().minus(t2d);
-        // }
+            // double poseAmbiguity = target.getPoseAmbiguity();
+
+            //Vector to target april tag relative to camera
+            //X forward, Y left, Z up
+            Transform3d cameraToApriltag = target.getBestCameraToTarget();
+            //Transforms to X right, Y forward, Z up
+            Translation3d trueCameraToAprilTag = new Translation3d(-cameraToApriltag.getY(), cameraToApriltag.getX(), cameraToApriltag.getZ());
+
+            //Rotates the vector to the point where camera is facing forward with the front of robot
+            //The discord said "50.5 up 16.94 to right" so I assume degrees
+            Rotation3d toRobotRotation = new Rotation3d(-50.5*DEG, 0, 16.94*DEG);
+            trueCameraToAprilTag = trueCameraToAprilTag.rotateBy(toRobotRotation);
+            //Transforms to robot frame
+            Translation3d robotToApriltag = trueCameraToAprilTag.minus(CAMERA_VECTOR);
+            //Top down view of camera to april tag vector
+            Translation2d robotToAprilTagTopDown = robotToApriltag.toTranslation2d();
+            //Finally gets the robot vector to camera
+            globalPosition = idToTag(targetID).getPosition().minus(robotToAprilTagTopDown);
+        } 
 
         // Integrating robot position using swerve pose
         ChassisSpeeds swerveSpeeds = drive.getVelocities();
         Translation2d swerveVel = new Translation2d(swerveSpeeds.vxMetersPerSecond, swerveSpeeds.vyMetersPerSecond);
         Translation2d navXVel = new Translation2d(navxGyro.getVelocityX(), navxGyro.getVelocityZ());
         Translation2d odometryVel = swerveVel.plus(navXVel).times(0.5).rotateBy(globalHeading.times(-1));
-        globalPosition = globalPosition.plus(odometryVel.times(0.02));
-
-        
+        // globalPosition = globalPosition.plus(odometryVel.times(0.02));
     }
     
-    public Translation2d getSpeakerLocation(){
-        if(Constants.getColor().equals(Alliance.Blue)){
-            return speaker_location[0].minus(globalPosition);
-        } else {
-            return speaker_location[1].minus(globalPosition);
-        }
-    }
+    // public Translation2d getSpeakerLocation(){
+    //     if(Constants.getColor().equals(Alliance.Blue)){
+    //         return speaker_location[0].minus(globalPosition);
+    //     } else {
+    //         return speaker_location[1].minus(globalPosition);
+    //     }
+    // }
 
     /**
      * Updates the state of the localization estimates

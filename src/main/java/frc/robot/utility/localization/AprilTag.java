@@ -19,6 +19,7 @@ public enum AprilTag implements FieldObject {
     // WEST is towards the Blue Alliance Area
     // 1 in = 0.0254 m
     // See https://docs.google.com/spreadsheets/d/1aTBUTqv_QWHWGeNzhRpJv8-SgyZ2aXf8bqGZQpopXcw/edit?usp=sharing
+    // From this diagram: https://firstfrc.blob.core.windows.net/frc2024/FieldAssets/2024LayoutMarkingDiagram.pdf#page=4
     BLUE_SOURCE_SOUTH(1, new Translation3d(15.079472, 0.245872, 1.355852), new Rotation2d(2.0943951023932)), 
     BLUE_SOURCE_NORTH(2, new Translation3d(16.185134, 0.883666, 1.355852), new Rotation2d(2.0943951023932)),
     RED_SOURCE_SOUTH(10, new Translation3d(1.461516, 0.245872, 1.355852), new Rotation2d(1.0471975511966)), 

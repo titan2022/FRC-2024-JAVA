@@ -61,7 +61,7 @@ public class TranslationalDriveCommand extends Command {
             isFieldOriented = !isFieldOriented;
             SmartDashboard.putBoolean("isFieldOriented", isFieldOriented);
         }
-
+        
         if (xbox.getAButtonPressed()) {
             phiOffset = localizer.getOrientation();
         }
