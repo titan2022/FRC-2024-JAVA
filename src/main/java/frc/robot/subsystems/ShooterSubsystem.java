@@ -36,7 +36,7 @@ public class ShooterSubsystem extends SubsystemBase {
     private static final double SHOOTER_GEAR_RATIO = 1;
     private static final double SHOOTER_WHEEL_RADIUS = 1 * IN;
 	
-	public final PIDController rotationPID = new PIDController(7500, 0, 5);
+	public final PIDController rotationPID = new PIDController(5000, 0, 5);
 	// private DoubleLogEntry angleLog;
 	// private BooleanLogEntry hasShot;
 
@@ -98,7 +98,9 @@ public class ShooterSubsystem extends SubsystemBase {
 	 * @return Angle in radians (zero is ground, positive is up)
 	 */
 	public double getRotation() {
-		return linkageEncoder.getAbsolutePosition() * 2.0 * Math.PI + -2.55;
+		double ans = -2.55;
+		SmartDashboard.putNumber("encoder", ans / DEG);
+		return ans;
 	}
 
     public double calculateShooterRotation() {
@@ -139,13 +141,14 @@ public class ShooterSubsystem extends SubsystemBase {
             targetRotation -= 2 * Math.PI;
         }
 		double in_rotation = lawOfCosines(LINKAGE_LONG_ARM_LENGTH, LINKAGE_SHORT_ARM_LENGTH, d);
+		SmartDashboard.putNumber("Target Shooter Angle", targetRotation / DEG);
 		if(targetRotation - deadzone < getRotation() && getRotation() < targetRotation + deadzone){
 			// linkageMotor.set(0.061 * Math.sin(in_rotation));
 			holdAngle(angle, targetRotation, d);
-			// SmartDashboard.putBoolean("Dead", true);
+			SmartDashboard.putBoolean("Dead", true);
 			return true;
 		}
-		// SmartDashboard.putBoolean("Dead", false);
+		SmartDashboard.putBoolean("Dead", false);
 		
 		double linkageMag = rotationPID.calculate(getRotation(), targetRotation);
         double PID = Math.copySign(Math.min(Math.abs(linkageMag), 40 / FALCON_TICKS), linkageMag);
@@ -154,7 +157,6 @@ public class ShooterSubsystem extends SubsystemBase {
 			DemandType.ArbitraryFeedForward, FF
 		);
 		// angleLog.append(targetRotation / DEG);
-		SmartDashboard.putNumber("Target Shooter Angle", targetRotation / DEG);
 		// SmartDashboard.putNumber("Shooter PID", PID);
 		// SmartDashboard.putNumber("Shooter FF", FF);
 
@@ -204,7 +206,7 @@ public class ShooterSubsystem extends SubsystemBase {
 		double theta2 = lawOfCosines(LINKAGE_LONG_ARM_LENGTH, SHOOTER_LENGTH, d2);
 
 		double theta3 = lawOfCosines(LINKAGE_LONG_ARM_LENGTH, LINKAGE_SHORT_ARM_LENGTH, d);
-		linkageMotor.set(SmartDashboard.getNumber("A", 0.0) * Math.cos(shooter_angle) / Math.sin(theta2) * Math.sin(theta3));
+		linkageMotor.set(0.0775 * Math.cos(shooter_angle) / Math.sin(theta2) * Math.sin(theta3));
 		// guys velocity = 0 doesn't work
 		// angle shifts down by a couple degrees, pls trust me on this
 		// linkageMotor.set(ControlMode.Velocity, 0);
