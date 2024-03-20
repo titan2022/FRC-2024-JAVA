@@ -34,7 +34,7 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
 
     // Deadbands
     private static final double WHEEL_DEADBAND = 0.01;
-    private static final double ROTATOR_DEADBAND = 0.0001;
+    private static final double ROTATOR_DEADBAND = 0.01;
 
     // CAN ID numbers
     private static final int LEFT_FRONT_MOTOR_PORT = 41;
@@ -57,7 +57,11 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
     private static final int BACK_LEFT_OFFSET = -1024 - 190 + 1024; // 0
     private static final int FRONT_RIGHT_OFFSET = -1835 + 1024 + 1024; // 2
     private static final int BACK_RIGHT_OFFSET = -3120 - 1024 + 1024; // 3
-    private static final int[] OFFSETS = new int[] { FRONT_LEFT_OFFSET, BACK_LEFT_OFFSET, FRONT_RIGHT_OFFSET,BACK_RIGHT_OFFSET };
+    // private static final int FRONT_LEFT_OFFSET = 2950; // 1
+    // private static final int BACK_LEFT_OFFSET = -15175; // 0
+    // private static final int FRONT_RIGHT_OFFSET = -17629; // 2
+    // private static final int BACK_RIGHT_OFFSET = 4192; // 3
+    public static int[] OFFSETS = new int[] { FRONT_LEFT_OFFSET, BACK_LEFT_OFFSET, FRONT_RIGHT_OFFSET,BACK_RIGHT_OFFSET };
 
     // Motor inversions
     private static final boolean WHEEL_INVERTED = false;
@@ -113,18 +117,32 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
 	 * 
 	 * @return TalonFX Configuration Object
 	 */
-	public static TalonFXConfiguration getSwerveDriveTalonRotaryConfig() {
+	// public static TalonFXConfiguration getSwerveDriveTalonRotaryConfig() {
+	// 	TalonFXConfiguration talon = new TalonFXConfiguration();
+	// 	// Add configs here:
+	// 	talon.slot0.kP = 0.38;
+	// 	talon.slot0.kI = 0;
+	// 	talon.slot0.kD = 2.0;
+	// 	talon.slot0.kF = 0;
+	// 	talon.slot0.integralZone = 75;
+	// 	talon.slot0.allowableClosedloopError = 5;// 217;
+	// 	talon.slot0.maxIntegralAccumulator = 5120;
+	// 	return talon;
+	// }
+
+    public static TalonFXConfiguration getSwerveDriveTalonRotaryConfig() {
 		TalonFXConfiguration talon = new TalonFXConfiguration();
 		// Add configs here:
-		talon.slot0.kP = 0.38;
+		talon.slot0.kP = 0.46;
 		talon.slot0.kI = 0;
-		talon.slot0.kD = 2.0;
+		talon.slot0.kD = 7.0;
 		talon.slot0.kF = 0;
 		talon.slot0.integralZone = 75;
 		talon.slot0.allowableClosedloopError = 5;// 217;
 		talon.slot0.maxIntegralAccumulator = 5120;
 		return talon;
 	}
+
 
     public static SimpleMotorFeedforward motorFeedfoward = new SimpleMotorFeedforward(TranslationalFeedForward.kS, TranslationalFeedForward.kV, TranslationalFeedForward.kA);
     
@@ -228,9 +246,9 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
         rotatorConfig.supplyCurrLimit.enable = true;
         rotatorConfig.supplyCurrLimit.triggerThresholdCurrent = 30;
         rotatorConfig.supplyCurrLimit.triggerThresholdTime = 0.01;
-        mainConfig.supplyCurrLimit.currentLimit = 30;
+        mainConfig.supplyCurrLimit.currentLimit = 50;
         mainConfig.supplyCurrLimit.enable = true;
-        mainConfig.supplyCurrLimit.triggerThresholdCurrent = 40;
+        mainConfig.supplyCurrLimit.triggerThresholdCurrent = 70;
         mainConfig.supplyCurrLimit.triggerThresholdTime = 0.01;
         // mainConfig.closedloopRamp = 0.5;
         // mainConfig.openloopRamp = 0.5;
@@ -328,6 +346,7 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
     }
 
     private void applyModuleState(SwerveModuleState state, int module, boolean forceOrient) {
+        SmartDashboard.putNumber("Target Speed", state.speedMetersPerSecond);
         double velTicks = state.speedMetersPerSecond / (10 * METERS_PER_TICKS);
         double feedForwardTicks = motorFeedfoward.calculate(state.speedMetersPerSecond);
         // SmartDashboard.putNumber("Feedforward input Y", feedForwardTicks);
@@ -363,6 +382,15 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
         motors[module].set(ControlMode.Velocity, velTicks, DemandType.ArbitraryFeedForward, feedForwardTicks);
         // motors[module].set(ControlMode.Velocity, velTicks, DemandType.ArbitraryFeedForward, feedForwardTicks);
         // motors[module].set(ControlMode.Velocity, velTicks);
+        if (module == 0)
+            SmartDashboard.putNumber("Front Left Delta R", deltaTicks);
+        else if (module == 2)
+            SmartDashboard.putNumber("Front Right Delta R", deltaTicks);
+        else if (module == 1)
+            SmartDashboard.putNumber("Back Left Delta R", deltaTicks);
+        else if (module == 3)
+            SmartDashboard.putNumber("Back Right Delta R", deltaTicks);
+
         rotators[module].set(ControlMode.Position, currTicks + deltaTicks + OFFSETS[module]);
     }
 
@@ -431,6 +459,10 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
      */
     public double getRotatorEncoderCount(int module) {
         return rotators[module].getSelectedSensorPosition() - OFFSETS[module];
+    }
+
+    public double getRotatorAbsEncoderCount(int module) {
+        return rotators[module].getSelectedSensorPosition();
     }
 
     /**

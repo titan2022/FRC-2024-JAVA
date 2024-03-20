@@ -71,8 +71,10 @@ public class TranslationalDriveCommand extends Command {
             speedMult = 0.25;
         }
 
-        double joyX = applyDeadband(xbox.getLeftX(), 0.15);
-        double joyY = applyDeadband(-xbox.getLeftY(), 0.15);
+        // double joyX = applyDeadband(xbox.getLeftX(), 0.15);
+        // double joyY = applyDeadband(-xbox.getLeftY(), 0.15);
+        double joyX = applyDeadband(xbox.getLeftX(), 0.5);
+        double joyY = applyDeadband(-xbox.getLeftY(), 0.5);
         Translation2d velocity = new Translation2d(scaleVelocity(joyX), scaleVelocity(joyY));
 
         if (isFieldOriented) {
@@ -80,8 +82,6 @@ public class TranslationalDriveCommand extends Command {
             velocity = velocity.rotateBy(heading);
         }
 
-        SmartDashboard.putNumber("Target Velocity X", velocity.getX());
-        SmartDashboard.putNumber("Target Velocity Y", velocity.getY());
         drive.setVelocity(velocity.times(speedMult));
     }
 

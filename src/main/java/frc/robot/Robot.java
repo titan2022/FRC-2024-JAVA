@@ -1,11 +1,13 @@
 package frc.robot;
 
+import static frc.robot.utility.Constants.Unit.DEG;
 import static frc.robot.utility.Constants.Unit.METERS;
 import static frc.robot.utility.Constants.Unit.SECONDS;
 
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -47,11 +49,23 @@ public class Robot extends TimedRobot {
     public void robotInit() {
         elevator.leftSpoolMotor.setSelectedSensorPosition(0.0);
         elevator.config();
-        SmartDashboard.putNumber("swkP", 0.0056);
-        SmartDashboard.putNumber("swkI", 0.0);
-        SmartDashboard.putNumber("swkD", 0.06);
-        SmartDashboard.putNumber("swkF", 0.02);
-        SmartDashboard.putNumber("auto_start_degrees", 0.0);
+        // SmartDashboard.putNumber("swkP", 0.0056);
+        // SmartDashboard.putNumber("swkI", 0.0);
+        // SmartDashboard.putNumber("swkD", 0.06);
+        // SmartDashboard.putNumber("swkF", 0.02);
+        // SmartDashboard.putNumber("auto_start_degrees", 0.0);
+        SmartDashboard.putNumber("kP", 0);
+        SmartDashboard.putNumber("kI", 0);
+        SmartDashboard.putNumber("kD", 0);
+        SmartDashboard.putNumber("kF", 0.175);
+        // SmartDashboard.putNumber("Direction", 0);
+
+        // SmartDashboard.putNumber("Front Left Encoder", -1930 + 1024 + 1024);
+        // SmartDashboard.putNumber("Front Right Encoder", -1835 + 1024 + 1024);
+        // SmartDashboard.putNumber("Back Left Encoder", -1024 - 190 + 1024);
+        // SmartDashboard.putNumber("Back Right Encoder", -3120 - 1024 + 1024);
+
+
         DataLogManager.start();
         log = DataLogManager.getLog();
     }
@@ -62,8 +76,22 @@ public class Robot extends TimedRobot {
         SmartDashboard.putNumber("X Velocity", drive.getTranslational().getVelocity().getX());
         SmartDashboard.putNumber("Y Velocity", drive.getTranslational().getVelocity().getY());
         SmartDashboard.putNumber("Speed", drive.getTranslational().getVelocity().getNorm());
-        SmartDashboard.putNumber("Heading", localizer.getHeading().getDegrees());
-        SmartDashboard.putBoolean("High Speed On", highSpeed);
+        // SmartDashboard.putNumber("Heading", localizer.getHeading().getDegrees());
+        // SmartDashboard.putBoolean("High Speed On", highSpeed);
+        // SmartDashboard.putNumber("Shooter Speed", shooter.getShooterVelocity());
+        SmartDashboard.putNumber("Front Left Abs", drive.getRotatorAbsEncoderCount(0));
+        SmartDashboard.putNumber("Front Right Abs", drive.getRotatorAbsEncoderCount(2));
+        SmartDashboard.putNumber("Back Left Abs", drive.getRotatorAbsEncoderCount(1));
+        SmartDashboard.putNumber("Back Right Abs", drive.getRotatorAbsEncoderCount(3));
+        // SmartDashboard.putNumber("Front Left Rotation", drive.getRotatorEncoderPosition(0) / DEG);
+        // SmartDashboard.putNumber("Front Right Rotation", drive.getRotatorEncoderPosition(2)/ DEG);
+        // SmartDashboard.putNumber("Back Left Rotation", drive.getRotatorEncoderPosition(1)/ DEG);
+        // SmartDashboard.putNumber("Back Right Rotation", drive.getRotatorEncoderPosition(3)/ DEG);
+        // SmartDashboard.putNumber("Front Left Speed", drive.getEncoderVelocity(0));
+        // SmartDashboard.putNumber("Front Right Speed", drive.getEncoderVelocity(2));
+        // SmartDashboard.putNumber("Back Left Speed", drive.getEncoderVelocity(1));
+        // SmartDashboard.putNumber("Back Right Speed", drive.getEncoderVelocity(3));
+
         localizer.step();
     }
 
@@ -75,14 +103,20 @@ public class Robot extends TimedRobot {
     @Override
     public void autonomousInit() {
         localizer.setup();
-        localizer.setPigeon(SmartDashboard.getNumber("auto_start_degrees", 0.0));
-        new SimpleAutoPlanLeft(drive.getTranslational(), drive.getRotational(), shooter, indexer, intake, elevator, localizer).schedule();
+        // localizer.setPigeon(SmartDashboard.getNumber("auto_start_degrees", 0.0));
+        // new SimpleAutoPlanLeft(drive.getTranslational(), drive.getRotational(), shooter, indexer, intake, elevator, localizer).schedule();
+        
     }
 
     int t = 0;
 
     @Override
     public void autonomousPeriodic() {
+        // if ((int) SmartDashboard.getNumber("Direction", 0) == 0)
+        //     drive.getTranslational().setVelocity(new Translation2d(0, 1));
+        // else if ((int) SmartDashboard.getNumber("Direction", 0) == 1)
+        //     drive.getTranslational().setVelocity(new Translation2d(1, 0));
+
         // shooter.setRotation(65);
         // shooter.shoot(0.7);
 
@@ -105,7 +139,7 @@ public class Robot extends TimedRobot {
         localizer.setup();
 
         // Main driver
-        drive.getTranslational().setDefaultCommand(new TranslationalDriveCommand(drive.getTranslational(), localizer, xbox1, 6));
+        drive.getTranslational().setDefaultCommand(new TranslationalDriveCommand(drive.getTranslational(), localizer, xbox1, 10));
         drive.getRotational().setDefaultCommand(new RotationalDriveCommand(drive.getRotational(), localizer, xbox1, 2.5 * Math.PI));
 
         // Second driver
@@ -119,6 +153,22 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopPeriodic() {
+        for (int i = 0; i < drive.rotators.length; i++) {
+            drive.motors[i].config_kP(0, SmartDashboard.getNumber("kP", 0));
+            drive.motors[i].config_kI(0, SmartDashboard.getNumber("kI", 0));
+            drive.motors[i].config_kD(0, SmartDashboard.getNumber("kD", 0));
+        }
+        drive.motorFeedfoward = new SimpleMotorFeedforward(0.015, SmartDashboard.getNumber("kF", 0));
+        // shooter.bottomShooterMotor.config_kP(0, SmartDashboard.getNumber("kP", 0));
+        // shooter.bottomShooterMotor.config_kI(0, SmartDashboard.getNumber("kI", 0));
+        // shooter.bottomShooterMotor.config_kD(0, SmartDashboard.getNumber("kD", 0));
+        // shooter.bottomShooterMotor.config_kF(0, SmartDashboard.getNumber("kF", 0));
+        // shooter.topShooterMotor.config_kP(0, SmartDashboard.getNumber("kP", 0));
+        // shooter.topShooterMotor.config_kI(0, SmartDashboard.getNumber("kI", 0));
+        // shooter.topShooterMotor.config_kD(0, SmartDashboard.getNumber("kD", 0));
+        // shooter.topShooterMotor.config_kF(0, SmartDashboard.getNumber("kF", 0));
+
+
         if (xbox1.getLeftBumperPressed() && !highSpeed) {
             SupplyCurrentLimitConfiguration config = new SupplyCurrentLimitConfiguration();
             config.currentLimit = 60;
@@ -143,6 +193,12 @@ public class Robot extends TimedRobot {
             highSpeed = false;
         }
         
+        // if (xbox2.getLeftY() > 0.5) {
+        //     drive.getTranslational().setVelocity(new Translation2d(0, 1));
+        // } else if (xbox2.getLeftX() > 0.5) {
+        //     drive.getTranslational().setVelocity(new Translation2d(1, 0));
+        // } else 
+        //     drive.getTranslational().setVelocity(new Translation2d(0, 0));
         // if (xbox1.getLeftBumperPressed()) {
         //     for (int i = 0; i < drive.motors.length; i++) {
         //         SupplyCurrentLimitConfiguration currConfig = new SupplyCurrentLimitConfiguration();

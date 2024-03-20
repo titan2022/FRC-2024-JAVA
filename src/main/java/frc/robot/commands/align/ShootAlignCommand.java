@@ -118,7 +118,8 @@ public class ShootAlignCommand extends Command{
         }
         if(!toggled) return;
         Translation2d position = getLocation();
-        Translation2d speakerPosition = localizer.getSpeakerLocation();
+        // Translation2d speakerPosition = localizer.getSpeakerLocation();
+        Translation2d speakerPosition = new Translation2d();
         SmartDashboard.putNumber("Speaker dx", speakerPosition.getX());
         SmartDashboard.putNumber("Speaker dy", speakerPosition.getY());
         double shooting_v = shooter.getShooterVelocity();

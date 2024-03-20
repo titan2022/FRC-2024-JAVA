@@ -34,17 +34,17 @@ public class ShooterSubsystem extends SubsystemBase {
 	private static final double INTAKE_SPEED = 0.6;
 	private static final double DEADZONE = 0.1 * DEG;
     private static final double SHOOTER_GEAR_RATIO = 1;
-    private static final double SHOOTER_WHEEL_RADIUS = 1 * IN;
+    private static final double SHOOTER_WHEEL_RADIUS = 2 * IN;
 	
 	public final PIDController rotationPID = new PIDController(7500, 0, 5);
 	// private DoubleLogEntry angleLog;
 	// private BooleanLogEntry hasShot;
 
 	public final WPI_TalonFX linkageMotor = new WPI_TalonFX(12, "CANivore");
-	private final WPI_TalonFX topShooterMotor = new WPI_TalonFX(13, "CANivore");
-	private final WPI_TalonFX bottomShooterMotor = new WPI_TalonFX(5, "CANivore");
-	private final WPI_TalonFX indexerMotor = new WPI_TalonFX(16, "CANivore");
-	private final DutyCycleEncoder linkageEncoder = new DutyCycleEncoder(9);
+	public final WPI_TalonFX topShooterMotor = new WPI_TalonFX(13, "CANivore");
+	public final WPI_TalonFX bottomShooterMotor = new WPI_TalonFX(5, "CANivore");
+	public final WPI_TalonFX indexerMotor = new WPI_TalonFX(16, "CANivore");
+	public final DutyCycleEncoder linkageEncoder = new DutyCycleEncoder(9);
 	public static final double MIN_ANGLE = 15*DEG;
 	// public static final double MAX_ANGLE = 65*DEG;
     public static final double MAX_ANGLE = 65*DEG;
@@ -182,7 +182,7 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public double getShooterVelocity() {
-        double averageMotorSpeed = (Math.abs(topShooterMotor.getSelectedSensorVelocity()) + Math.abs(topShooterMotor.getSelectedSensorVelocity())) / 2;
+        double averageMotorSpeed = (Math.abs(topShooterMotor.getSelectedSensorVelocity()) + Math.abs(bottomShooterMotor.getSelectedSensorVelocity())) / 2;
         double rotationsPerSec = (averageMotorSpeed * 10) * FALCON_TICKS;
         double metersPerSec = rotationsPerSec * SHOOTER_WHEEL_RADIUS / SHOOTER_GEAR_RATIO;
         return metersPerSec;

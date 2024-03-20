@@ -49,7 +49,7 @@ public class TwoNoteAuto extends SequentialCommandGroup {
             new SimpleShootCommand(SHOOT_SPEAKER_SPEED, shooter, indexer),
             new TranslationCommand(new Translation2d(0, 3), 1, translational),
             new RotationCommand(Rotation2d.fromDegrees(sign * 45), rotational, localizer),
-            new TranslationCommand(new Translation2d(0, 5), 1, translational),
+            new TranslationCommand(new Translation2d(0, 5), 1, translational)
             // new ParallelCommandGroup(
             //     new NoteIntakeCommand(indexer, intake, shooter),
             //     new TranslationCommand(new Translation2d(0, 2), 1, translational)
