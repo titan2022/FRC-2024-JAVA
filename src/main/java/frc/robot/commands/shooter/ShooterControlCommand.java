@@ -41,7 +41,7 @@ public class ShooterControlCommand extends Command {
         shotLog = new BooleanLogEntry(log, "/my/shot");
     }
 
-    @Override
+    @Override   
     public void execute() {
         if (Math.abs(xbox.getRightY()) > 0.1) {
             shooterAngle += -xbox.getRightY() * 80 * DEG * 0.02;// = SmartDashboard.getNumber("targetAngle", ShooterSubsystem.MIN_ANGLE);
@@ -52,8 +52,8 @@ public class ShooterControlCommand extends Command {
             // shooter.holdAngle();
         }
         // shooterAngle = 65;
-        shooter.setRotation(shooterAngle);
-        
+        // shooter.setRotation(shooterAngle);
+        SmartDashboard.putNumber("Shooter Angle", shooterAngle);
 
         if (xbox.getRightTriggerAxis() > 0.5) {
             double shooterMag = 0.7;//xbox.getRightTriggerAxis() * 0.5 * shooterDir;
@@ -67,7 +67,7 @@ public class ShooterControlCommand extends Command {
 
     @Override
     public void end(boolean interrupted) {
-        shooter.holdAngle();
+        // shooter.holdAngle();
         shooter.holdIndex();
     }
 

@@ -11,10 +11,13 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.CANCoderStatusFrame;
 import com.ctre.phoenix.sensors.SensorInitializationStrategy;
+import com.pathplanner.lib.auto.AutoBuilder;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -51,10 +54,14 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
     private static final int RIGHT_BACK_ENCODER_ROTATOR_PORT = 53;
 
     // Rotator encoder offsets
-    private static final int FRONT_LEFT_OFFSET = -1930 + 1024 + 1024; // 1
-    private static final int BACK_LEFT_OFFSET = -1024 - 190 + 1024; // 0
-    private static final int FRONT_RIGHT_OFFSET = -1835 + 1024 + 1024; // 2
-    private static final int BACK_RIGHT_OFFSET = -3120 - 1024 + 1024; // 3
+     private static final int FRONT_LEFT_OFFSET = -2930 + 1024 - 0 + 2048; // 1
+     private static final int BACK_LEFT_OFFSET = -3267 + 1024 - 0 + 2048; // 0
+     private static final int FRONT_RIGHT_OFFSET = -2841 + 1024 + 0 + 2048; // 2
+     private static final int BACK_RIGHT_OFFSET = -2143 + 1024 + 0 + 2048; // 3
+    //private static final int FRONT_LEFT_OFFSET = -1930 + 1024 + 1024; // 1
+    //private static final int BACK_LEFT_OFFSET = -1024 - 190 + 1024; // 0
+    //private static final int FRONT_RIGHT_OFFSET = -1835 + 1024 + 1024; // 2
+    //private static final int BACK_RIGHT_OFFSET = -3120 - 1024 + 1024; // 3
     private static final int[] OFFSETS = new int[] { FRONT_LEFT_OFFSET, BACK_LEFT_OFFSET, FRONT_RIGHT_OFFSET,BACK_RIGHT_OFFSET };
 
     // Motor inversions
@@ -114,12 +121,12 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
 	public static TalonFXConfiguration getSwerveDriveTalonRotaryConfig() {
 		TalonFXConfiguration talon = new TalonFXConfiguration();
 		// Add configs here:
-		talon.slot0.kP = 0.38;
-		talon.slot0.kI = 0;
-		talon.slot0.kD = 2.0;
+		talon.slot0.kP = 0.35;
+		talon.slot0.kI = .0053;
+		talon.slot0.kD = 0.05;
 		talon.slot0.kF = 0;
 		talon.slot0.integralZone = 75;
-		talon.slot0.allowableClosedloopError = 5;// 217;
+		talon.slot0.allowableClosedloopError = 2;//5;// 217;
 		talon.slot0.maxIntegralAccumulator = 5120;
 		return talon;
 	}
@@ -198,6 +205,7 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
      * @param mainConfig    Requires PID configuration in slot 0
      * @param rotatorConfig Requires PID configuration in slot 0
      */
+    private StructArrayPublisher<SwerveModuleState> publisher;
     public SwerveDriveSubsystem() {
         TalonFXConfiguration mainConfig = getSwerveDriveTalonDriveConfig();
         TalonFXConfiguration rotatorConfig = getSwerveDriveTalonRotaryConfig();
@@ -216,6 +224,8 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
         motors[0].getAllConfigs(mainConfig);
         rotators[0].getAllConfigs(rotatorConfig);
 
+        // WPILib
+        publisher = NetworkTableInstance.getDefault().getStructArrayTopic("MyStates", SwerveModuleState.struct).publish();
         // Current limits
         // rotatorConfig.supplyCurrLimit = supplyCurrentLimit;
         // mainConfig.supplyCurrLimit = supplyCurrentLimit;
@@ -384,7 +394,7 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
      * @param leftOutputValue  left side output value for ControlMode
      * @param rightOutputValue right side output value for ControlMode
      */
-    private void setVelocities(ChassisSpeeds inputChassisSpeeds) {
+    public void setVelocities(ChassisSpeeds inputChassisSpeeds) {
         SwerveModuleState[] modules = kinematics.toSwerveModuleStates(inputChassisSpeeds);
         SwerveDriveKinematics.desaturateWheelSpeeds(modules, MAX_WHEEL_SPEED);
         for (int i = 0; i < 4; i++) {
@@ -392,6 +402,7 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
             // applyModuleState(optimized, i);
             applyModuleState(modules[i], i);
         }
+        publisher.set(modules);
     }
 
     private void setSwerveStates(SwerveModuleState state) {
@@ -480,4 +491,5 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
 //             rotators[i].set(ControlMode.Position, OFFSETS[i] + adjustments[i]);
 //         }
 //     }
+
 }

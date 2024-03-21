@@ -1,5 +1,7 @@
 package frc.robot.utility;
 
+import static frc.robot.utility.Constants.Unit.FT;
+
 import java.util.Dictionary;
 import java.util.Hashtable;
 
@@ -42,7 +44,7 @@ public class Localizer {
     private DoubleLogEntry yLog;
 
 
-    private Rotation2d pigeonOffset = new Rotation2d(0);
+    public Rotation2d pigeonOffset = new Rotation2d();
 
     private Translation2d globalPosition = new Translation2d();
     private Rotation2d globalHeading = new Rotation2d();
@@ -55,7 +57,7 @@ public class Localizer {
     private Dictionary<Integer, NetworkingTag> tags = new Hashtable<>();
     private Translation2d[] speaker_location = {new Translation2d(-1.50, 218.42), new Translation2d(652.73, 218.42)};
 
-    private Pose2d startingPose2d = new Pose2d(); 
+    public Pose2d startingPose2d = new Pose2d(); 
     /**
      * Localizer constructor
      * 
@@ -150,13 +152,29 @@ public class Localizer {
     public void resetStartingPose2d(Pose2d pose){
         startingPose2d=pose;
     }
+
+    public void resetStartingPose2d(){
+        resetStartingPose2d(new Pose2d());
+    }
+
+    public void resetPose2d(Pose2d pose){
+        SmartDashboard.putNumber("reset_pose_x", pose.getX());
+        globalPosition = pose.getTranslation();
+        pigeonOffset = pigeon.getRotation2d().plus(new Rotation2d(Math.PI / 2)).minus(pose.getRotation());
+    }
     /**
+     * 
      * Gets Pose2d based on translation and rotation for path planner
      * @return
      */
     public Pose2d getDisplacementPose2d() {
-        return (new Pose2d(globalPosition,globalOrientation)).relativeTo(startingPose2d);
+        return (new Pose2d(globalPosition,globalHeading.times(-1))).relativeTo(startingPose2d);
     }
+
+    // public Pose2d getAutoDisplacementPose2d(){
+    //     Pose2d normalPose2d = getDisplacementPose2d();
+    //     return new Pose2d(normalPose2d.getTranslation().rotateBy(new Rotation2d(Math.PI/2)), normalPose2d.getRotation());
+    // }
 
     /**
      * Gets global rotation of speaker
@@ -249,8 +267,10 @@ public class Localizer {
         // Integrating robot position using swerve pose
         ChassisSpeeds swerveSpeeds = drive.getVelocities();
         Translation2d swerveVel = new Translation2d(swerveSpeeds.vxMetersPerSecond, swerveSpeeds.vyMetersPerSecond);
-        Translation2d navXVel = new Translation2d(navxGyro.getVelocityX(), navxGyro.getVelocityZ());
-        Translation2d odometryVel = swerveVel.plus(navXVel).times(0.5).rotateBy(globalHeading.times(-1));
+        Translation2d navXVel = new Translation2d(0, 0);
+        Translation2d odometryVel = swerveVel.plus(navXVel).times(0.5).rotateBy(globalHeading);
+        SmartDashboard.putNumber("odometryvx", odometryVel.getX());
+        SmartDashboard.putNumber("odometryvy", odometryVel.getY());
         globalPosition = globalPosition.plus(odometryVel.times(0.02));
 
         
