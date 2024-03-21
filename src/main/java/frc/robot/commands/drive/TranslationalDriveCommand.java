@@ -57,7 +57,7 @@ public class TranslationalDriveCommand extends Command {
 
     @Override
     public void execute() {
-        if (xbox.getStartButtonPressed() && localizer != null) {
+        if (xbox.getBButtonPressed() && localizer != null) {
             isFieldOriented = !isFieldOriented;
             SmartDashboard.putBoolean("isFieldOriented", isFieldOriented);
         }
