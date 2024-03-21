@@ -385,6 +385,8 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
      * @param rightOutputValue right side output value for ControlMode
      */
     private void setVelocities(ChassisSpeeds inputChassisSpeeds) {
+        SmartDashboard.putNumber("Chassis X", inputChassisSpeeds.vxMetersPerSecond);
+        SmartDashboard.putNumber("Chassis Y", inputChassisSpeeds.vyMetersPerSecond);
         SwerveModuleState[] modules = kinematics.toSwerveModuleStates(inputChassisSpeeds);
         SwerveDriveKinematics.desaturateWheelSpeeds(modules, MAX_WHEEL_SPEED);
         for (int i = 0; i < 4; i++) {
