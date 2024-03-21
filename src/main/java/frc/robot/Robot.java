@@ -44,40 +44,40 @@ public class Robot extends TimedRobot {
 
     @Override
     public void robotInit() {
-        AutoBuilder.configureHolonomic(
-            localizer::getDisplacementPose2d,
-            localizer::resetPose2d,
-            drive::getVelocities,
-            drive::setVelocities, 
-            new HolonomicPathFollowerConfig(
-                new PIDConstants(7.5, 0, 1),
-                new PIDConstants(.5, 0, 0), 
-                drive.getMaxSpeed(), 
-                12.3743687 * IN , 
-                new ReplanningConfig()
-            ),
-            () -> {
-                var alliance = DriverStation.getAlliance();
-                if(alliance.isPresent()){
-                    return alliance.get() == DriverStation.Alliance.Red;
-                }
-                return false;
-            } , drive
-        );
-        elevator.leftSpoolMotor.setSelectedSensorPosition(0.0);
-        elevator.config();
-        SmartDashboard.putNumber("swkP", 0.0056);
-        SmartDashboard.putNumber("swkI", 0.0);
-        SmartDashboard.putNumber("swkF", 0.02);
-        SmartDashboard.putNumber("swkD", 0.06);
-        SmartDashboard.putNumber("A", 0.0775);
-        SmartDashboard.putNumber("D", 30);
-        SmartDashboard.putNumber("E", 0.005);
-        SmartDashboard.putNumber("F", -2.55);
+    //     AutoBuilder.configureHolonomic(
+    //         localizer::getDisplacementPose2d,
+    //         localizer::resetPose2d,
+    //         drive::getVelocities,
+    //         drive::setVelocities, 
+    //         new HolonomicPathFollowerConfig(
+    //             new PIDConstants(7.5, 0, 1),
+    //             new PIDConstants(.5, 0, 0), 
+    //             drive.getMaxSpeed(), 
+    //             12.3743687 * IN , 
+    //             new ReplanningConfig()
+    //         ),
+    //         () -> {
+    //             var alliance = DriverStation.getAlliance();
+    //             if(alliance.isPresent()){
+    //                 return alliance.get() == DriverStation.Alliance.Red;
+    //             }
+    //             return false;
+    //         } , drive
+    //     );
+    //     elevator.leftSpoolMotor.setSelectedSensorPosition(0.0);
+    //     elevator.config();
+    //     SmartDashboard.putNumber("swkP", 0.0056);
+    //     SmartDashboard.putNumber("swkI", 0.0);
+    //     SmartDashboard.putNumber("swkF", 0.02);
+    //     SmartDashboard.putNumber("swkD", 0.06);
+    //     SmartDashboard.putNumber("A", 0.0775);
+    //     SmartDashboard.putNumber("D", 30);
+    //     SmartDashboard.putNumber("E", 0.005);
+    //     SmartDashboard.putNumber("F", -2.55);
 
-        DataLogManager.start();
-        log = DataLogManager.getLog();
-        auto = new PathPlannerAuto("Test");
+        // DataLogManager.start();
+        // log = DataLogManager.getLog();
+        // auto = new PathPlannerAuto("Test");
     }
 
     @Override
@@ -97,8 +97,8 @@ public class Robot extends TimedRobot {
         // SmartDashboard.putNumber("startposex", localizer.startingPose2d.getX());
         // SmartDashboard.putNumber("startposey", localizer.startingPose2d.getY());
         var pose2d = localizer.getDisplacementPose2d();
-        SmartDashboard.putNumber("xpose2d", pose2d.getX());
-        SmartDashboard.putNumber("ypose2d", pose2d.getY());
+        // SmartDashboard.putNumber("xpose2d", pose2d.getX());
+        // SmartDashboard.putNumber("ypose2d", pose2d.getY());
         SmartDashboard.putNumber("Pigeon Offset", localizer.pigeonOffset.getDegrees());
     }
 
@@ -156,8 +156,8 @@ public class Robot extends TimedRobot {
     double degrees = 30.0;
     @Override
     public void teleopPeriodic() {
-        SmartDashboard.putNumber("height", elevator.getEncoder());
-        SmartDashboard.putNumber("linkage angle", shooter.getRotation());
+        // SmartDashboard.putNumber("height", elevator.getEncoder());
+        // SmartDashboard.putNumber("linkage angle", shooter.getRotation());
         // if(xbox1.getAButton()){
             // drive.getTranslational().setVelocity(new Translation2d(0, 1));
         // } else drive.getTranslational().setVelocity(new Translation2d(0, 0));

@@ -399,6 +399,14 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
         SmartDashboard.putNumber("Chassis Y", inputChassisSpeeds.vyMetersPerSecond);
         SwerveModuleState[] modules = kinematics.toSwerveModuleStates(inputChassisSpeeds);
         SwerveDriveKinematics.desaturateWheelSpeeds(modules, MAX_WHEEL_SPEED);
+        SmartDashboard.putNumber("FL Speed", modules[0].speedMetersPerSecond);
+        SmartDashboard.putNumber("FL Rot", modules[0].angle.getDegrees());
+        SmartDashboard.putNumber("FR Speed", modules[2].speedMetersPerSecond);
+        SmartDashboard.putNumber("FR Rot", modules[2].angle.getDegrees());
+        SmartDashboard.putNumber("BL Speed", modules[1].speedMetersPerSecond);
+        SmartDashboard.putNumber("BL Rot", modules[1].angle.getDegrees());
+        SmartDashboard.putNumber("BR Speed", modules[3].speedMetersPerSecond);
+        SmartDashboard.putNumber("BR Rot", modules[3].angle.getDegrees());
         for (int i = 0; i < 4; i++) {
             // SwerveModuleState optimized = SwerveModuleState.optimize(modules[i], new Rotation2d(encoders[i].getAbsolutePosition()));
             // applyModuleState(optimized, i);
