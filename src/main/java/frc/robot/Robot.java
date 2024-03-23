@@ -89,8 +89,8 @@ public class Robot extends TimedRobot {
         // SmartDashboard.putNumber("Rotated vx", rotatedVelocity.getX());
         // SmartDashboard.putNumber("Rotated vy", rotatedVelocity.getY());
         SmartDashboard.putNumber("Speed", drive.getTranslational().getVelocity().getNorm());
-        SmartDashboard.putNumber("Heading", localizer.getHeading().getDegrees());
-        SmartDashboard.putNumber("global orientation", localizer.getOrientation().getDegrees());
+        // SmartDashboard.putNumber("Heading", localizer.getHeading().getDegrees());
+        // SmartDashboard.putNumber("global orientation", localizer.getOrientation().getDegrees());
         // SmartDashboard.putNumber("vx", drive.getVelocities().vxMetersPerSecond);
         // SmartDashboard.putNumber("vy", drive.getVelocities().vyMetersPerSecond);
         localizer.step();
@@ -99,7 +99,7 @@ public class Robot extends TimedRobot {
         var pose2d = localizer.getDisplacementPose2d();
         // SmartDashboard.putNumber("xpose2d", pose2d.getX());
         // SmartDashboard.putNumber("ypose2d", pose2d.getY());
-        SmartDashboard.putNumber("Pigeon Offset", localizer.pigeonOffset.getDegrees());
+        // SmartDashboard.putNumber("Pigeon Offset", localizer.pigeonOffset.getDegrees());
     }
 
     @Override
