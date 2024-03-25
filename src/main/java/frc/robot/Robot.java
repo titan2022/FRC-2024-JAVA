@@ -39,8 +39,8 @@ public class Robot extends TimedRobot {
     private IntakeSubsystem intake = new IntakeSubsystem();
     private ShooterSubsystem shooter = new ShooterSubsystem();
     private IndexerSubsystem indexer = new IndexerSubsystem();
-    private DataLog log;
-    private Command auto;
+    // private DataLog log;
+    // private Command auto;
 
     @Override
     public void robotInit() {
@@ -110,7 +110,7 @@ public class Robot extends TimedRobot {
     @Override
     public void autonomousInit() {
         localizer.setup();
-        auto.schedule();
+        // auto.schedule();
 
         // new SimpleAutoPlanLeft(drive.getTranslational(), drive.getRotational(), shooter, indexer, intake, elevator, localizer).schedule();
     }

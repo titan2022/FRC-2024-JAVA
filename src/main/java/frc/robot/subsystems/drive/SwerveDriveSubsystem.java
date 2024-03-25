@@ -349,9 +349,8 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
         }
         double currentTicks = getRotatorEncoderCount(module);
         //Converts from [-pi, pi] to [0, 2pi] range.
-        double targetTicks = (state.angle.getRadians() + 2 * Math.PI) % (2 * Math.PI);
+        double targetTicks = ((state.angle.getRadians() + ROT) % ROT) / CANCODER_TICKS;
         //Converts to encoder ticks
-        targetTicks /= CANCODER_TICKS;
         //Calculates the difference in ticks on the [0, 2pi] interval
         double deltaTicks = (targetTicks - currentTicks) % CANCODER_CPR;
         double setTicks = currentTicks + deltaTicks;
