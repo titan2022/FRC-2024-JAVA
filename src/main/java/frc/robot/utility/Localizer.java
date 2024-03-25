@@ -15,6 +15,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.drive.SwerveDriveSubsystem;
@@ -160,15 +161,20 @@ public class Localizer {
     public void resetPose2d(Pose2d pose){
         SmartDashboard.putNumber("reset_pose_x", pose.getX());
         globalPosition = pose.getTranslation();
-        pigeonOffset = pigeon.getRotation2d().plus(new Rotation2d(Math.PI / 2)).minus(pose.getRotation());
+        // if(DriverStation.getAlliance().equals(Alliance.Blue)){
+            pigeonOffset = pigeon.getRotation2d().plus(new Rotation2d(Math.PI/2)).minus(pose.getRotation());
+        // }
+        // else{
+        //     pigeonOffset = pigeon.getRotation2d().minus(new Rotation2d(Math.PI/2)).minus(pose.getRotation());
+        // }
     }
     /**
-     * 
+     * 5rtf
      * Gets Pose2d based on translation and rotation for path planner
      * @return
      */
     public Pose2d getDisplacementPose2d() {
-        return (new Pose2d(globalPosition,globalHeading.times(-1))).relativeTo(startingPose2d);
+        return (new Pose2d(globalPosition,globalHeading)).relativeTo(startingPose2d);
     }
 
     // public Pose2d getAutoDisplacementPose2d(){
@@ -268,12 +274,11 @@ public class Localizer {
         ChassisSpeeds swerveSpeeds = drive.getVelocities();
         Translation2d swerveVel = new Translation2d(swerveSpeeds.vxMetersPerSecond, swerveSpeeds.vyMetersPerSecond);
         Translation2d navXVel = new Translation2d(0, 0);
-        Translation2d odometryVel = swerveVel.plus(navXVel).times(0.5).rotateBy(globalHeading);
+        // there was a times .5 for some reason, lmk if that's important
+        Translation2d odometryVel = swerveVel.plus(navXVel).rotateBy(globalHeading);
         SmartDashboard.putNumber("odometryvx", odometryVel.getX());
         SmartDashboard.putNumber("odometryvy", odometryVel.getY());
         globalPosition = globalPosition.plus(odometryVel.times(0.02));
-
-        
     }
     
     public Translation2d getSpeakerLocation(){

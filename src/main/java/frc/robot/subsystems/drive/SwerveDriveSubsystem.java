@@ -169,7 +169,7 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
             new WPI_TalonFX(LEFT_BACK_MOTOR_ROTATOR_PORT),
             new WPI_TalonFX(RIGHT_BACK_MOTOR_ROTATOR_PORT)
     };
-    private final CANCoder[] encoders = new CANCoder[] {
+    public final CANCoder[] encoders = new CANCoder[] {
             new CANCoder(LEFT_FRONT_ENCODER_ROTATOR_PORT),
             new CANCoder(RIGHT_FRONT_ENCODER_ROTATOR_PORT),
             new CANCoder(LEFT_BACK_ENCODER_ROTATOR_PORT),
@@ -545,6 +545,13 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
         for (WPI_TalonFX rotator : rotators)
             rotator.setNeutralMode(NeutralMode.Brake);
     }
+
+    // @Override
+    // public void periodic() {
+    //     SmartDashboard.putNumber("FR Rot", rotators[0].getSelectedSensorPosition());
+    //     SmartDashboard.putNumber("FR Enc Pos", encoders[0].getPosition());
+    //     SmartDashboard.putNumber("FR Enc Abs", encoders[0].getAbsolutePosition());
+    // }
 
 //     public void setRotatorTest() {
 //         int[] adjustments = {

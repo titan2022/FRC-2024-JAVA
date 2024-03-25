@@ -4,6 +4,7 @@ import static frc.robot.utility.Constants.Unit.IN;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
@@ -128,7 +129,6 @@ public class Robot extends TimedRobot {
     @Override
     public void autonomousInit() {
         localizer.setup();
-        new NoteIntakeCommand(indexer, intake, shooter).schedule();
         // auto.schedule();
 
         // new SimpleAutoPlanLeft(drive.getTranslational(), drive.getRotational(), shooter, indexer, intake, elevator, localizer).schedule();
@@ -198,8 +198,19 @@ public class Robot extends TimedRobot {
         // if(xbox1.getAButton()){
             // drive.getTranslational().setVelocity(new Translation2d(0, 1));
         // } else drive.getTranslational().setVelocity(new Translation2d(0, 0));
-
-        // elevator.leftSpoolMotor.set(ControlMode.PercentOutput, 0.1*(xbox1.getLeftTriggerAxis() - xbox1.getRightTriggerAxis()));
+        
+        // if(xbox1.getYButton()){
+        //     intake.intake();
+        //     indexer.intake();
+        //     shooter.intake();
+        //     shooter.shoot(.2);
+        // } else {
+        //     intake.stop();
+        //     indexer.stop();
+        //     shooter.index(0);
+        //     shooter.shoot(0);
+        // }
+        elevator.leftSpoolMotor.set(ControlMode.PercentOutput, 0.1*(xbox1.getLeftTriggerAxis() - xbox1.getRightTriggerAxis()));
         
         // if(xbox1.getBButton()){
         //     degrees = 15.1 + (64.8 - 15.1) * xbox1.getLeftTriggerAxis();
@@ -241,10 +252,10 @@ public class Robot extends TimedRobot {
 
         
 
-        // if (xbox1.getStartButtonPressed()) {
-        //     if (!elevator.unlocked) {
-        //        shooter.linkageMotor.disable();
-        //     }
-        // }
+        if (xbox1.getStartButtonPressed()) {
+            if (!elevator.unlocked) {
+               shooter.linkageMotor.disable();
+            }
+        }
     }
 }
