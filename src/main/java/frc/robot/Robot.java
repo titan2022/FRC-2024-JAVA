@@ -4,6 +4,7 @@ import static frc.robot.utility.Constants.Unit.IN;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
@@ -51,7 +52,7 @@ public class Robot extends TimedRobot {
             drive::setVelocities, 
             new HolonomicPathFollowerConfig(
                 new PIDConstants(7.5, 0, 1),
-                new PIDConstants(.5, 0, 0), 
+                new PIDConstants(2.5, 0.01, 0.1), 
                 drive.getMaxSpeed(), 
                 12.3743687 * IN , 
                 new ReplanningConfig()
@@ -77,7 +78,7 @@ public class Robot extends TimedRobot {
 
         DataLogManager.start();
         log = DataLogManager.getLog();
-        auto = new PathPlannerAuto("Test");
+        auto = new PathPlannerAuto("Odometry Test");
     }
 
     @Override
@@ -99,7 +100,11 @@ public class Robot extends TimedRobot {
         var pose2d = localizer.getDisplacementPose2d();
         SmartDashboard.putNumber("xpose2d", pose2d.getX());
         SmartDashboard.putNumber("ypose2d", pose2d.getY());
+        SmartDashboard.putNumber("angle displacement", pose2d.getRotation().getDegrees());
         SmartDashboard.putNumber("Pigeon Offset", localizer.pigeonOffset.getDegrees());
+        SmartDashboard.putNumber("FR Rot", drive.rotators[0].getSelectedSensorPosition());
+        SmartDashboard.putNumber("FR Enc Pos", drive.encoders[0].getPosition());
+        SmartDashboard.putNumber("FR Enc Abs", drive.encoders[0].getAbsolutePosition());
     }
 
     @Override
@@ -109,9 +114,34 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousInit() {
+        AutoBuilder.configureHolonomic(
+            localizer::getDisplacementPose2d,
+            localizer::resetPose2d,
+            drive::getVelocities,
+            drive::setVelocities, 
+            new HolonomicPathFollowerConfig(
+                new PIDConstants(7.5, 0, 1),
+                new PIDConstants(0.25, 0, 0), 
+                drive.getMaxSpeed(), 
+                12.3743687 * IN , 
+                new ReplanningConfig()
+            ),
+            () -> {
+                var alliance = DriverStation.getAlliance();
+                if(alliance.isPresent()){
+                    return alliance.get() == DriverStation.Alliance.Red;
+                }
+                return false;
+            } , drive
+        );
         localizer.setup();
         auto.schedule();
-
+        drive.getTranslational().removeDefaultCommand();
+        drive.getRotational().removeDefaultCommand();
+        intake.intake();
+        indexer.intake();
+        shooter.intake();
+        shooter.shoot(.5);
         // new SimpleAutoPlanLeft(drive.getTranslational(), drive.getRotational(), shooter, indexer, intake, elevator, localizer).schedule();
     }
 
@@ -146,8 +176,8 @@ public class Robot extends TimedRobot {
         drive.getRotational().setDefaultCommand(new RotationalDriveCommand(drive.getRotational(), localizer, xbox1, 2.5 * Math.PI));
 
         // Second driver
-        shooter.setDefaultCommand(new ShooterControlCommand(shooter, indexer, xbox2, log));
-        elevator.setDefaultCommand(new ElevatorControlCommand(elevator, xbox2,  xbox1));
+        // shooter.setDefaultCommand(new ShooterControlCommand(shooter, indexer, xbox2, log));
+        // elevator.setDefaultCommand(new ElevatorControlCommand(elevator, xbox2,  xbox1));
         // Trigger xboxTrigger = new JoystickButton(xbox1, XboxController.Button.kY.value);
         // xboxTrigger.onTrue(new PreSpeakerAlignCommand(drive, localizer, new Rotation2d(0), 0.2 * Math.PI));
     }
@@ -156,13 +186,26 @@ public class Robot extends TimedRobot {
     double degrees = 30.0;
     @Override
     public void teleopPeriodic() {
+        // new TranslationalDriveCommand(drive.getTranslational(), localizer, xbox1, 6).schedule();
+        // new RotationalDriveCommand(drive.getRotational(), localizer, xbox1, 2.5 * Math.PI).schedule();
         SmartDashboard.putNumber("height", elevator.getEncoder());
         SmartDashboard.putNumber("linkage angle", shooter.getRotation());
         // if(xbox1.getAButton()){
             // drive.getTranslational().setVelocity(new Translation2d(0, 1));
         // } else drive.getTranslational().setVelocity(new Translation2d(0, 0));
-
-        // elevator.leftSpoolMotor.set(ControlMode.PercentOutput, 0.1*(xbox1.getLeftTriggerAxis() - xbox1.getRightTriggerAxis()));
+        
+        // if(xbox1.getYButton()){
+        //     intake.intake();
+        //     indexer.intake();
+        //     shooter.intake();
+        //     shooter.shoot(.2);
+        // } else {
+        //     intake.stop();
+        //     indexer.stop();
+        //     shooter.index(0);
+        //     shooter.shoot(0);
+        // }
+        elevator.leftSpoolMotor.set(ControlMode.PercentOutput, 0.1*(xbox1.getLeftTriggerAxis() - xbox1.getRightTriggerAxis()));
         
         // if(xbox1.getBButton()){
         //     degrees = 15.1 + (64.8 - 15.1) * xbox1.getLeftTriggerAxis();
@@ -230,10 +273,10 @@ public class Robot extends TimedRobot {
 
         
 
-        // if (xbox1.getStartButtonPressed()) {
-        //     if (!elevator.unlocked) {
-        //        shooter.linkageMotor.disable();
-        //     }
-        // }
+        if (xbox1.getStartButtonPressed()) {
+            if (!elevator.unlocked) {
+               shooter.linkageMotor.disable();
+            }
+        }
     }
 }
