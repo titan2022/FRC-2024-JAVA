@@ -24,7 +24,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 	private static final double GEAR_RATIO = 28;
 	private static final double TICKS_PER_METER = FALCON_CPR * GEAR_RATIO / (10 * SPOOL_RADIUS * 2 * Math.PI);
 	private static final double WINCH_SPEED = -0.5;
-	public static int TOP_ENCODER_VALUE = 185000;
+	public static int TOP_ENCODER_VALUE = 183000;
 	public static final int BOT_ENCODER_VALUE = 1000;
 	private static final double VELOCITY_STALL_LIMIT = 1000;
 	private static final double GRAVITY_CURRENT = 0.3;
