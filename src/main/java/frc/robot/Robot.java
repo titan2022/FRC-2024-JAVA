@@ -100,6 +100,15 @@ public class Robot extends TimedRobot {
         // SmartDashboard.putNumber("xpose2d", pose2d.getX());
         // SmartDashboard.putNumber("ypose2d", pose2d.getY());
         // SmartDashboard.putNumber("Pigeon Offset", localizer.pigeonOffset.getDegrees());
+        SmartDashboard.putNumber("FL Rot", drive.getRotatorEncoderPosition(0));
+        SmartDashboard.putNumber("FR Rot", drive.getRotatorEncoderPosition(1));
+        SmartDashboard.putNumber("BL Rot", drive.getRotatorEncoderPosition(2));
+        SmartDashboard.putNumber("BR Rot", drive.getRotatorEncoderPosition(3));
+        SmartDashboard.putNumber("FL Enc", drive.getRotatorEncoderCount(0));
+        SmartDashboard.putNumber("FR Enc", drive.getRotatorEncoderCount(1));
+        SmartDashboard.putNumber("BL Enc", drive.getRotatorEncoderCount(2));
+        SmartDashboard.putNumber("BR Enc", drive.getRotatorEncoderCount(3));
+
     }
 
     @Override
