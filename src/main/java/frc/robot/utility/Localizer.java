@@ -1,7 +1,5 @@
 package frc.robot.utility;
 
-import static frc.robot.utility.Constants.Unit.FT;
-
 import java.util.Dictionary;
 import java.util.Hashtable;
 
@@ -15,7 +13,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.drive.SwerveDriveSubsystem;
@@ -191,11 +188,11 @@ public class Localizer {
     }
 
     /**
-     * Gets distance from shooter to speaker in meters
+     * Gets position from shooter to speaker in meters
      * @return meters
      */
-    public double getSpeakerDistance() {
-        return speakerDist;
+    public Translation2d getSpeakerPosition() {
+        return new Translation2d();
     }
 
     /**
