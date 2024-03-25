@@ -33,7 +33,7 @@ public class ShooterSubsystem extends SubsystemBase {
 	private static final double ENCODER_ABSOLUTE_ZERO = 0;
 	private static final double INTAKE_SPEED = 0.6;
 	private static final double DEADZONE = 0.1 * DEG;
-    private static final double SHOOTER_GEAR_RATIO = 1;
+    private static final double SHOOTER_GEAR_RATIO = 2;
     private static final double SHOOTER_WHEEL_RADIUS = 1 * IN;
 	
 	public final PIDController rotationPID = new PIDController(5000, 0, 5);

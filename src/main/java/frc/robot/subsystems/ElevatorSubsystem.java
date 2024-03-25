@@ -24,11 +24,9 @@ public class ElevatorSubsystem extends SubsystemBase {
 	private static final double GEAR_RATIO = 28;
 	private static final double TICKS_PER_METER = FALCON_CPR * GEAR_RATIO / (10 * SPOOL_RADIUS * 2 * Math.PI);
 	private static final double WINCH_SPEED = -0.5;
-	public static int TOP_ENCODER_VALUE = 183000;
-	public static final int BOT_ENCODER_VALUE = 1000;
+	public static int TOP_ENCODER_VALUE = 183500;
+	public static final int BOT_ENCODER_VALUE = -500;
 	private static final double VELOCITY_STALL_LIMIT = 1000;
-	private static final double GRAVITY_CURRENT = 0.3;
-	private static final double GRAVITY_FEEDFOWARD = 0.00022;
 
 	public final WPI_TalonFX leftSpoolMotor = new WPI_TalonFX(18, "CANivore");
 	public final WPI_TalonFX rightSpoolMotor = new WPI_TalonFX(14, "CANivore");
@@ -114,10 +112,14 @@ public class ElevatorSubsystem extends SubsystemBase {
 		} else if (setPoint < 0) {
 			setPoint = 0;
 		}
-			
+
 		if (!unlocked) {
 			if (canRun()) {
-				leftSpoolMotor.set(ControlMode.Position, setPoint * TOP_ENCODER_VALUE);
+                if (setPoint == 0) {
+				    leftSpoolMotor.set(ControlMode.Position,BOT_ENCODER_VALUE);
+                } else {
+                    leftSpoolMotor.set(ControlMode.Position, setPoint * TOP_ENCODER_VALUE);
+                }
 			} else {
 				leftSpoolMotor.set(ControlMode.Velocity, 0);
 			}

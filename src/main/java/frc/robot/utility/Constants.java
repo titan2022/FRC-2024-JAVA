@@ -45,6 +45,7 @@ public final class Constants {
 		public static final double QUAD_ENCODER_CPR = 1024;
 		public static final double FALCON_TICKS = ROT / FALCON_CPR; // Ticks to radians
 		public static final double CANCODER_TICKS = ROT / CANCODER_CPR; // Ticks to radians
+        public static final double DEG_TO_CANCODER_TICKS = (DEG / ROT) * CANCODER_CPR; // Deg to can ticks
 		public static final double QUAD_ENCODER_TICKS = ROT / QUAD_ENCODER_CPR; // Ticks to radians
 		public static final double SECONDS = 1.0, S = SECONDS;
 		public static final double MIN = 60 * S;

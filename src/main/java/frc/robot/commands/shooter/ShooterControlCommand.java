@@ -14,7 +14,6 @@ import frc.robot.subsystems.ShooterSubsystem;
 public class ShooterControlCommand extends Command {
     private static final int COAST_TIME = 2000 / 50; // In frames (20ms)
     private ShooterSubsystem shooter;
-    private IndexerSubsystem indexer;
     private XboxController xbox;
     private DataLog log;
 
@@ -24,12 +23,16 @@ public class ShooterControlCommand extends Command {
     private double shooterAngle = ShooterSubsystem.ANGLE_OFFSET;
     // private int shooterDir = 1;
 
-    public ShooterControlCommand(ShooterSubsystem shooter, IndexerSubsystem indexer, XboxController xbox, DataLog log) {
+    private ShooterControlCommand(ShooterSubsystem shooter, XboxController xbox) {
         this.shooter = shooter;
-        this.indexer = indexer;
         this.xbox = xbox;
+        
+        addRequirements(shooter);
+    }
+
+    public ShooterControlCommand(ShooterSubsystem shooter, XboxController xbox, DataLog log) {
+        this(shooter, xbox);
         this.log = log;
-        addRequirements(shooter, indexer);
     }
 
     @Override
@@ -52,16 +55,22 @@ public class ShooterControlCommand extends Command {
             // shooter.holdAngle();
         }
         // shooterAngle = 65;
-        // shooter.setRotation(shooterAngle);
+        shooter.setRotation(shooterAngle);
         SmartDashboard.putNumber("Shooter Angle", shooterAngle);
 
         if (xbox.getRightTriggerAxis() > 0.5) {
-            double shooterMag = 0.7;//xbox.getRightTriggerAxis() * 0.5 * shooterDir;
+            double shooterMag = SmartDashboard.getNumber("Tar Shoot Speed", 0);//xbox.getRightTriggerAxis() * 0.5 * shooterDir;
             shooter.shoot(shooterMag);
             shotLog.append(true);
             angleLog.append(shooterAngle);
         } else {
             shooter.shoot(0);
+        }
+
+        if (xbox.getRightBumper()) {
+            shooter.index(0.5);
+        } else {
+            shooter.holdIndex();
         }
     }
 
