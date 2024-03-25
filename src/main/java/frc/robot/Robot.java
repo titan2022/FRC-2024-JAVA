@@ -114,10 +114,6 @@ public class Robot extends TimedRobot {
         // SmartDashboard.putNumber("BL Rot", drive.getRotatorCount(2));
         // SmartDashboard.putNumber("BR Rot", drive.getRotatorCount(3));
         SmartDashboard.putBoolean("hasNote", indexer.hasNote());
-        SmartDashboard.putNumber("FL Enc", drive.getRawRotatorCount(0));
-        SmartDashboard.putNumber("FR Enc", drive.getRawRotatorCount(1));
-        SmartDashboard.putNumber("BL Enc", drive.getRawRotatorCount(2));
-        SmartDashboard.putNumber("BR Enc", drive.getRawRotatorCount(3));
 
     }
 
