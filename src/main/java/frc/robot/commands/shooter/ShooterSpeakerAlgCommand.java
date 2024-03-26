@@ -4,7 +4,7 @@
 
 package frc.robot.commands.shooter;
 
-import frc.robot.utility.Constants.Unit;
+import static frc.robot.utility.Constants.Unit.*;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
@@ -23,11 +23,11 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 /** An example command that uses an example subsystem. */
 public class ShooterSpeakerAlgCommand extends SequentialCommandGroup {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
-    public static final double GRAVITY_STRENGTH = 9.8 * Unit.METERS;
-    public static final double SPEAKER_HEIGHT = 2.0 * Unit.METERS;
-    public static final Translation2d SHOOTER_PIVOT_OFFSET = new Translation2d(0.95 * Unit.IN, 7.89 * Unit.IN); 
-    public static final double SHOOTER_ARM_LENGTH = 8.387 * Unit.IN;
-    public static final Translation2d TARGET_OFFSET = new Translation2d(0, 0);
+    public static final double GRAVITY_STRENGTH = 9.8 * METERS;
+    public static final double SPEAKER_HEIGHT = 2.0 * METERS;
+    public static final Translation2d SHOOTER_PIVOT_OFFSET = new Translation2d(0.95 * IN, 7.89 * IN); 
+    public static final double SHOOTER_ARM_LENGTH = 8.387 * IN;
+    public static final Translation2d TARGET_OFFSET = new Translation2d(0.72, 0.42);
     public static final int BLUE_SPEAKER_APRILTAG = 7;
     public static final int RED_SPEAKER_APRILTAG = 4;
 
@@ -51,7 +51,8 @@ public class ShooterSpeakerAlgCommand extends SequentialCommandGroup {
 
 
     public static Translation2d getShootVector(Localizer localizer) {
-        double horizontalDistance = localizer.getSpeakerPosition().getNorm();
+        // double horizontalDistance = localizer.getSpeakerPosition().getNorm();
+        double horizontalDistance = SmartDashboard.getNumber("Speaker Distance", 0) * IN;
 
         Translation2d robotDistanceToAprilTag = new Translation2d(horizontalDistance, SPEAKER_HEIGHT);
         Translation2d shootVector = robotDistanceToAprilTag.minus(SHOOTER_PIVOT_OFFSET);
@@ -65,6 +66,7 @@ public class ShooterSpeakerAlgCommand extends SequentialCommandGroup {
 
     public ShooterSpeakerAlgCommand(double speed, ShooterSubsystem shooter, IndexerSubsystem indexer, Localizer localizer) {
         Translation2d shootTarget = getShootVector(localizer);
+        // Translation2d shootTarget = new Translation2d(80 * IN, SPEAKER_HEIGHT);
         SmartDashboard.putNumber("Shoot X", shootTarget.getX());
         SmartDashboard.putNumber("Shoot Y", shootTarget.getY());
 
@@ -78,9 +80,9 @@ public class ShooterSpeakerAlgCommand extends SequentialCommandGroup {
         SmartDashboard.putNumber("Shoot Angle", setAngle.getDegrees());
 
         addCommands(
-            new RotateShooterCommand(setAngle, shooter)
-            // new RevShooterCommand(speed, shooter),
-            // new FireShooterCommand(indexer, shooter)
+            new RotateShooterCommand(setAngle, shooter),
+            new RevShooterCommand(8, shooter),
+            new FireShooterCommand(indexer, shooter)
         );
 
     }

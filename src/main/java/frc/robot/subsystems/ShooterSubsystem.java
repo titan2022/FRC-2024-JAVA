@@ -72,12 +72,12 @@ public class ShooterSubsystem extends SubsystemBase {
 	public ShooterSubsystem() {
 		// this.angleLog = angleLog;
 		// this.hasShot = hasShot;
-		topShooterMotor.setNeutralMode(NeutralMode.Brake);
-		bottomShooterMotor.setNeutralMode(NeutralMode.Brake);
+		topShooterMotor.setNeutralMode(NeutralMode.Coast);
+		bottomShooterMotor.setNeutralMode(NeutralMode.Coast);
 		linkageMotor.setNeutralMode(NeutralMode.Brake);
 		indexerMotor.setNeutralMode(NeutralMode.Brake);
 		topShooterMotor.setInverted(true);
-		bottomShooterMotor.follow(topShooterMotor);
+		// bottomShooterMotor.follow(topShooterMotor);
 		bottomShooterMotor.setInverted(true);
 		linkageEncoder.reset();
 
@@ -167,7 +167,11 @@ public class ShooterSubsystem extends SubsystemBase {
 	 * @param percent
 	 */
 	public void shoot(double percent) {
+        if (percent > 1) {
+            percent = 1;
+        }
 		topShooterMotor.set(ControlMode.PercentOutput, percent);
+        bottomShooterMotor.set(ControlMode.PercentOutput, percent + SmartDashboard.getNumber("Bot Shooter", 0));
 	}
 
     public void shootCoastToggle() {

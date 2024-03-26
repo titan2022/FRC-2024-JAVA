@@ -15,11 +15,11 @@ public class FireShooterCommand extends Command {
     // public static final double RAMP_TIME = 1;
     // public static final double SHOOT_DURATION = 0.25;
     // public static final double INDEX_SPEED = 0.5;
-    public static final double DELAY_TIME = 1;
-    public static final double FIRE_TIME = 0.25;
+    public static final double DELAY_TIME = 0.25;
+    public static final double FIRE_TIME = 1.5;
     public ShooterSubsystem shooter;
     public IndexerSubsystem indexer;
-    public double delayTime;
+    // public double delayTime;
     public double endTime;
     
     public FireShooterCommand(IndexerSubsystem indexer, ShooterSubsystem shooter) {
@@ -31,17 +31,15 @@ public class FireShooterCommand extends Command {
 
     @Override
     public void initialize() {
-        delayTime = Timer.getFPGATimestamp() + DELAY_TIME;
-        endTime = delayTime + FIRE_TIME;
+        // delayTime = Timer.getFPGATimestamp() + DELAY_TIME;
+        endTime = Timer.getFPGATimestamp() + FIRE_TIME;
     }
 
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        if (Timer.getFPGATimestamp() > delayTime) {
-            shooter.intake();
-            indexer.intake();
-        }
+        shooter.intake();
+        indexer.intake();
     }
 
     // Called once the command ends or is interrupted.
@@ -50,7 +48,6 @@ public class FireShooterCommand extends Command {
         shooter.holdIndex();
         indexer.stop();
         shooter.shoot(0);
-        shooter.shootBrakeToggle();
     }
 
     // Returns true when the command should end.

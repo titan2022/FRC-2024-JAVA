@@ -1,6 +1,7 @@
 package frc.robot;
 
 import edu.wpi.first.util.datalog.DataLog;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -33,6 +34,9 @@ public class Robot extends TimedRobot {
 
     @Override
     public void robotInit() {
+        SmartDashboard.putNumber("Speaker Distance", 0);
+        SmartDashboard.putNumber("Bot Shooter", 0.01);
+        SmartDashboard.putNumber("Tar Shoot Speed", 0);
     //     AutoBuilder.configureHolonomic(
     //         localizer::getDisplacementPose2d,
     //         localizer::resetPose2d,
@@ -64,8 +68,8 @@ public class Robot extends TimedRobot {
     //     SmartDashboard.putNumber("E", 0.005);
     //     SmartDashboard.putNumber("F", -2.55);
 
-        // DataLogManager.start();
-        // log = DataLogManager.getLog();
+        DataLogManager.start();
+        log = DataLogManager.getLog();
         // auto = new PathPlannerAuto("Test");
     }
 
@@ -103,7 +107,10 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousInit() {
-        new ShooterSpeakerAlgCommand(8, shooter, indexer, localizer).schedule();
+        intake.removeDefaultCommand();
+        shooter.removeDefaultCommand();
+        indexer.removeDefaultCommand();
+        new ShooterSpeakerAlgCommand(19.5, shooter, indexer, localizer).schedule();
     //     AutoBuilder.configureHolonomic(
     //         localizer::getDisplacementPose2d,
     //         localizer::resetPose2d,
