@@ -1,29 +1,17 @@
 package frc.robot;
 
-import static frc.robot.utility.Constants.Unit.IN;
-
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.NamedCommands;
-import com.pathplanner.lib.commands.PathPlannerAuto;
-import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
-import com.pathplanner.lib.util.PIDConstants;
-import com.pathplanner.lib.util.ReplanningConfig;
-
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.util.datalog.DataLog;
-import edu.wpi.first.wpilibj.DataLogManager;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.commands.auto.SimpleAutoPlanLeft;
 import frc.robot.commands.control.ElevatorControlCommand;
+import frc.robot.commands.control.IntakeIndexerControlCommand;
 import frc.robot.commands.drive.RotationalDriveCommand;
 import frc.robot.commands.drive.TranslationalDriveCommand;
 import frc.robot.commands.shooter.ShooterControlCommand;
+import frc.robot.commands.shooter.ShooterSpeakerAlgCommand;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -115,6 +103,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousInit() {
+        new ShooterSpeakerAlgCommand(8, shooter, indexer, localizer).schedule();
     //     AutoBuilder.configureHolonomic(
     //         localizer::getDisplacementPose2d,
     //         localizer::resetPose2d,
@@ -177,8 +166,9 @@ public class Robot extends TimedRobot {
         drive.getRotational().setDefaultCommand(new RotationalDriveCommand(drive.getRotational(), localizer, xbox1, 2.5 * Math.PI));
 
         // Second driver
-        // shooter.setDefaultCommand(new ShooterControlCommand(shooter, indexer, xbox2, log));
-        // elevator.setDefaultCommand(new ElevatorControlCommand(elevator, xbox2,  xbox1));
+        shooter.setDefaultCommand(new ShooterControlCommand(shooter, xbox2, log));
+        elevator.setDefaultCommand(new ElevatorControlCommand(elevator, xbox2,  xbox1));
+        intake.setDefaultCommand(new IntakeIndexerControlCommand(intake, indexer, xbox2));
         // Trigger xboxTrigger = new JoystickButton(xbox1, XboxController.Button.kY.value);
         // xboxTrigger.onTrue(new PreSpeakerAlignCommand(drive, localizer, new Rotation2d(0), 0.2 * Math.PI));
     }
@@ -204,7 +194,7 @@ public class Robot extends TimedRobot {
         //     shooter.index(0);
         //     shooter.shoot(0);
         // }
-        elevator.leftSpoolMotor.set(ControlMode.PercentOutput, 0.1*(xbox1.getLeftTriggerAxis() - xbox1.getRightTriggerAxis()));
+        // elevator.leftSpoolMotor.set(ControlMode.PercentOutput, 0.1*(xbox1.getLeftTriggerAxis() - xbox1.getRightTriggerAxis()));
         
         // if(xbox1.getBButton()){
         //     degrees = 15.1 + (64.8 - 15.1) * xbox1.getLeftTriggerAxis();
@@ -245,37 +235,5 @@ public class Robot extends TimedRobot {
         // }
 
 
-        if (xbox2.getRightBumper()) {
-            shooter.index(0.5);
-            indexer.intake();
-        } else {
-            shooter.index(0);
-        }
-
-        if (xbox2.getAButton()) { 
-            intake.setWheelSpeed(0.45);
-            indexer.intake();
-        } else if (xbox2.getYButton()) {
-            intake.setWheelSpeed(-0.45);
-            indexer.reverse();
-        } else {
-            intake.stop();
-        }
-
-        if (xbox2.getBButton()) {
-            indexer.reverse();
-        }
-
-        if (!xbox2.getBButton() && !xbox2.getAButton() && !xbox2.getYButton() && !xbox2.getRightBumper()) {
-            indexer.stop();
-        }
-
-        
-
-        if (xbox1.getStartButtonPressed()) {
-            if (!elevator.unlocked) {
-               shooter.linkageMotor.disable();
-            }
-        }
     }
 }

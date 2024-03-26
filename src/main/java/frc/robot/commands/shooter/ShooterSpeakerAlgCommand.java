@@ -27,7 +27,7 @@ public class ShooterSpeakerAlgCommand extends SequentialCommandGroup {
     public static final double SPEAKER_HEIGHT = 2.0 * Unit.METERS;
     public static final Translation2d SHOOTER_PIVOT_OFFSET = new Translation2d(0.95 * Unit.IN, 7.89 * Unit.IN); 
     public static final double SHOOTER_ARM_LENGTH = 8.387 * Unit.IN;
-    public static final Translation2d TARGET_OFFSET = new Translation2d();
+    public static final Translation2d TARGET_OFFSET = new Translation2d(0, 0);
     public static final int BLUE_SPEAKER_APRILTAG = 7;
     public static final int RED_SPEAKER_APRILTAG = 4;
 
@@ -78,7 +78,7 @@ public class ShooterSpeakerAlgCommand extends SequentialCommandGroup {
         SmartDashboard.putNumber("Shoot Angle", setAngle.getDegrees());
 
         addCommands(
-            new RotateShooterCommand(setAngle, shooter),
+            new RotateShooterCommand(setAngle, shooter)
             // new RevShooterCommand(speed, shooter),
             // new FireShooterCommand(indexer, shooter)
         );

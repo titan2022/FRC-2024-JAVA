@@ -23,7 +23,7 @@ public class ShooterAlignSpeakerCommand extends Command {
     // public static final double RAMP_TIME = 1;
     // public static final double SHOOT_DURATION = 0.25;
     // public static final double INDEX_SPEED = 0.5;
-    public static final double SPEAKER_HEIGHT = 2 * METERS;
+    public static final double SPEAKER_HEIGHT = 2.0 * METERS;
     public static final int BLUE_SPEAKER_APRILTAG = 7;
     public static final int RED_SPEAKER_APRILTAG = 4;
 
