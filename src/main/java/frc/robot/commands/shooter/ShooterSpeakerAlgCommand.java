@@ -79,8 +79,8 @@ public class ShooterSpeakerAlgCommand extends SequentialCommandGroup {
 
         addCommands(
             new RotateShooterCommand(setAngle, shooter),
-            new RevShooterCommand(speed, shooter),
-            new FireShooterCommand(indexer, shooter)
+            // new RevShooterCommand(speed, shooter),
+            // new FireShooterCommand(indexer, shooter)
         );
 
     }
