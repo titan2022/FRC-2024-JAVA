@@ -46,7 +46,7 @@ public class ShooterAlignSpeakerCommand extends Command {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        double horizontalDistance = localizer.getSpeakerDistance();
+        double horizontalDistance = localizer.getSpeakerPosition().getNorm();
         Translation2d shootVector = new Translation2d(horizontalDistance, SPEAKER_HEIGHT);
         Rotation2d shootAngle = shootVector.getAngle();
 

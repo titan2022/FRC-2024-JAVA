@@ -51,7 +51,7 @@ public class Robot extends TimedRobot {
         SmartDashboard.putNumber("Target X", 0);
         SmartDashboard.putNumber("Target Y", 0);
         SmartDashboard.putNumber("Target Omega", 0);
-        SmartDashboard.putNumber("kP", 0.1);
+        // SmartDashboard.putNumber("kP", 0.1);
         SmartDashboard.putNumber("Tar Shoot Speed", 0);
     //     AutoBuilder.configureHolonomic(
     //         localizer::getDisplacementPose2d,
@@ -92,17 +92,18 @@ public class Robot extends TimedRobot {
     @Override
     public void robotPeriodic() {
         CommandScheduler.getInstance().run();
+        localizer.step();
+
         SmartDashboard.putNumber("Shooter Speed", shooter.getShooterVelocity());
 
         // Translation2d rotatedVelocity = drive.getTranslational().getVelocity().rotateBy(localizer.getHeading());
         // SmartDashboard.putNumber("Rotated vx", rotatedVelocity.getX());
         // SmartDashboard.putNumber("Rotated vy", rotatedVelocity.getY());
-        SmartDashboard.putNumber("Speed", drive.getTranslational().getVelocity().getNorm());
+        // SmartDashboard.putNumber("Speed", drive.getTranslational().getVelocity().getNorm());
         // SmartDashboard.putNumber("Heading", localizer.getHeading().getDegrees());
         // SmartDashboard.putNumber("global orientation", localizer.getOrientation().getDegrees());
         // SmartDashboard.putNumber("vx", drive.getVelocities().vxMetersPerSecond);
         // SmartDashboard.putNumber("vy", drive.getVelocities().vyMetersPerSecond);
-        localizer.step();
         // SmartDashboard.putNumber("startposex", localizer.startingPose2d.getX());
         // SmartDashboard.putNumber("startposey", localizer.startingPose2d.getY());
         var pose2d = localizer.getDisplacementPose2d();
@@ -138,15 +139,15 @@ public class Robot extends TimedRobot {
         //     drive.rotators[i].config_kP(0, SmartDashboard.getNumber("kP", 0));
         // }
 
-        drive.getTranslational().setVelocity(new Translation2d(
-            SmartDashboard.getNumber("Target X", 0),
-            SmartDashboard.getNumber("Target Y", 0)
-        )
-        );
+        // drive.getTranslational().setVelocity(new Translation2d(
+        //     SmartDashboard.getNumber("Target X", 0),
+        //     SmartDashboard.getNumber("Target Y", 0)
+        // )
+        // );
 
-        drive.getRotational().setRotationalVelocity(
-            Rotation2d.fromDegrees(SmartDashboard.getNumber("Target Omega", 0))
-        );
+        // drive.getRotational().setRotationalVelocity(
+        //     Rotation2d.fromDegrees(SmartDashboard.getNumber("Target Omega", 0))
+        // );
     
         // drive.getTranslational().setVelocity(new Translation2d(0, -0.5));
         // shooter.setRotation(65);
@@ -186,9 +187,9 @@ public class Robot extends TimedRobot {
     double degrees = 30.0;
     @Override
     public void teleopPeriodic() {
-        for (int i = 0; i < 4; i++) {
-            drive.rotators[i].config_kP(0, SmartDashboard.getNumber("kP", 0));
-        }
+        // for (int i = 0; i < 4; i++) {
+        //     drive.rotators[i].config_kP(0, SmartDashboard.getNumber("kP", 0));
+        // }
         // SmartDashboard.putNumber("height", elevator.getEncoder());
         // SmartDashboard.putNumber("linkage angle", shooter.getRotation());
         // if(xbox1.getAButton()){
@@ -206,7 +207,7 @@ public class Robot extends TimedRobot {
         //     shooter.index(0);
         //     shooter.shoot(0);
         // }
-        elevator.leftSpoolMotor.set(ControlMode.PercentOutput, 0.1*(xbox1.getLeftTriggerAxis() - xbox1.getRightTriggerAxis()));
+        // elevator.leftSpoolMotor.set(ControlMode.PercentOutput, 0.1*(xbox1.getLeftTriggerAxis() - xbox1.getRightTriggerAxis()));
         
         // if(xbox1.getBButton()){
         //     degrees = 15.1 + (64.8 - 15.1) * xbox1.getLeftTriggerAxis();

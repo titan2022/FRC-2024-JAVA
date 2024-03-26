@@ -34,7 +34,7 @@ public class ShooterSubsystem extends SubsystemBase {
 	private static final double INTAKE_SPEED = 0.6;
 	private static final double DEADZONE = 0.1 * DEG;
     private static final double SHOOTER_GEAR_RATIO = 2;
-    private static final double SHOOTER_WHEEL_RADIUS = 1 * IN;
+    private static final double SHOOTER_WHEEL_RADIUS = 2 * IN;
 	
 	public final PIDController rotationPID = new PIDController(7500, 0, 5);
 	// private DoubleLogEntry angleLog;
@@ -167,7 +167,6 @@ public class ShooterSubsystem extends SubsystemBase {
 	 * @param percent
 	 */
 	public void shoot(double percent) {
-		
 		topShooterMotor.set(ControlMode.PercentOutput, percent);
 	}
 
@@ -182,7 +181,7 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public double getShooterVelocity() {
-        double averageMotorSpeed = (Math.abs(topShooterMotor.getSelectedSensorVelocity()) + Math.abs(topShooterMotor.getSelectedSensorVelocity())) / 2;
+        double averageMotorSpeed = Math.abs(topShooterMotor.getSelectedSensorVelocity());
         double rotationsPerSec = (averageMotorSpeed * 10) * FALCON_TICKS;
         double metersPerSec = rotationsPerSec * SHOOTER_WHEEL_RADIUS / SHOOTER_GEAR_RATIO;
         return metersPerSec;
