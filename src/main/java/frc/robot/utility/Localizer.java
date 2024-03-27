@@ -47,11 +47,9 @@ public class Localizer {
     private Translation2d globalPosition = new Translation2d();
     private Rotation2d globalHeading = new Rotation2d();
     private Rotation2d globalOrientation = new Rotation2d();
-    private Rotation3d globalOrientationFromTags = new Rotation3d();
+    private Rotation2d globalOrientationFromTags = new Rotation2d();
     private double noteDistance = -1;
     private Rotation3d noteRotation = new Rotation3d();
-    private double speakerDist;
-    private Rotation2d speakerHeading;
     private Dictionary<Integer, NetworkingTag> tags = new Hashtable<>();
     private Translation2d[] speaker_location = {new Translation2d(-1.50, 218.42), new Translation2d(652.73, 218.42)};
 
@@ -184,7 +182,7 @@ public class Localizer {
      * @return Rotation2d
      */
     public Rotation2d getSpeakerHeading() {
-        return speakerHeading;
+        return globalOrientationFromTags.times(-1.0);
     }
 
     /**
@@ -192,7 +190,7 @@ public class Localizer {
      * @return meters
      */
     public Translation2d getSpeakerPosition() {
-        return new Translation2d();
+        return globalPosition.times(-1.0); // Speaker is 0, 0
     }
 
     /**
@@ -203,9 +201,9 @@ public class Localizer {
 
         if (server != null) {
             server.subscribe("pose", (NetworkingCall<NetworkingPose>)(NetworkingPose pose) -> {
-                // SmartDashboard.putNumber("poseX", pose.position.getX());
-                globalPosition = pose.position.toTranslation2d();
-                // globalOrientationFromTags = pose.rotation;
+                SmartDashboard.putNumber("poseX", pose.position.getX());
+                globalPosition = new Translation2d(pose.position.getX(), pose.position.getZ());
+                globalOrientationFromTags = Rotation2d.fromRadians(pose.rotation.getY());
             });
     
             server.subscribe("note",  (NetworkingCall<NetworkingPose>)(NetworkingPose note) -> {
