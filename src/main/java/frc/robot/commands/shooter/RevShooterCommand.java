@@ -7,6 +7,7 @@ import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 
 /** An example command that uses an example subsystem. */
@@ -24,7 +25,7 @@ public class RevShooterCommand extends Command {
         this.shooter = shooter;
         this.speed = speed;
 
-        addRequirements(shooter);
+        // addRequirements(shooter);
     }
 
     @Override
@@ -36,11 +37,17 @@ public class RevShooterCommand extends Command {
     @Override
     public void execute() {
         shooter.shoot(SHOOT_SPEED);
+        if (shooter.getShooterVelocity() >= 8)
+            SmartDashboard.putBoolean("Rev Shooter Init", true);
+        else 
+            SmartDashboard.putBoolean("Rev Shooter Init", false);
+
     }
 
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
+        SmartDashboard.putBoolean("End Rev", true);
         // shooter.shootCoastToggle();
     }
 
@@ -48,5 +55,6 @@ public class RevShooterCommand extends Command {
     @Override
     public boolean isFinished() {
         return shooter.getShooterVelocity() >= speed;
+        
     }
 }

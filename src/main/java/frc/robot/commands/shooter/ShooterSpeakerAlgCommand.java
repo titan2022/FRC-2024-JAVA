@@ -18,7 +18,9 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 /** An example command that uses an example subsystem. */
 public class ShooterSpeakerAlgCommand extends SequentialCommandGroup {
@@ -28,8 +30,6 @@ public class ShooterSpeakerAlgCommand extends SequentialCommandGroup {
     public static final Translation2d SHOOTER_PIVOT_OFFSET = new Translation2d(0.95 * IN, 7.89 * IN); 
     public static final double SHOOTER_ARM_LENGTH = 8.387 * IN;
     public static final Translation2d TARGET_OFFSET = new Translation2d(0.72, 0.42);
-    public static final int BLUE_SPEAKER_APRILTAG = 7;
-    public static final int RED_SPEAKER_APRILTAG = 4;
 
     //Assume vector from note in shooter
     public static Rotation2d calculateAngle(double speed, Translation2d shootTarget) {
@@ -51,14 +51,14 @@ public class ShooterSpeakerAlgCommand extends SequentialCommandGroup {
 
 
     public static Translation2d getShootVector(Localizer localizer) {
-        // double horizontalDistance = localizer.getSpeakerPosition().getNorm();
-        double horizontalDistance = SmartDashboard.getNumber("Speaker Distance", 0) * IN;
+        double horizontalDistance = localizer.getSpeakerPosition().getNorm();
+        // double horizontalDistance = SmartDashboard.getNumber("Speaker Distance", 0) * IN;
 
         Translation2d robotDistanceToAprilTag = new Translation2d(horizontalDistance, SPEAKER_HEIGHT);
         Translation2d shootVector = robotDistanceToAprilTag.minus(SHOOTER_PIVOT_OFFSET);
-        Rotation2d dynamicStartAngle = Rotation2d.fromDegrees(55);
-        // Translation2d dynamicShooterStartPoint = new Translation2d(dynamicStartAngle.getCos() * SHOOTER_ARM_LENGTH, dynamicStartAngle.getSin() * SHOOTER_ARM_LENGTH);
-        Translation2d dynamicShooterStartPoint = new Translation2d(0, 0);
+        Rotation2d dynamicStartAngle = Rotation2d.fromDegrees(45);
+        Translation2d dynamicShooterStartPoint = new Translation2d(dynamicStartAngle.getCos() * SHOOTER_ARM_LENGTH, dynamicStartAngle.getSin() * SHOOTER_ARM_LENGTH);
+        // Translation2d dynamicShooterStartPoint = new Translation2d(0, 0);
 
         Translation2d trueShootVector = shootVector.minus(dynamicShooterStartPoint);
         return trueShootVector.plus(TARGET_OFFSET);
@@ -74,15 +74,19 @@ public class ShooterSpeakerAlgCommand extends SequentialCommandGroup {
         try {
             setAngle = calculateAngle(speed, shootTarget);
         } catch (Exception e) {
-            setAngle = Rotation2d.fromDegrees(65);
+            setAngle = Rotation2d.fromDegrees(30);
         }        
 
         SmartDashboard.putNumber("Shoot Angle", setAngle.getDegrees());
 
         addCommands(
             new RotateShooterCommand(setAngle, shooter),
-            new RevShooterCommand(8, shooter),
-            new FireShooterCommand(indexer, shooter)
+            new ParallelDeadlineGroup(
+                new SequentialCommandGroup(
+                    new RevShooterCommand(8, shooter),
+                    new FireShooterCommand(indexer, shooter)
+                ), 
+                new HoldAngleCommand(setAngle, shooter))
         );
 
     }

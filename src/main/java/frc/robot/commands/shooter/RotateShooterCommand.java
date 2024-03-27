@@ -23,8 +23,6 @@ public class RotateShooterCommand extends Command {
     public RotateShooterCommand(Rotation2d angle, ShooterSubsystem shooter) {
         this.shooter = shooter;
         this.angle = angle;
-
-        addRequirements(shooter);
     }
 
     @Override
@@ -35,7 +33,7 @@ public class RotateShooterCommand extends Command {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        //Methods return if reached desired location
+        // shooter.setTargetAngle(angle);
         reachedAngle = shooter.setRotation(angle.getRadians());
     }
 

@@ -1,13 +1,12 @@
 package frc.robot.commands.shooter;
 
 import frc.robot.utility.Localizer;
-import frc.robot.utility.Constants;
-import frc.robot.utility.Constants.Unit;
 import frc.robot.utility.Constants.Unit.*;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 
+import static frc.robot.utility.Constants.Unit.IN;
 import static frc.robot.utility.Constants.Unit.METERS;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -20,44 +19,87 @@ import edu.wpi.first.wpilibj2.command.Command;
 /** An example command that uses an example subsystem. */
 public class ShooterAlignSpeakerCommand extends Command {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
-    // public static final double RAMP_TIME = 1;
-    // public static final double SHOOT_DURATION = 0.25;
-    // public static final double INDEX_SPEED = 0.5;
-    public static final double SPEAKER_HEIGHT = 2.0 * METERS;
-    public static final int BLUE_SPEAKER_APRILTAG = 7;
-    public static final int RED_SPEAKER_APRILTAG = 4;
+    private static final double GRAVITY_STRENGTH = 9.8 * METERS;
+    private static final double SPEAKER_HEIGHT = 2.0 * METERS;
+    private static final Translation2d SHOOTER_PIVOT_OFFSET = new Translation2d(0.95 * IN, 7.89 * IN); 
+    private static final double SHOOTER_ARM_LENGTH = 8.387 * IN;
+    private static final Translation2d TARGET_OFFSET = new Translation2d(0.72, 0.42);
 
-    public ShooterSubsystem shooter;
-    public Localizer localizer;
-    public boolean reachedAngle = false;
+
+    private ShooterSubsystem shooter;
+    private Localizer localizer;
+    private double speed;
+    private boolean reachedAngle = false;
+    private Rotation2d targetAngle;
     
-    public ShooterAlignSpeakerCommand(ShooterSubsystem shooter, Localizer localizer) {
+
+    public static Rotation2d calculateAngle(double speed, Translation2d shootTarget) {
+        double x = shootTarget.getX();
+        double y = shootTarget.getY();
+        double gx2OverV = GRAVITY_STRENGTH * x * x / (speed * speed);
+        //Quadratic formula 
+        double middleTerm = (GRAVITY_STRENGTH * GRAVITY_STRENGTH * Math.pow(x, 4) / (Math.pow(speed, 4)));
+        double lastTerm = 2 * GRAVITY_STRENGTH * x * x * y / (speed * speed);
+        double sqrt = Math.sqrt(x * x - middleTerm - lastTerm);
+        double numerator = x - sqrt;
+
+        return new Rotation2d(Math.atan2(numerator, gx2OverV));
+    }
+
+    public static Rotation2d linearShooter(Translation2d shootTarget) {
+        return new Rotation2d(Math.atan2(shootTarget.getX(), shootTarget.getY()));
+    }
+
+
+    public static Translation2d getShootVector(Localizer localizer) {
+        // double horizontalDistance = localizer.getSpeakerPosition().getNorm();
+        double horizontalDistance = SmartDashboard.getNumber("Speaker Distance", 0) * IN;
+
+        Translation2d robotDistanceToAprilTag = new Translation2d(horizontalDistance, SPEAKER_HEIGHT);
+        Translation2d shootVector = robotDistanceToAprilTag.minus(SHOOTER_PIVOT_OFFSET);
+        Rotation2d dynamicStartAngle = linearShooter(robotDistanceToAprilTag);
+        // Translation2d dynamicShooterStartPoint = new Translation2d(dynamicStartAngle.getCos() * SHOOTER_ARM_LENGTH, dynamicStartAngle.getSin() * SHOOTER_ARM_LENGTH);
+        Translation2d dynamicShooterStartPoint = new Translation2d(0, 0);
+
+        Translation2d trueShootVector = shootVector.minus(dynamicShooterStartPoint);
+        return trueShootVector.plus(TARGET_OFFSET);
+    }
+    
+    public ShooterAlignSpeakerCommand(double speed, ShooterSubsystem shooter, Localizer localizer) {
         this.shooter = shooter;
         this.localizer = localizer;
+        this.speed = speed;
 
         addRequirements(shooter);
     }
 
     @Override
     public void initialize() {
+        Translation2d shootTarget = getShootVector(localizer);
+        // Translation2d shootTarget = new Translation2d(80 * IN, SPEAKER_HEIGHT);
+        SmartDashboard.putNumber("Shoot X", shootTarget.getX());
+        SmartDashboard.putNumber("Shoot Y", shootTarget.getY());
+
+        try {
+            targetAngle = calculateAngle(speed, shootTarget);
+        } catch (Exception e) {
+            targetAngle = Rotation2d.fromDegrees(45);
+        }        
+
+        SmartDashboard.putNumber("Shoot Angle", targetAngle.getDegrees());
+
 
     }
 
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        double horizontalDistance = localizer.getSpeakerPosition().getNorm();
-        Translation2d shootVector = new Translation2d(horizontalDistance, SPEAKER_HEIGHT);
-        Rotation2d shootAngle = shootVector.getAngle();
-
-        reachedAngle = shooter.setRotation(shootAngle.getRadians());
-        // SmartDashboard.putBoolean("Shoot Angle Reached", reachedAngle);
-        // SmartDashboard.putNumber("Shoot Align Angle", shootAngle.getDegrees());
+        reachedAngle = shooter.setRotation(targetAngle.getRadians());
     }
 
-    // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
+        shooter.holdAngle(SHOOTER_ARM_LENGTH, METERS, speed);
     }
 
     // Returns true when the command should end.

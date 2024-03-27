@@ -11,6 +11,7 @@ import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -35,6 +36,7 @@ public class ShooterSubsystem extends SubsystemBase {
 	private static final double DEADZONE = 0.1 * DEG;
     private static final double SHOOTER_GEAR_RATIO = 2;
     private static final double SHOOTER_WHEEL_RADIUS = 2 * IN;
+    private Rotation2d targetAngle = Rotation2d.fromDegrees(16);
 	
 	public final PIDController rotationPID = new PIDController(7500, 0, 5);
 	// private DoubleLogEntry angleLog;
@@ -160,7 +162,14 @@ public class ShooterSubsystem extends SubsystemBase {
 
 		return false;
 	}
+
+    public Rotation2d getTargetAngle() {
+        return targetAngle;
+    }
 	
+    public void setTargetAngle(Rotation2d setAngle) {
+        targetAngle = setAngle;
+    }
 
 	/**
 	 * Shoots at specified motor percentage
@@ -208,7 +217,8 @@ public class ShooterSubsystem extends SubsystemBase {
 
 		double theta3 = lawOfCosines(LINKAGE_LONG_ARM_LENGTH, LINKAGE_SHORT_ARM_LENGTH, d);
 		linkageMotor.set(0.0775 * Math.cos(shooter_angle) / Math.sin(theta2) * Math.sin(theta3));
-		// guys velocity = 0 doesn't work
+		SmartDashboard.putNumber("counter", SmartDashboard.getNumber("counter", 0) + 1);
+        // guys velocity = 0 doesn't work
 		// angle shifts down by a couple degrees, pls trust me on this
 		// linkageMotor.set(ControlMode.Velocity, 0);
 	}
@@ -241,5 +251,10 @@ public class ShooterSubsystem extends SubsystemBase {
 	public void holdIndex() {
 		indexerMotor.set(ControlMode.PercentOutput, 0);
 	}
+
+    // @Override 
+    // public void periodic() {
+    //     setRotation(targetAngle.getDegrees());
+    // }
 
 }
