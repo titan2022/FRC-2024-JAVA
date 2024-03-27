@@ -14,7 +14,7 @@ public class IndexerSubsystem extends SubsystemBase {
 	private static final int BREAK_TIMEOUT = 1; // In frames (20ms)
 
 	private final WPI_TalonFX intakeMotor = new WPI_TalonFX(22);
-	private final AnalogInput beamBreakerInput = new AnalogInput(0);
+	public final AnalogInput beamBreakerInput = new AnalogInput(0);
 
 	private boolean noteStatus = false;
 	private int noteStatusTimer = 0;
@@ -51,7 +51,7 @@ public class IndexerSubsystem extends SubsystemBase {
 
     public boolean hasNote() {
         // SmartDashboard.putNumber("Beam Breaker", beamBreakerInput.getValue());
-        if (beamBreakerInput.getValue() > 2350)
+        if (beamBreakerInput.getValue() > 2345)
             return true;
         else 
             return false;

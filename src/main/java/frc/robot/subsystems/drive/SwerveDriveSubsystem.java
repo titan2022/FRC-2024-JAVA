@@ -54,15 +54,15 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
     private static final int RIGHT_BACK_ENCODER_ROTATOR_PORT = 53;
 
     // Rotator encoder offsets
-     private static final int FRONT_LEFT_OFFSET = -2930 + 1024 - 0 + 2048; // 1
-     private static final int BACK_LEFT_OFFSET = -3267 + 1024 - 0 + 2048; // 0
-     private static final int FRONT_RIGHT_OFFSET = -2841 + 1024 + 0 + 2048; // 2
-     private static final int BACK_RIGHT_OFFSET = -2143 + 1024 + 0 + 2048; // 3
+     public static int FRONT_LEFT_OFFSET = -2930 + 1024 + 2048; // 1
+     public static int BACK_LEFT_OFFSET = -3267 + 1024 + 2048; // 0
+     public static int FRONT_RIGHT_OFFSET = -2841 + 1024 + 2048; // 2
+     public static int BACK_RIGHT_OFFSET = -2143 + 1024 + 2048; // 3
     //private static final int FRONT_LEFT_OFFSET = -1930 + 1024 + 1024; // 1
     //private static final int BACK_LEFT_OFFSET = -1024 - 190 + 1024; // 0
     //private static final int FRONT_RIGHT_OFFSET = -1835 + 1024 + 1024; // 2
     //private static final int BACK_RIGHT_OFFSET = -3120 - 1024 + 1024; // 3
-    private static final int[] OFFSETS = new int[] { FRONT_LEFT_OFFSET, BACK_LEFT_OFFSET, FRONT_RIGHT_OFFSET,BACK_RIGHT_OFFSET };
+    public static int[] OFFSETS = new int[] { FRONT_LEFT_OFFSET, BACK_LEFT_OFFSET, FRONT_RIGHT_OFFSET,BACK_RIGHT_OFFSET };
 
     // Motor inversions
     private static final boolean WHEEL_INVERTED = false;
@@ -113,6 +113,7 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
 		return talon;
 	}
 
+
 	/**
 	 * Contains a position based PID configuration
 	 * 
@@ -121,8 +122,10 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
 	public static TalonFXConfiguration getSwerveDriveTalonRotaryConfig() {
 		TalonFXConfiguration talon = new TalonFXConfiguration();
 		// Add configs here:
-		talon.slot0.kP = 0.35;
-		talon.slot0.kI = .0053;
+		// talon.slot0.kP = 0.35;
+        talon.slot0.kP = 0.35;
+        // talon.slot0.kI = 0;
+		talon.slot0.kI = .0035;
 		talon.slot0.kD = 0.05;
 		talon.slot0.kF = 0;
 		talon.slot0.integralZone = 75;
@@ -357,6 +360,16 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
             velTicks *= -1;
             feedForwardTicks *= -1;
         }
+
+        if (module == 0) {
+            SmartDashboard.putNumber("FL DeltaTicks", deltaTicks);
+        } else if (module == 2) {
+            SmartDashboard.putNumber("FR DeltaTicks", deltaTicks);
+        } else if (module == 1) {
+            SmartDashboard.putNumber("BL DeltaTicks", deltaTicks);
+        } else if (module == 3) {
+            SmartDashboard.putNumber("BR DeltaTicks", deltaTicks);
+        }
         // SmartDashboard.putNumber("speed STATE " + module, state.speedMetersPerSecond);
         // SmartDashboard.putNumber("angle STATE " + module, state.angle.getDegrees());
         // SmartDashboard.putNumber("set rot " + module, currTicks + deltaTicks);
@@ -365,10 +378,11 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
         // SmartDashboard.putNumber("cur rot " + module, currTicks);
         // SmartDashboard.putNumber("delta rot" + module, deltaTicks);
         // SmartDashboard.putNumber("target rot " + module, targetTicks);
+        double rotatorFeedforward = Math.copySign(SmartDashboard.getNumber("Rotation Static", 0), deltaTicks);
         motors[module].set(ControlMode.Velocity, velTicks, DemandType.ArbitraryFeedForward, feedForwardTicks);
         // motors[module].set(ControlMode.Velocity, velTicks, DemandType.ArbitraryFeedForward, feedForwardTicks);
         // motors[module].set(ControlMode.Velocity, velTicks);
-        rotators[module].set(ControlMode.Position, currTicks + deltaTicks + OFFSETS[module]);
+        rotators[module].set(ControlMode.Position, currTicks + deltaTicks + OFFSETS[module], DemandType.ArbitraryFeedForward, rotatorFeedforward);
     }
 
     private void applyModuleState(SwerveModuleState state, int idx) {
@@ -394,19 +408,9 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
      * @param leftOutputValue  left side output value for ControlMode
      * @param rightOutputValue right side output value for ControlMode
      */
-    private void setVelocities(ChassisSpeeds inputChassisSpeeds) {
-        SmartDashboard.putNumber("Chassis X", inputChassisSpeeds.vxMetersPerSecond);
-        SmartDashboard.putNumber("Chassis Y", inputChassisSpeeds.vyMetersPerSecond);
+    public void setVelocities(ChassisSpeeds inputChassisSpeeds) {
         SwerveModuleState[] modules = kinematics.toSwerveModuleStates(inputChassisSpeeds);
         SwerveDriveKinematics.desaturateWheelSpeeds(modules, MAX_WHEEL_SPEED);
-        SmartDashboard.putNumber("FL Speed", modules[0].speedMetersPerSecond);
-        SmartDashboard.putNumber("FL Rot", modules[0].angle.getDegrees());
-        SmartDashboard.putNumber("FR Speed", modules[2].speedMetersPerSecond);
-        SmartDashboard.putNumber("FR Rot", modules[2].angle.getDegrees());
-        SmartDashboard.putNumber("BL Speed", modules[1].speedMetersPerSecond);
-        SmartDashboard.putNumber("BL Rot", modules[1].angle.getDegrees());
-        SmartDashboard.putNumber("BR Speed", modules[3].speedMetersPerSecond);
-        SmartDashboard.putNumber("BR Rot", modules[3].angle.getDegrees());
         for (int i = 0; i < 4; i++) {
             // SwerveModuleState optimized = SwerveModuleState.optimize(modules[i], new Rotation2d(encoders[i].getAbsolutePosition()));
             // applyModuleState(optimized, i);

@@ -8,10 +8,11 @@ import frc.robot.subsystems.ShooterSubsystem;
 
 @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
 public class NoteIntakeCommand extends Command {
-    public static final double INTAKE_DURATION = 2;
+    public static final double INTAKE_DURATION = 0.1;
     private IndexerSubsystem indexer;
     private IntakeSubsystem intake;
     private ShooterSubsystem shooter;
+    public boolean isTriggered = false;
     private boolean isReverse = false;
     public double endTime;
 
@@ -30,7 +31,6 @@ public class NoteIntakeCommand extends Command {
 
     @Override
     public void initialize() {
-        endTime = Timer.getFPGATimestamp() + INTAKE_DURATION;
     }
 
     @Override
@@ -38,11 +38,16 @@ public class NoteIntakeCommand extends Command {
         if (!isReverse) {
             intake.intake();
             indexer.intake();
-            shooter.reverseIndex();
         } else {
             intake.reverse();
             indexer.reverse();
         }
+
+        if (indexer.hasNote() && !isTriggered) {
+            endTime = Timer.getFPGATimestamp() + INTAKE_DURATION;
+            isTriggered = true;
+        }
+
     }
 
     @Override
@@ -54,7 +59,7 @@ public class NoteIntakeCommand extends Command {
 
     @Override
     public boolean isFinished() {
-        return Timer.getFPGATimestamp() > endTime;
+        return (Timer.getFPGATimestamp() > endTime && isTriggered);
         // return indexer.hasNote();
     }
 }

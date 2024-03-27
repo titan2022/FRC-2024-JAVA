@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -21,6 +22,7 @@ import frc.robot.utility.networking.NetworkingCall;
 import frc.robot.utility.networking.NetworkingServer;
 import frc.robot.utility.networking.types.NetworkingPose;
 import frc.robot.utility.networking.types.NetworkingTag;
+import frc.robot.utility.networking.types.NetworkingVector;
 
 /**
  * Localizer class for the 2024 Crescendo arena
@@ -202,6 +204,7 @@ public class Localizer {
         if (server != null) {
             server.subscribe("pose", (NetworkingCall<NetworkingPose>)(NetworkingPose pose) -> {
                 SmartDashboard.putNumber("poseX", pose.position.getX());
+                SmartDashboard.putNumber("poseZ", pose.position.getZ());
                 globalPosition = new Translation2d(pose.position.getX(), pose.position.getZ());
                 globalOrientationFromTags = Rotation2d.fromRadians(pose.rotation.getY());
             });
@@ -209,6 +212,11 @@ public class Localizer {
             server.subscribe("note",  (NetworkingCall<NetworkingPose>)(NetworkingPose note) -> {
                 // noteDistance = `
                 noteRotation = note.rotation;
+            });
+
+            server.subscribe("visible", (NetworkingCall<Translation3d>)(Translation3d fakeVec) -> {
+                speakerTagVisible = fakeVec.getX() > 0;
+                SmartDashboard.putBoolean("Tag Visible", speakerTagVisible);
             });
         }
     }
@@ -273,7 +281,7 @@ public class Localizer {
         Translation2d odometryVel = swerveVel.plus(navXVel).rotateBy(globalHeading);
         SmartDashboard.putNumber("odometryvx", odometryVel.getX());
         SmartDashboard.putNumber("odometryvy", odometryVel.getY());
-        globalPosition = globalPosition.plus(odometryVel.times(0.02));
+        // globalPosition = globalPosition.plus(odometryVel.times(0.02));
     }
     
     public Translation2d getSpeakerLocation(){
