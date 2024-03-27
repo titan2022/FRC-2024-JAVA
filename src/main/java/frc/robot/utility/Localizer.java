@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -21,6 +22,7 @@ import frc.robot.utility.networking.NetworkingCall;
 import frc.robot.utility.networking.NetworkingServer;
 import frc.robot.utility.networking.types.NetworkingPose;
 import frc.robot.utility.networking.types.NetworkingTag;
+import frc.robot.utility.networking.types.NetworkingVector;
 
 /**
  * Localizer class for the 2024 Crescendo arena
@@ -50,6 +52,7 @@ public class Localizer {
     private Rotation2d globalOrientationFromTags = new Rotation2d();
     private double noteDistance = -1;
     private Rotation3d noteRotation = new Rotation3d();
+    private boolean speakerTagVisible = false;
     private Dictionary<Integer, NetworkingTag> tags = new Hashtable<>();
     private Translation2d[] speaker_location = {new Translation2d(-1.50, 218.42), new Translation2d(652.73, 218.42)};
 
@@ -210,6 +213,11 @@ public class Localizer {
             server.subscribe("note",  (NetworkingCall<NetworkingPose>)(NetworkingPose note) -> {
                 // noteDistance = `
                 noteRotation = note.rotation;
+            });
+
+            server.subscribe("visible", (NetworkingCall<Translation3d>)(Translation3d fakeVec) -> {
+                speakerTagVisible = fakeVec.getX() > 0;
+                SmartDashboard.putBoolean("Tag Visible", speakerTagVisible);
             });
         }
     }
