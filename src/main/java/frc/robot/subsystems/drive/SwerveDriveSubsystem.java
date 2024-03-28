@@ -19,6 +19,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -135,6 +136,11 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
 	}
 
     public static SimpleMotorFeedforward motorFeedfoward = new SimpleMotorFeedforward(TranslationalFeedForward.kS, TranslationalFeedForward.kV, TranslationalFeedForward.kA);
+    public static PIDController rotationPID = new PIDController(0, 0, 0);
+    private double[] velocitySetTicks = new double[] {0, 0, 0, 0};
+    private double[] feedForwardTicksArray = new double[] {0, 0, 0, 0};
+    private double[] rotationalSetTicks = new double[] {0, 0, 0, 0};
+
 
     // Physical Hardware
     public final WPI_TalonFX[] motors = new WPI_TalonFX[] {
@@ -191,6 +197,10 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
     private final RotationalDrivebase rotationalLock = new RotationalDrivebase() {
         @Override
         public void setRotationalVelocity(Rotation2d omega) {
+            // ChassisSpeeds actualSpeeds = getVelocities();
+            // double actualRotationalVelocity = actualSpeeds.omegaRadiansPerSecond;
+            // double pidCorrection = rotationPID.calculate(actualRotationalVelocity, omega.getRadians());
+
             lastVelocity.omegaRadiansPerSecond = omega.getRadians();
             setVelocities(lastVelocity);
         }
@@ -361,15 +371,15 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
             feedForwardTicks *= -1;
         }
 
-        if (module == 0) {
-            SmartDashboard.putNumber("FL DeltaTicks", deltaTicks);
-        } else if (module == 2) {
-            SmartDashboard.putNumber("FR DeltaTicks", deltaTicks);
-        } else if (module == 1) {
-            SmartDashboard.putNumber("BL DeltaTicks", deltaTicks);
-        } else if (module == 3) {
-            SmartDashboard.putNumber("BR DeltaTicks", deltaTicks);
-        }
+        // if (module == 0) {
+        //     SmartDashboard.putNumber("FL DeltaTicks", deltaTicks);
+        // } else if (module == 2) {
+        //     SmartDashboard.putNumber("FR DeltaTicks", deltaTicks);
+        // } else if (module == 1) {
+        //     SmartDashboard.putNumber("BL DeltaTicks", deltaTicks);
+        // } else if (module == 3) {
+        //     SmartDashboard.putNumber("BR DeltaTicks", deltaTicks);
+        // }
         // SmartDashboard.putNumber("speed STATE " + module, state.speedMetersPerSecond);
         // SmartDashboard.putNumber("angle STATE " + module, state.angle.getDegrees());
         // SmartDashboard.putNumber("set rot " + module, currTicks + deltaTicks);
@@ -378,11 +388,23 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
         // SmartDashboard.putNumber("cur rot " + module, currTicks);
         // SmartDashboard.putNumber("delta rot" + module, deltaTicks);
         // SmartDashboard.putNumber("target rot " + module, targetTicks);
-        double rotatorFeedforward = Math.copySign(SmartDashboard.getNumber("Rotation Static", 0), deltaTicks);
+        // double rotatorFeedforward = Math.copySign(SmartDashboard.getNumber("Rotation Static", 0), deltaTicks);
         motors[module].set(ControlMode.Velocity, velTicks, DemandType.ArbitraryFeedForward, feedForwardTicks);
-        // motors[module].set(ControlMode.Velocity, velTicks, DemandType.ArbitraryFeedForward, feedForwardTicks);
-        // motors[module].set(ControlMode.Velocity, velTicks);
-        rotators[module].set(ControlMode.Position, currTicks + deltaTicks + OFFSETS[module], DemandType.ArbitraryFeedForward, rotatorFeedforward);
+        rotators[module].set(ControlMode.Position, currTicks + deltaTicks + OFFSETS[module]);
+        // rotationalSetTicks[module] = currTicks + deltaTicks + OFFSETS[module];
+        // feedForwardTicksArray[module] = feedForwardTicks;
+        // velocitySetTicks[module] = velTicks;
+        
+    }
+
+    private void applyStateTogether(double[] velocity, double[] feedForwardTicks, double[] rotation) {
+        for (int i = 0; i < 4; i++) {
+            // rotators[i].set(ControlMode.Position, rotation[i]);
+        }
+
+        for (int i = 0; i < 4; i++) {
+            // motors[i].set(ControlMode.Velocity, 0, DemandType.ArbitraryFeedForward, feedForwardTicks[i]);
+        }
     }
 
     private void applyModuleState(SwerveModuleState state, int idx) {
@@ -416,6 +438,7 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
             // applyModuleState(optimized, i);
             applyModuleState(modules[i], i);
         }
+        // applyStateTogether(velocitySetTicks, feedForwardTicksArray, rotationalSetTicks);
         publisher.set(modules);
     }
 

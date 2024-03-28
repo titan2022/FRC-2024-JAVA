@@ -5,13 +5,16 @@ import frc.robot.utility.Constants.Unit.*;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
+
+import com.pathplanner.lib.pathfinding.LocalADStar;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 
 /** An example command that uses an example subsystem. */
-public class HoldAngleCommand extends Command {
+public class HoldSpeakerAngleCommand extends Command {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
     // public static final double RAMP_TIME = 1;
     // public static final double SHOOT_DURATION = 0.25;
@@ -20,7 +23,7 @@ public class HoldAngleCommand extends Command {
     public Rotation2d angle;
     public boolean reachedAngle = false;
     
-    public HoldAngleCommand(Rotation2d angle, ShooterSubsystem shooter) {
+    public HoldSpeakerAngleCommand(double speed, Rotation2d angle, ShooterSubsystem shooter) {
         this.shooter = shooter;
         this.angle = angle;
     }

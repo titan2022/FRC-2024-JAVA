@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.control.ElevatorControlCommand;
 import frc.robot.commands.control.IntakeIndexerControlCommand;
+import frc.robot.commands.drive.AlignSpeakerCommand;
 import frc.robot.commands.drive.RotationalDriveCommand;
 import frc.robot.commands.drive.TranslationalDriveCommand;
 import frc.robot.commands.shooter.ShooterControlCommand;
@@ -44,14 +45,13 @@ public class Robot extends TimedRobot {
         // SmartDashboard.putNumber("R", 0);
         // SmartDashboard.putNumber("G", 0);
         // SmartDashboard.putNumber("B", 0);
-        // SmartDashboard.putNumber("kP", 0.35);
-        // SmartDashboard.putNumber("kI", .0035);
-        // SmartDashboard.putNumber("kD", 0.05);
-        // SmartDashboard.putNumber("kF", 0);
+        SmartDashboard.putNumber("kP", 0.35);
+        SmartDashboard.putNumber("kI", 0.0035);
+        SmartDashboard.putNumber("kD", 0.05);
 
         SmartDashboard.putNumber("Speaker Distance", 0);
         // SmartDashboard.putNumber("Bot Shooter", 0.01);
-        // SmartDashboard.putNumber("Tar Shoot Speed", 0);
+        SmartDashboard.putNumber("Tar Shoot Speed", 0);
         SmartDashboard.putNumber("Rotator Static", 0);
     //     AutoBuilder.configureHolonomic(
     //         localizer::getDisplacementPose2d,
@@ -83,10 +83,10 @@ public class Robot extends TimedRobot {
     //     SmartDashboard.putNumber("D", 30);
     //     SmartDashboard.putNumber("E", 0.005);
     //     SmartDashboard.putNumber("F", -2.55);
-        SmartDashboard.putNumber("Delta FL", 0);
-        SmartDashboard.putNumber("Delta FR", 0);
-        SmartDashboard.putNumber("Delta BL", 0);
-        SmartDashboard.putNumber("Delta BR", 0);
+        // SmartDashboard.putNumber("Delta FL", 0);
+        // SmartDashboard.putNumber("Delta FR", 0);
+        // SmartDashboard.putNumber("Delta BL", 0);
+        // SmartDashboard.putNumber("Delta BR", 0);
 
         DataLogManager.start();
         log = DataLogManager.getLog();
@@ -106,7 +106,7 @@ public class Robot extends TimedRobot {
         // Translation2d rotatedVelocity = drive.getTranslational().getVelocity().rotateBy(localizer.getHeading());
         // SmartDashboard.putNumber("Rotated vx", rotatedVelocity.getX());
         // SmartDashboard.putNumber("Rotated vy", rotatedVelocity.getY());
-        SmartDashboard.putNumber("Speed", drive.getTranslational().getVelocity().getNorm());
+        // SmartDashboard.putNumber("Speed", drive.getTranslational().getVelocity().getNorm());
         SmartDashboard.putNumber("Speaker Heading", localizer.getSpeakerHeading().getDegrees());
         SmartDashboard.putNumber("Speaker X", localizer.getSpeakerPosition().getX());
         SmartDashboard.putNumber("Speaker Y", localizer.getSpeakerPosition().getY());
@@ -124,6 +124,7 @@ public class Robot extends TimedRobot {
         // SmartDashboard.putNumber("FR Rot", drive.rotators[0].getSelectedSensorPosition());
         // SmartDashboard.putNumber("FR Enc Pos", drive.encoders[0].getPosition());
         // SmartDashboard.putNumber("FR Enc Abs", drive.encoders[0].getAbsolutePosition());
+        SmartDashboard.putNumber("Robot Heading", localizer.getHeading().getDegrees());
     }
 
     @Override
@@ -136,7 +137,9 @@ public class Robot extends TimedRobot {
         intake.removeDefaultCommand();
         shooter.removeDefaultCommand();
         indexer.removeDefaultCommand();
-        new ShooterSpeakerAlgCommand(19.5, shooter, indexer, localizer).schedule();
+        drive.getRotational().removeDefaultCommand();
+
+        new AlignSpeakerCommand(drive.getRotational(), localizer).schedule();
     //     AutoBuilder.configureHolonomic(
     //         localizer::getDisplacementPose2d,
     //         localizer::resetPose2d,
@@ -187,7 +190,7 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopInit() {
         Trigger shootTrigger = new JoystickButton(xbox2, XboxController.Button.kLeftBumper.value);
-        shootTrigger.onTrue(new ShooterSpeakerAlgCommand(8, shooter, indexer, localizer));
+        shootTrigger.onTrue(new ShooterSpeakerAlgCommand(16, drive.getRotational(), shooter, indexer, localizer));
         // for (int i = 0; i < drive.motors.length; i++) {
         //     drive.motors[i].config_kP(0, SmartDashboard.getNumber("swkP", 0.0056));
         //     drive.motors[i].config_kI(0, SmartDashboard.getNumber("swkI", 0.0));
@@ -200,7 +203,7 @@ public class Robot extends TimedRobot {
         drive.getRotational().setDefaultCommand(new RotationalDriveCommand(drive.getRotational(), localizer, xbox1, 2.5 * Math.PI));
 
         // Second driver
-        // shooter.setDefaultCommand(new ShooterControlCommand(shooter, xbox2, log));
+        shooter.setDefaultCommand(new ShooterControlCommand(shooter, xbox2, log));
         elevator.setDefaultCommand(new ElevatorControlCommand(elevator, xbox2,  xbox1));
         intake.setDefaultCommand(new IntakeIndexerControlCommand(intake, indexer, xbox2));
         // Trigger xboxTrigger = new JoystickButton(xbox1, XboxController.Button.kY.value);
@@ -211,10 +214,17 @@ public class Robot extends TimedRobot {
     double degrees = 30.0;
     @Override
     public void teleopPeriodic() {
-        drive.OFFSETS[0] = -2930 + 1024 + 2048 + (int) SmartDashboard.getNumber("Delta FL", 0);
-        drive.OFFSETS[2] = -2841 + 1024 + 2048 + (int) SmartDashboard.getNumber("Delta FR", 0);
-        drive.OFFSETS[1] = -3267 + 1024 + 2048 + (int) SmartDashboard.getNumber("Delta BL", 0);
-        drive.OFFSETS[3] = -2143 + 1024 + 2048 + (int) SmartDashboard.getNumber("Delta BR", 0);
+        // for (int i = 0; i < 4; i++) {
+        //     drive.rotators[i].config_kP(0, SmartDashboard.getNumber("kP", 0));
+        //     drive.rotators[i].config_kI(0, SmartDashboard.getNumber("kI", 0));
+        //     drive.rotators[i].config_kD(0, SmartDashboard.getNumber("kD", 0));
+        // }
+
+
+        // drive.OFFSETS[0] = -2930 + 1024 + 2048 + (int) SmartDashboard.getNumber("Delta FL", 0);
+        // drive.OFFSETS[2] = -2841 + 1024 + 2048 + (int) SmartDashboard.getNumber("Delta FR", 0);
+        // drive.OFFSETS[1] = -3267 + 1024 + 2048 + (int) SmartDashboard.getNumber("Delta BL", 0);
+        // drive.OFFSETS[3] = -2143 + 1024 + 2048 + (int) SmartDashboard.getNumber("Delta BR", 0);
 
         // for (int i = 0; i < 4; ++i) {
         //     drive.rotators[i].config_kP(i, SmartDashboard.getNumber("kP", 0));
@@ -225,20 +235,24 @@ public class Robot extends TimedRobot {
 
         if (indexer.hasNote()) {
             for (var i = 0; i < m_ledBuffer.getLength(); i++) {
-            m_ledBuffer.setRGB(i, (int) SmartDashboard.getNumber("R", 0), (int) SmartDashboard.getNumber("G", 0), (int) SmartDashboard.getNumber("B", 0));
-
+            m_ledBuffer.setRGB(i, 255, 20, 0);
             }
         } else {
             for (var i = 0; i < m_ledBuffer.getLength(); i++) {
+            // m_ledBuffer.setRGB(i, (int) SmartDashboard.getNumber("R", 0), (int) SmartDashboard.getNumber("G", 0), (int) SmartDashboard.getNumber("B", 0));
             m_ledBuffer.setRGB(i, 0, 0, 255);
             }
         }
 
         m_led.setData(m_ledBuffer);
 
-        if (xbox2.getLeftBumperPressed()) {
-            new ShooterSpeakerAlgCommand(8, shooter, indexer, localizer).schedule();
-        }
+        // if (xbox1.getXButtonPressed()) {
+        //     localizer.resetHeading();
+        // }
+
+        // if (xbox2.getLeftBumperPressed()) {
+        //     new ShooterSpeakerAlgCommand(8, shooter, indexer, localizer).schedule();
+        // }
 
         // SmartDashboard.putNumber("height", elevator.getEncoder());
         // SmartDashboard.putNumber("linkage angle", shooter.getRotation());

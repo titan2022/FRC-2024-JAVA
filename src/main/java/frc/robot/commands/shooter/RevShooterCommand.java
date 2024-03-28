@@ -37,17 +37,11 @@ public class RevShooterCommand extends Command {
     @Override
     public void execute() {
         shooter.shoot(SHOOT_SPEED);
-        if (shooter.getShooterVelocity() >= 8)
-            SmartDashboard.putBoolean("Rev Shooter Init", true);
-        else 
-            SmartDashboard.putBoolean("Rev Shooter Init", false);
-
     }
 
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
-        SmartDashboard.putBoolean("End Rev", true);
         // shooter.shootCoastToggle();
     }
 

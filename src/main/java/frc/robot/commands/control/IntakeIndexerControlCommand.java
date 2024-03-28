@@ -35,11 +35,11 @@ public class IntakeIndexerControlCommand extends Command {
         SmartDashboard.putNumber("Note Timer", timer);
 
         if (xbox.getAButton() && timer > 0) { 
-            intake.setWheelSpeed(0.45);
+            intake.setWheelSpeed(0.60);
             indexer.intake();
         } else if (xbox.getYButton()) {
-            intake.setWheelSpeed(-0.45);
-            indexer.reverse();
+            intake.setWheelSpeed(-0.60);
+            // indexer.reverse();
         } else if (xbox.getBButton()) {
             indexer.reverse();
         } else if (xbox.getRightBumper()) {

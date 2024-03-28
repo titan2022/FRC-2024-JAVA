@@ -5,9 +5,12 @@
 package frc.robot.commands.shooter;
 
 import static frc.robot.utility.Constants.Unit.*;
+
+import frc.robot.commands.drive.AlignSpeakerCommand;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
+import frc.robot.subsystems.drive.RotationalDrivebase;
 import frc.robot.utility.Constants;
 import frc.robot.utility.Localizer;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -29,7 +32,7 @@ public class ShooterSpeakerAlgCommand extends SequentialCommandGroup {
     public static final double SPEAKER_HEIGHT = 2.0 * METERS;
     public static final Translation2d SHOOTER_PIVOT_OFFSET = new Translation2d(0.95 * IN, 7.89 * IN); 
     public static final double SHOOTER_ARM_LENGTH = 8.387 * IN;
-    public static final Translation2d TARGET_OFFSET = new Translation2d(0.72, 0.42);
+    public static final Translation2d TARGET_OFFSET = new Translation2d(0.92, 0.42);
 
     //Assume vector from note in shooter
     public static Rotation2d calculateAngle(double speed, Translation2d shootTarget) {
@@ -64,31 +67,30 @@ public class ShooterSpeakerAlgCommand extends SequentialCommandGroup {
         return trueShootVector.plus(TARGET_OFFSET);
     }
 
-    public ShooterSpeakerAlgCommand(double speed, ShooterSubsystem shooter, IndexerSubsystem indexer, Localizer localizer) {
-        Translation2d shootTarget = getShootVector(localizer);
+    public ShooterSpeakerAlgCommand(double speed, RotationalDrivebase rotational, ShooterSubsystem shooter, IndexerSubsystem indexer, Localizer localizer) {
+        // Translation2d shootTarget = getShootVector(localizer);
         // Translation2d shootTarget = new Translation2d(80 * IN, SPEAKER_HEIGHT);
-        SmartDashboard.putNumber("Shoot X", shootTarget.getX());
-        SmartDashboard.putNumber("Shoot Y", shootTarget.getY());
+        // SmartDashboard.putNumber("Shoot X", shootTarget.getX());
+        // SmartDashboard.putNumber("Shoot Y", shootTarget.getY());
 
-        Rotation2d setAngle;
-        try {
-            setAngle = calculateAngle(19.5, shootTarget);
-        } catch (Exception e) {
-            setAngle = Rotation2d.fromDegrees(30);
-        }        
+        // Rotation2d setAngle;
+        // try {
+        //     setAngle = calculateAngle(speed * 1.5, shootTarget);
+        // } catch (Exception e) {
+        //     setAngle = Rotation2d.fromDegrees(30);
+        // }        
 
-        SmartDashboard.putNumber("Shoot Angle", setAngle.getDegrees());
-
+        // SmartDashboard.putNumber("Shoot Angle", setAngle.getDegrees());
         addCommands(
-            new RotateShooterCommand(setAngle, shooter),
+            // new AlignSpeakerCommand(rotational, localizer)
             new ParallelDeadlineGroup(
                 new SequentialCommandGroup(
-                    new RevShooterCommand(8, shooter),
+                    new RevShooterCommand(speed, shooter),
                     new FireShooterCommand(indexer, shooter)
                 ), 
-                new HoldAngleCommand(setAngle, shooter))
+            new ShooterAlignSpeakerCommand(speed * 1.15, shooter, localizer)
+            )
         );
-
     }
 }
 

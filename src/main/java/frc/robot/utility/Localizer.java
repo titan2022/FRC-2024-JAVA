@@ -93,9 +93,9 @@ public class Localizer {
     /**
      * Resets rotational offset 
      */
-    public void resetOrientation() {
-        navxGyro.reset();
-        navxGyro.resetDisplacement();
+    public void resetHeading() {
+        // navxGyro.reset();
+        pigeonOffset = pigeon.getRotation2d();
     }
 
     /**
@@ -184,7 +184,7 @@ public class Localizer {
      * @return Rotation2d
      */
     public Rotation2d getSpeakerHeading() {
-        return globalOrientationFromTags.times(-1.0);
+        return globalOrientationFromTags.times(-1.0).plus(Rotation2d.fromDegrees(16.94));
     }
 
     /**
@@ -192,14 +192,14 @@ public class Localizer {
      * @return meters
      */
     public Translation2d getSpeakerPosition() {
-        return globalPosition.times(-1.0); // Speaker is 0, 0
+        return new Translation2d(-globalPosition.getX(), globalPosition.getY()); // Speaker is 0, 0
     }
 
     /**
      * Updates first frame localization estimates
      */
     public void setup() {
-        resetOrientation();
+        resetHeading();
 
         if (server != null) {
             server.subscribe("pose", (NetworkingCall<NetworkingPose>)(NetworkingPose pose) -> {
@@ -215,8 +215,8 @@ public class Localizer {
             });
 
             server.subscribe("visible", (NetworkingCall<Translation3d>)(Translation3d fakeVec) -> {
-                speakerTagVisible = fakeVec.getX() > 0;
-                SmartDashboard.putBoolean("Tag Visible", speakerTagVisible);
+                // speakerTagVisible = fakeVec.getX() > 0;
+                // SmartDashboard.putBoolean("Tag Visible", speakerTagVisible);
             });
         }
     }

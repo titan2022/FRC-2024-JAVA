@@ -194,7 +194,7 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public double getShooterVelocity() {
-        double averageMotorSpeed = Math.abs(topShooterMotor.getSelectedSensorVelocity());
+        double averageMotorSpeed = Math.abs(topShooterMotor.getSelectedSensorVelocity()) + Math.abs(bottomShooterMotor.getSelectedSensorVelocity());
         double rotationsPerSec = (averageMotorSpeed * 10) * FALCON_TICKS;
         double metersPerSec = rotationsPerSec * SHOOTER_WHEEL_RADIUS / SHOOTER_GEAR_RATIO;
         return metersPerSec;
@@ -210,17 +210,18 @@ public class ShooterSubsystem extends SubsystemBase {
 	 * Holds angle with brake mode
 	 */
 	public void holdAngle(double shooter_angle, double target_angle, double d) {
-		double x = LINKAGE_PIVOT_DX + LINKAGE_SHORT_ARM_LENGTH*Math.cos(target_angle - Math.PI / 2);
-		double y = LINKAGE_PIVOT_DY + LINKAGE_SHORT_ARM_LENGTH*Math.sin(target_angle - Math.PI / 2);
-		double d2 = new Translation2d(x, y).getNorm();
-		double theta2 = lawOfCosines(LINKAGE_LONG_ARM_LENGTH, SHOOTER_LENGTH, d2);
+		// double x = LINKAGE_PIVOT_DX + LINKAGE_SHORT_ARM_LENGTH*Math.cos(target_angle - Math.PI / 2);
+		// double y = LINKAGE_PIVOT_DY + LINKAGE_SHORT_ARM_LENGTH*Math.sin(target_angle - Math.PI / 2);
+		// double d2 = new Translation2d(x, y).getNorm();
+		// double theta2 = lawOfCosines(LINKAGE_LONG_ARM_LENGTH, SHOOTER_LENGTH, d2);
 
-		double theta3 = lawOfCosines(LINKAGE_LONG_ARM_LENGTH, LINKAGE_SHORT_ARM_LENGTH, d);
-		linkageMotor.set(0.0775 * Math.cos(shooter_angle) / Math.sin(theta2) * Math.sin(theta3));
-		SmartDashboard.putNumber("counter", SmartDashboard.getNumber("counter", 0) + 1);
+		// double theta3 = lawOfCosines(LINKAGE_LONG_ARM_LENGTH, LINKAGE_SHORT_ARM_LENGTH, d);
+		// linkageMotor.set(0.0775 * Math.cos(shooter_angle) / Math.sin(theta2) * Math.sin(theta3));
+		// SmartDashboard.putNumber("counter", SmartDashboard.getNumber("counter", 0) + 1);
+
         // guys velocity = 0 doesn't work
 		// angle shifts down by a couple degrees, pls trust me on this
-		// linkageMotor.set(ControlMode.Velocity, 0);
+		linkageMotor.set(ControlMode.Velocity, 0);
 	}
 
 	/**
