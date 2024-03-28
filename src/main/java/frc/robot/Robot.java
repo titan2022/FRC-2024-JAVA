@@ -21,6 +21,7 @@ import frc.robot.commands.shooter.ShooterSpeakerAlgCommand;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.drive.SwerveDriveSubsystem;
 import frc.robot.utility.Localizer;
@@ -34,10 +35,9 @@ public class Robot extends TimedRobot {
     private IntakeSubsystem intake = new IntakeSubsystem();
     private ShooterSubsystem shooter = new ShooterSubsystem();
     private IndexerSubsystem indexer = new IndexerSubsystem();
+    private LEDSubsystem led = new LEDSubsystem();
     private DataLog log;
     private Command auto;
-    private AddressableLED m_led = new AddressableLED(0);
-    private AddressableLEDBuffer m_ledBuffer = new AddressableLEDBuffer(17);
 
     @Override
     public void robotInit() {
@@ -91,10 +91,6 @@ public class Robot extends TimedRobot {
         DataLogManager.start();
         log = DataLogManager.getLog();
         // auto = new PathPlannerAuto("Test");
-        m_led.setLength(m_ledBuffer.getLength());
-
-        m_led.setData(m_ledBuffer);
-        m_led.start();
 
     }
 
@@ -190,7 +186,7 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopInit() {
         Trigger shootTrigger = new JoystickButton(xbox2, XboxController.Button.kLeftBumper.value);
-        shootTrigger.onTrue(new ShooterSpeakerAlgCommand(16, drive.getRotational(), shooter, indexer, localizer));
+        shootTrigger.onTrue(new ShooterSpeakerAlgCommand(16, drive.getRotational(), shooter, indexer, localizer, led));
         // for (int i = 0; i < drive.motors.length; i++) {
         //     drive.motors[i].config_kP(0, SmartDashboard.getNumber("swkP", 0.0056));
         //     drive.motors[i].config_kI(0, SmartDashboard.getNumber("swkI", 0.0));
@@ -226,18 +222,13 @@ public class Robot extends TimedRobot {
         // drive.OFFSETS[1] = -3267 + 1024 + 2048 + (int) SmartDashboard.getNumber("Delta BL", 0);
         // drive.OFFSETS[3] = -2143 + 1024 + 2048 + (int) SmartDashboard.getNumber("Delta BR", 0);
 
-        if (indexer.hasNote()) {
-            for (var i = 0; i < m_ledBuffer.getLength(); i++) {
-            m_ledBuffer.setRGB(i, 255, 20, 0);
-            }
+        if (localizer.isSpeakerTagVisible()) {
+            led.fill(0, 255, 0);
+        } else if (indexer.hasNote()) {
+            led.fill(255, 20, 0);
         } else {
-            for (var i = 0; i < m_ledBuffer.getLength(); i++) {
-            // m_ledBuffer.setRGB(i, (int) SmartDashboard.getNumber("R", 0), (int) SmartDashboard.getNumber("G", 0), (int) SmartDashboard.getNumber("B", 0));
-            m_ledBuffer.setRGB(i, 0, 0, 255);
-            }
+            led.fill(0, 0, 255);
         }
-
-        m_led.setData(m_ledBuffer);
 
         // if (xbox1.getXButtonPressed()) {
         //     localizer.resetHeading();

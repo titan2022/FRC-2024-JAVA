@@ -1,13 +1,10 @@
 package frc.robot.commands.shooter;
 
-import frc.robot.utility.Constants.Unit;
-import frc.robot.utility.Constants.Unit.*;
-import frc.robot.subsystems.ElevatorSubsystem;
-import frc.robot.subsystems.IndexerSubsystem;
-import frc.robot.subsystems.ShooterSubsystem;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.IndexerSubsystem;
+import frc.robot.subsystems.LEDSubsystem;
+import frc.robot.subsystems.ShooterSubsystem;
 
 /** An example command that uses an example subsystem. */
 public class FireShooterCommand extends Command {
@@ -17,14 +14,16 @@ public class FireShooterCommand extends Command {
     // public static final double INDEX_SPEED = 0.5;
     public static final double DELAY_TIME = 0.25;
     public static final double FIRE_TIME = 1.5;
-    public ShooterSubsystem shooter;
-    public IndexerSubsystem indexer;
+    private ShooterSubsystem shooter;
+    private IndexerSubsystem indexer;
+    private LEDSubsystem led;
     // public double delayTime;
     public double endTime;
     
-    public FireShooterCommand(IndexerSubsystem indexer, ShooterSubsystem shooter) {
+    public FireShooterCommand(IndexerSubsystem indexer, ShooterSubsystem shooter, LEDSubsystem led) {
         this.shooter = shooter;
         this.indexer = indexer;
+        this.led = led;
 
         // addRequirements(shooter);
     }
@@ -49,6 +48,7 @@ public class FireShooterCommand extends Command {
         shooter.holdIndex();
         indexer.stop();
         shooter.shoot(0);
+        led.fill(0, 0, 255);
     }
 
     // Returns true when the command should end.

@@ -4,26 +4,18 @@
 
 package frc.robot.commands.shooter;
 
-import static frc.robot.utility.Constants.Unit.*;
+import static frc.robot.utility.Constants.Unit.IN;
+import static frc.robot.utility.Constants.Unit.METERS;
 
-import frc.robot.commands.drive.AlignSpeakerCommand;
-import frc.robot.subsystems.ElevatorSubsystem;
-import frc.robot.subsystems.IndexerSubsystem;
-import frc.robot.subsystems.ShooterSubsystem;
-import frc.robot.subsystems.drive.RotationalDrivebase;
-import frc.robot.utility.Constants;
-import frc.robot.utility.Localizer;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.robot.subsystems.IndexerSubsystem;
+import frc.robot.subsystems.LEDSubsystem;
+import frc.robot.subsystems.ShooterSubsystem;
+import frc.robot.subsystems.drive.RotationalDrivebase;
+import frc.robot.utility.Localizer;
 
 /** An example command that uses an example subsystem. */
 public class ShooterSpeakerAlgCommand extends SequentialCommandGroup {
@@ -67,7 +59,7 @@ public class ShooterSpeakerAlgCommand extends SequentialCommandGroup {
         return trueShootVector.plus(TARGET_OFFSET);
     }
 
-    public ShooterSpeakerAlgCommand(double speed, RotationalDrivebase rotational, ShooterSubsystem shooter, IndexerSubsystem indexer, Localizer localizer) {
+    public ShooterSpeakerAlgCommand(double speed, RotationalDrivebase rotational, ShooterSubsystem shooter, IndexerSubsystem indexer, Localizer localizer, LEDSubsystem led) {
         // Translation2d shootTarget = getShootVector(localizer);
         // Translation2d shootTarget = new Translation2d(80 * IN, SPEAKER_HEIGHT);
         // SmartDashboard.putNumber("Shoot X", shootTarget.getX());
@@ -85,10 +77,10 @@ public class ShooterSpeakerAlgCommand extends SequentialCommandGroup {
             // new AlignSpeakerCommand(rotational, localizer)
             new ParallelDeadlineGroup(
                 new SequentialCommandGroup(
-                    new RevShooterCommand(speed, shooter),
-                    new FireShooterCommand(indexer, shooter)
+                    new RevShooterCommand(speed, shooter, led),
+                    new FireShooterCommand(indexer, shooter, led)
                 ), 
-            new ShooterAlignSpeakerCommand(speed * 1.15, shooter, localizer)
+                new ShooterAlignSpeakerCommand(speed * 1.15, shooter, localizer)
             )
         );
     }

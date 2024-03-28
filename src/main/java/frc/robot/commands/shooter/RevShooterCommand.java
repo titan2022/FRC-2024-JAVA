@@ -1,14 +1,8 @@
 package frc.robot.commands.shooter;
 
-import frc.robot.utility.Constants.Unit;
-import frc.robot.utility.Constants.Unit.*;
-import frc.robot.subsystems.ElevatorSubsystem;
-import frc.robot.subsystems.IndexerSubsystem;
-import frc.robot.subsystems.ShooterSubsystem;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.LEDSubsystem;
+import frc.robot.subsystems.ShooterSubsystem;
 
 /** An example command that uses an example subsystem. */
 public class RevShooterCommand extends Command {
@@ -17,13 +11,15 @@ public class RevShooterCommand extends Command {
     // public static final double INDEX_SPEED = 0.5;
     // public static final double REV_DURATION = 3;
     public static final double SHOOT_SPEED = 0.8;
-    public ShooterSubsystem shooter;
+    private ShooterSubsystem shooter;
+    private LEDSubsystem led;
     public double speed;
     // public double endTime;
     
-    public RevShooterCommand(double speed, ShooterSubsystem shooter) {
+    public RevShooterCommand(double speed, ShooterSubsystem shooter, LEDSubsystem led) {
         this.shooter = shooter;
         this.speed = speed;
+        this.led = led;
 
         // addRequirements(shooter);
     }
@@ -31,6 +27,7 @@ public class RevShooterCommand extends Command {
     @Override
     public void initialize() {
         // endTime = Timer.getFPGATimestamp() + REV_DURATION;
+        led.fill(255, 255, 0);
     }
 
     // Called every time the scheduler runs while the command is scheduled.

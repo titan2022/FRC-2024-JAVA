@@ -40,9 +40,6 @@ public class Localizer {
     private WPI_Pigeon2 pigeon = new WPI_Pigeon2(15);
     public static final AHRS navxGyro = new AHRS(SPI.Port.kMXP);
 
-    private DoubleLogEntry xLog;
-    private DoubleLogEntry yLog;
-
 
     public Rotation2d pigeonOffset = new Rotation2d();
 
@@ -54,6 +51,7 @@ public class Localizer {
     private Rotation3d noteRotation = new Rotation3d();
     private Dictionary<Integer, NetworkingTag> tags = new Hashtable<>();
     private Translation2d[] speaker_location = {new Translation2d(-1.50, 218.42), new Translation2d(652.73, 218.42)};
+    private boolean speakerTagVisible = false;
 
     public Pose2d startingPose2d = new Pose2d(); 
     /**
@@ -196,6 +194,14 @@ public class Localizer {
     }
 
     /**
+     * Returns true if speaker tag is seen by camera
+     * @return boolean
+     */
+    public boolean isSpeakerTagVisible() {
+        return speakerTagVisible;
+    }
+
+    /**
      * Updates first frame localization estimates
      */
     public void setup() {
@@ -209,14 +215,14 @@ public class Localizer {
                 globalOrientationFromTags = Rotation2d.fromRadians(pose.rotation.getY());
             });
     
-            server.subscribe("note",  (NetworkingCall<NetworkingPose>)(NetworkingPose note) -> {
-                // noteDistance = `
-                noteRotation = note.rotation;
-            });
+            // server.subscribe("note",  (NetworkingCall<NetworkingPose>)(NetworkingPose note) -> {
+            //     // noteDistance = `
+            //     noteRotation = note.rotation;
+            // });
 
             server.subscribe("visible", (NetworkingCall<Translation3d>)(Translation3d fakeVec) -> {
-                // speakerTagVisible = fakeVec.getX() > 0;
-                // SmartDashboard.putBoolean("Tag Visible", speakerTagVisible);
+                speakerTagVisible = fakeVec.getX() > 0;
+                SmartDashboard.putBoolean("Tag Visible", speakerTagVisible);
             });
         }
     }
