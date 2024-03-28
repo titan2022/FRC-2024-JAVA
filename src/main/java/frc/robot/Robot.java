@@ -1,8 +1,5 @@
 package frc.robot;
 
-<<<<<<< HEAD
-import edu.wpi.first.math.geometry.Rotation2d;
-=======
 import static frc.robot.utility.Constants.Unit.IN;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -12,7 +9,7 @@ import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 
->>>>>>> a7e1b18f53f824f514faeac5d21bf30b7500cac7
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -246,10 +243,13 @@ public class Robot extends TimedRobot {
         // drive.OFFSETS[1] = -3267 + 1024 + 2048 + (int) SmartDashboard.getNumber("Delta BL", 0);
         // drive.OFFSETS[3] = -2143 + 1024 + 2048 + (int) SmartDashboard.getNumber("Delta BR", 0);
 
-        if (localizer.isSpeakerTagVisible()) {
-            led.fill(0, 255, 0);
-        } else if (indexer.hasNote()) {
-            led.fill(255, 20, 0);
+        SmartDashboard.putBoolean("hasnote", indexer.hasNote());
+        if (indexer.hasNote()) {
+            if (localizer.isSpeakerTagVisible()) {
+                led.fill(0, 255, 0);
+            } else {
+                led.fill(255, 20, 0);
+            }
         } else {
             led.fill(0, 0, 255);
         }
