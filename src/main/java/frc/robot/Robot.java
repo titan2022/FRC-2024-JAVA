@@ -1,5 +1,8 @@
 package frc.robot;
 
+<<<<<<< HEAD
+import edu.wpi.first.math.geometry.Rotation2d;
+=======
 import static frc.robot.utility.Constants.Unit.IN;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -9,6 +12,7 @@ import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 
+>>>>>>> a7e1b18f53f824f514faeac5d21bf30b7500cac7
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -203,6 +207,8 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopInit() {
+        localizer.resetHeading(Rotation2d.fromDegrees(-30));
+
         Trigger shootTrigger = new JoystickButton(xbox2, XboxController.Button.kLeftBumper.value);
         shootTrigger.onTrue(new ShooterSpeakerAlgCommand(16, drive.getRotational(), shooter, indexer, localizer, led));
         // for (int i = 0; i < drive.motors.length; i++) {

@@ -38,7 +38,7 @@ public class AlignSpeakerCommand extends Command {
         double angle = Math.tan(speakerPosition.getX() / speakerPosition.getY()) - (Math.PI / 2);
         double rotationalAngle = 3 * Math.PI / 2;
         setAngle = new Rotation2d(rotationalAngle + angle);
-        deltaAngle = new Rotation2d(setAngle.getRadians() - localizer.getOrientation().getRadians());
+        deltaAngle = new Rotation2d(setAngle.getRadians() - localizer.getTrueOrientation().getRadians());
         // angle -= Math.PI / 2;
         // Rotation2d translationalDeltaAngle = new Rotation2d(angle);
         // Rotation2d rotationalDeltaAngle = localizer.getSpeakerHeading();
@@ -78,10 +78,10 @@ public class AlignSpeakerCommand extends Command {
     @Override
     public boolean isFinished() {
         if (omega.getRadians() > 0) {
-            return (setAngle.getRadians() - localizer.getOrientation().getRadians() <= DEAD_BAND);
+            return (setAngle.getRadians() - localizer.getTrueOrientation().getRadians() <= DEAD_BAND);
         }
         else {
-            return Math.abs(setAngle.getRadians() - localizer.getOrientation().getRadians()) <= DEAD_BAND;
+            return Math.abs(setAngle.getRadians() - localizer.getTrueOrientation().getRadians()) <= DEAD_BAND;
         }
     }
 }

@@ -90,14 +90,23 @@ public class Localizer {
         return globalOrientation;
     }
 
+    public Rotation2d getTrueOrientation() {
+        return globalHeading.plus(new Rotation2d(Math.PI / 2));
+    }
+
     /**
      * Resets rotational offset 
      */
     public void resetHeading() {
         // navxGyro.reset();
         // localOffset = pigeon.getRotation2d();
-        pigeonOffset = pigeon.getRotation2d();
+        resetHeading(Rotation2d.fromDegrees(0));
     }
+
+    public void resetHeading(Rotation2d startingAngle) {
+        pigeonOffset = pigeon.getRotation2d().plus(startingAngle);
+    }
+
 
     /**
      * Gets the Pigeon rotation velocity (clockwise is positive)
