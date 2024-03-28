@@ -208,7 +208,7 @@ public class Localizer {
      * Updates first frame localization estimates
      */
     public void setup() {
-        resetHeading();
+        // resetHeading();
 
         if (server != null) {
             server.subscribe("pose", (NetworkingCall<NetworkingPose>)(NetworkingPose pose) -> {
