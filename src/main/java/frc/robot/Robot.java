@@ -1,5 +1,6 @@
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.wpilibj.AddressableLED;
@@ -188,6 +189,8 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopInit() {
+        localizer.resetHeading(Rotation2d.fromDegrees(-30));
+
         Trigger shootTrigger = new JoystickButton(xbox2, XboxController.Button.kLeftBumper.value);
         shootTrigger.onTrue(new ShooterSpeakerAlgCommand(16, drive.getRotational(), shooter, indexer, localizer, led));
         // for (int i = 0; i < drive.motors.length; i++) {
