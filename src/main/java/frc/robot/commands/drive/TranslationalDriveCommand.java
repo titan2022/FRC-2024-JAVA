@@ -17,6 +17,8 @@ public class TranslationalDriveCommand extends Command {
     private double maxVel;
     private boolean isFieldOriented = true;
     private Rotation2d phiOffset = new Rotation2d(0);
+    private double xOffset = 0;
+    private double yOffset = 0;
 
     /**
      * Creates a new TranlationalDriveCommand with optional field orientation.
@@ -57,6 +59,11 @@ public class TranslationalDriveCommand extends Command {
 
     @Override
     public void execute() {
+        if (xbox.getLeftBumperPressed()) {
+            xOffset = xbox.getLeftX();
+            yOffset = xbox.getLeftY();
+        }
+
         if (xbox.getBButtonPressed() && localizer != null) {
             isFieldOriented = !isFieldOriented;
             SmartDashboard.putBoolean("isFieldOriented", isFieldOriented);
@@ -71,8 +78,8 @@ public class TranslationalDriveCommand extends Command {
             speedMult = 0.25;
         }
 
-        double joyX = applyDeadband(xbox.getLeftX(), 0.15);
-        double joyY = applyDeadband(-xbox.getLeftY(), 0.15);
+        double joyX = applyDeadband(xbox.getLeftX() - xOffset, 0.15);
+        double joyY = applyDeadband(-xbox.getLeftY() - yOffset, 0.15);
         // double x = 0;
         // double y = 0;
         // if (Math.abs(xbox.getLeftX()) > 0.4) {

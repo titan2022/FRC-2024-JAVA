@@ -226,13 +226,6 @@ public class Robot extends TimedRobot {
         // drive.OFFSETS[1] = -3267 + 1024 + 2048 + (int) SmartDashboard.getNumber("Delta BL", 0);
         // drive.OFFSETS[3] = -2143 + 1024 + 2048 + (int) SmartDashboard.getNumber("Delta BR", 0);
 
-        // for (int i = 0; i < 4; ++i) {
-        //     drive.rotators[i].config_kP(i, SmartDashboard.getNumber("kP", 0));
-        //     drive.rotators[i].config_kI(i, SmartDashboard.getNumber("kI", 0));
-        //     drive.rotators[i].config_kD(i, SmartDashboard.getNumber("kD", 0));
-        //     drive.rotators[i].config_kF(i, SmartDashboard.getNumber("kF", 0));
-        // }
-
         if (indexer.hasNote()) {
             for (var i = 0; i < m_ledBuffer.getLength(); i++) {
             m_ledBuffer.setRGB(i, 255, 20, 0);
