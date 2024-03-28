@@ -1,5 +1,6 @@
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
@@ -15,6 +16,7 @@ import frc.robot.commands.control.ElevatorControlCommand;
 import frc.robot.commands.control.IntakeIndexerControlCommand;
 import frc.robot.commands.drive.AlignSpeakerCommand;
 import frc.robot.commands.drive.RotationalDriveCommand;
+import frc.robot.commands.drive.TranslationCommand;
 import frc.robot.commands.drive.TranslationalDriveCommand;
 import frc.robot.commands.shooter.ShooterControlCommand;
 import frc.robot.commands.shooter.ShooterSpeakerAlgCommand;
@@ -139,7 +141,8 @@ public class Robot extends TimedRobot {
         indexer.removeDefaultCommand();
         drive.getRotational().removeDefaultCommand();
 
-        new AlignSpeakerCommand(drive.getRotational(), localizer).schedule();
+        new TranslationCommand(new Translation2d(0, 1000), 6, drive.getTranslational()).schedule();;
+        // new AlignSpeakerCommand(drive.getRotational(), localizer).schedule();
     //     AutoBuilder.configureHolonomic(
     //         localizer::getDisplacementPose2d,
     //         localizer::resetPose2d,
