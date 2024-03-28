@@ -1,11 +1,22 @@
 package frc.robot;
 
+<<<<<<< HEAD
 import edu.wpi.first.math.geometry.Rotation2d;
+=======
+import static frc.robot.utility.Constants.Unit.IN;
+
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
+import com.pathplanner.lib.util.PIDConstants;
+import com.pathplanner.lib.util.ReplanningConfig;
+
+>>>>>>> a7e1b18f53f824f514faeac5d21bf30b7500cac7
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.util.datalog.DataLog;
-import edu.wpi.first.wpilibj.AddressableLED;
-import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -13,12 +24,15 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.commands.auto.AutoIntakeCommand;
+import frc.robot.commands.auto.HoldShooterRevCommand;
+import frc.robot.commands.auto.ShootCommand;
 import frc.robot.commands.control.ElevatorControlCommand;
 import frc.robot.commands.control.IntakeIndexerControlCommand;
-import frc.robot.commands.drive.AlignSpeakerCommand;
 import frc.robot.commands.drive.RotationalDriveCommand;
 import frc.robot.commands.drive.TranslationCommand;
 import frc.robot.commands.drive.TranslationalDriveCommand;
+import frc.robot.commands.shooter.ShooterAlignSpeakerCommand;
 import frc.robot.commands.shooter.ShooterControlCommand;
 import frc.robot.commands.shooter.ShooterSpeakerAlgCommand;
 import frc.robot.subsystems.ElevatorSubsystem;
@@ -56,26 +70,30 @@ public class Robot extends TimedRobot {
         // SmartDashboard.putNumber("Bot Shooter", 0.01);
         SmartDashboard.putNumber("Tar Shoot Speed", 0);
         SmartDashboard.putNumber("Rotator Static", 0);
-    //     AutoBuilder.configureHolonomic(
-    //         localizer::getDisplacementPose2d,
-    //         localizer::resetPose2d,
-    //         drive::getVelocities,
-    //         drive::setVelocities, 
-    //         new HolonomicPathFollowerConfig(
-    //             new PIDConstants(7.5, 0, 1),
-    //             new PIDConstants(.5, 0, 0), 
-    //             drive.getMaxSpeed(), 
-    //             12.3743687 * IN , 
-    //             new ReplanningConfig()
-    //         ),
-    //         () -> {
-    //             var alliance = DriverStation.getAlliance();
-    //             if(alliance.isPresent()){
-    //                 return alliance.get() == DriverStation.Alliance.Red;
-    //             }
-    //             return false;
-    //         } , drive
-    //     );
+        AutoBuilder.configureHolonomic(
+            localizer::getDisplacementPose2d,
+            localizer::resetPose2d,
+            drive::getVelocities,
+            drive::setVelocities, 
+            new HolonomicPathFollowerConfig(
+                new PIDConstants(7.5, 0, 1),
+                new PIDConstants(.5, 0, 0), 
+                drive.getMaxSpeed(), 
+                12.3743687 * IN , 
+                new ReplanningConfig()
+            ),
+            () -> {
+                var alliance = DriverStation.getAlliance();
+                if(alliance.isPresent()){
+                    return alliance.get() == DriverStation.Alliance.Red;
+                }
+                return false;
+            } , drive
+        );
+        NamedCommands.registerCommand("Intake", new AutoIntakeCommand(indexer, intake, shooter));
+        NamedCommands.registerCommand("Rev", new HoldShooterRevCommand(16, shooter));
+        NamedCommands.registerCommand("Shoot", new ShootCommand(shooter, indexer));
+        NamedCommands.registerCommand("Align", new ShooterAlignSpeakerCommand(16 * 1.15, shooter, localizer));
     //     elevator.leftSpoolMotor.setSelectedSensorPosition(0.0);
     //     elevator.config();
     //     SmartDashboard.putNumber("swkP", 0.0056);
@@ -93,7 +111,7 @@ public class Robot extends TimedRobot {
 
         DataLogManager.start();
         log = DataLogManager.getLog();
-        // auto = new PathPlannerAuto("Test");
+        auto = new PathPlannerAuto("Test");
 
     }
 
