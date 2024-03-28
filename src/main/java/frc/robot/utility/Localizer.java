@@ -42,11 +42,13 @@ public class Localizer {
 
 
     public Rotation2d pigeonOffset = new Rotation2d();
+    // public Rotation2d localOffset = new Rotation2d();
 
     private Translation2d globalPosition = new Translation2d();
     private Rotation2d globalHeading = new Rotation2d();
     private Rotation2d globalOrientation = new Rotation2d();
     private Rotation2d globalOrientationFromTags = new Rotation2d();
+    // private Rotation2d localOrientation = new Rotation2d();
     private double noteDistance = -1;
     private Rotation3d noteRotation = new Rotation3d();
     private Dictionary<Integer, NetworkingTag> tags = new Hashtable<>();
@@ -93,6 +95,7 @@ public class Localizer {
      */
     public void resetHeading() {
         // navxGyro.reset();
+        // localOffset = pigeon.getRotation2d();
         pigeonOffset = pigeon.getRotation2d();
     }
 

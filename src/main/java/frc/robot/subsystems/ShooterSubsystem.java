@@ -180,7 +180,7 @@ public class ShooterSubsystem extends SubsystemBase {
             percent = 1;
         }
 		topShooterMotor.set(ControlMode.PercentOutput, percent);
-        bottomShooterMotor.set(ControlMode.PercentOutput, percent + SmartDashboard.getNumber("Bot Shooter", 0));
+        bottomShooterMotor.set(ControlMode.PercentOutput, percent);
 	}
 
     public void shootCoastToggle() {

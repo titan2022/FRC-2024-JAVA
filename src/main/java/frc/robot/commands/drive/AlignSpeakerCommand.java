@@ -35,16 +35,19 @@ public class AlignSpeakerCommand extends Command {
     @Override
     public void initialize() {
         Translation2d speakerPosition = localizer.getSpeakerPosition();
-        double angle = Math.atan2(speakerPosition.getY(), speakerPosition.getX()) - (Math.PI / 2);
+        double angle = Math.tan(speakerPosition.getX() / speakerPosition.getY()) - (Math.PI / 2);
+        double rotationalAngle = 3 * Math.PI / 2;
+        setAngle = new Rotation2d(rotationalAngle + angle);
+        deltaAngle = new Rotation2d(setAngle.getRadians() - localizer.getOrientation().getRadians());
         // angle -= Math.PI / 2;
         // Rotation2d translationalDeltaAngle = new Rotation2d(angle);
         // Rotation2d rotationalDeltaAngle = localizer.getSpeakerHeading();
         // deltaAngle = translationalDeltaAngle.minus(rotationalDeltaAngle).plus(SPIN_OFFSET);
-        Rotation2d translationalDeltaAngle = new Rotation2d(angle);
-        Rotation2d rotationalDeltaAngle = localizer.getSpeakerHeading();
-        deltaAngle = translationalDeltaAngle.minus(rotationalDeltaAngle);
-        setAngle = localizer.getOrientation().plus(deltaAngle.plus(SPIN_OFFSET));
-        setAngle = new Rotation2d(setAngle.getRadians() % (2 * Math.PI));
+        // Rotation2d translationalDeltaAngle = new Rotation2d(angle);
+        // Rotation2d rotationalDeltaAngle = localizer.getSpeakerHeading();
+        // deltaAngle = translationalDeltaAngle.minus(rotationalDeltaAngle);
+        // setAngle = localizer.getOrientation().plus(deltaAngle.plus(SPIN_OFFSET));
+        // setAngle = new Rotation2d(setAngle.getRadians() % (2 * Math.PI));
 
         SmartDashboard.putNumber("delta angle", deltaAngle.getDegrees());
         SmartDashboard.putNumber("set angle", setAngle.getDegrees());
