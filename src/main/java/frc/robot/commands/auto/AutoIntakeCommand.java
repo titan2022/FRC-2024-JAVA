@@ -22,7 +22,7 @@ public class AutoIntakeCommand extends Command {
         // this.isReverse = isReverse;
         this.shooter = shooter;
 
-        addRequirements(intake, indexer);
+        // addRequirements(intake, indexer);
     }
 
     @Override

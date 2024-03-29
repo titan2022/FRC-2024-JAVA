@@ -21,7 +21,7 @@ public class RevShooterCommand extends Command {
         this.speed = speed;
         this.led = led;
 
-        // addRequirements(shooter);
+        addRequirements(shooter);
     }
 
     @Override

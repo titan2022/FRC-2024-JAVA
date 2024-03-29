@@ -42,7 +42,10 @@ public class HoldShooterRevCommand extends Command {
     @Override
     public void execute() {
         if(!reached) shooter.shoot(REV_SPEED);
-        else shooter.shoot(HOLD_SPEED);
+        else{
+            shooter.shoot(0.5);
+            shooter.shootCoastToggle();
+        }
         reached = shooter.getShooterVelocity() >= speed;
     }
 

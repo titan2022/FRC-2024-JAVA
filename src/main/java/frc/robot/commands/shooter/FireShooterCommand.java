@@ -25,7 +25,7 @@ public class FireShooterCommand extends Command {
         this.indexer = indexer;
         this.led = led;
 
-        // addRequirements(shooter);
+        addRequirements(shooter);
     }
 
     @Override

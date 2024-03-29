@@ -246,9 +246,9 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
         rotatorConfig.supplyCurrLimit.enable = true;
         rotatorConfig.supplyCurrLimit.triggerThresholdCurrent = 30;
         rotatorConfig.supplyCurrLimit.triggerThresholdTime = 0.01;
-        mainConfig.supplyCurrLimit.currentLimit = 30;
+        mainConfig.supplyCurrLimit.currentLimit = 36;
         mainConfig.supplyCurrLimit.enable = true;
-        mainConfig.supplyCurrLimit.triggerThresholdCurrent = 40;
+        mainConfig.supplyCurrLimit.triggerThresholdCurrent = 46;
         mainConfig.supplyCurrLimit.triggerThresholdTime = 0.01;
         // mainConfig.closedloopRamp = 0.5;
         // mainConfig.openloopRamp = 0.5;

@@ -10,7 +10,6 @@ import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -26,8 +25,8 @@ import frc.robot.commands.auto.HoldShooterRevCommand;
 import frc.robot.commands.auto.ShootCommand;
 import frc.robot.commands.control.ElevatorControlCommand;
 import frc.robot.commands.control.IntakeIndexerControlCommand;
+import frc.robot.commands.drive.AlignSpeakerCommand;
 import frc.robot.commands.drive.RotationalDriveCommand;
-import frc.robot.commands.drive.TranslationCommand;
 import frc.robot.commands.drive.TranslationalDriveCommand;
 import frc.robot.commands.shooter.ShooterAlignSpeakerCommand;
 import frc.robot.commands.shooter.ShooterControlCommand;
@@ -41,8 +40,8 @@ import frc.robot.subsystems.drive.SwerveDriveSubsystem;
 import frc.robot.utility.Localizer;
 
 public class Robot extends TimedRobot {
-    private final XboxController xbox1 = new XboxController(0);
-    private final XboxController xbox2 = new XboxController(1);
+    private final XboxController xbox1 = new XboxController(2);
+    private final XboxController xbox2 = new XboxController(0);
     private SwerveDriveSubsystem drive = new SwerveDriveSubsystem();
     private Localizer localizer = new Localizer(drive, true, 5804); 
     private ElevatorSubsystem elevator = new ElevatorSubsystem();
@@ -74,9 +73,9 @@ public class Robot extends TimedRobot {
             drive::setVelocities, 
             new HolonomicPathFollowerConfig(
                 new PIDConstants(7.5, 0, 1),
-                new PIDConstants(.5, 0, 0), 
+                new PIDConstants(.5, 0, 0),     
                 drive.getMaxSpeed(), 
-                12.3743687 * IN , 
+                12.3743687 * IN,
                 new ReplanningConfig()
             ),
             () -> {
@@ -89,7 +88,7 @@ public class Robot extends TimedRobot {
         );
         NamedCommands.registerCommand("Intake", new AutoIntakeCommand(indexer, intake, shooter));
         NamedCommands.registerCommand("Rev", new HoldShooterRevCommand(16, shooter));
-        NamedCommands.registerCommand("Shoot", new ShootCommand(shooter, indexer));
+        NamedCommands.registerCommand("Shoot", new ShootCommand(shooter, indexer,  intake));
         NamedCommands.registerCommand("Align", new ShooterAlignSpeakerCommand(16 * 1.15, shooter, localizer));
     //     elevator.leftSpoolMotor.setSelectedSensorPosition(0.0);
     //     elevator.config();
@@ -108,7 +107,7 @@ public class Robot extends TimedRobot {
 
         DataLogManager.start();
         log = DataLogManager.getLog();
-        auto = new PathPlannerAuto("Test");
+        auto = new PathPlannerAuto("Rotation Auto");
 
     }
 
@@ -121,7 +120,7 @@ public class Robot extends TimedRobot {
         // SmartDashboard.putNumber("Rotated vx", rotatedVelocity.getX());
         // SmartDashboard.putNumber("Rotated vy", rotatedVelocity.getY());
         // SmartDashboard.putNumber("Speed", drive.getTranslational().getVelocity().getNorm());
-        SmartDashboard.putNumber("Speaker Heading", localizer.getSpeakerHeading().getDegrees());
+        // SmartDashboard.putNumber("Speaker Heading", localizer.getSpeakerHeading().getDegrees());
         SmartDashboard.putNumber("Speaker X", localizer.getSpeakerPosition().getX());
         SmartDashboard.putNumber("Speaker Y", localizer.getSpeakerPosition().getY());
 
@@ -152,8 +151,10 @@ public class Robot extends TimedRobot {
         shooter.removeDefaultCommand();
         indexer.removeDefaultCommand();
         drive.getRotational().removeDefaultCommand();
-
-        new TranslationCommand(new Translation2d(0, 1000), 6, drive.getTranslational()).schedule();;
+        drive.getTranslational().removeDefaultCommand();
+        auto.schedule();
+        //  new AlignSpeakerCommand(drive.getRotational(), localizer).schedule();
+        // new TranslationCommand(new Translation2d(0, 30), 6, drive.getTranslational()).schedule();
         // new AlignSpeakerCommand(drive.getRotational(), localizer).schedule();
     //     AutoBuilder.configureHolonomic(
     //         localizer::getDisplacementPose2d,
@@ -204,7 +205,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopInit() {
-        localizer.resetHeading(Rotation2d.fromDegrees(-30));
+        // localizer.resetHeading(Rotation2d.fromDegrees(-30));
 
         Trigger shootTrigger = new JoystickButton(xbox2, XboxController.Button.kLeftBumper.value);
         shootTrigger.onTrue(new ShooterSpeakerAlgCommand(16, drive.getRotational(), shooter, indexer, localizer, led));
@@ -218,11 +219,13 @@ public class Robot extends TimedRobot {
         // Main driver
         drive.getTranslational().setDefaultCommand(new TranslationalDriveCommand(drive.getTranslational(), localizer, xbox1, 6));
         drive.getRotational().setDefaultCommand(new RotationalDriveCommand(drive.getRotational(), localizer, xbox1, 2.5 * Math.PI));
+       
 
         // Second driver
         shooter.setDefaultCommand(new ShooterControlCommand(shooter, xbox2, log));
         elevator.setDefaultCommand(new ElevatorControlCommand(elevator, xbox2,  xbox1));
         intake.setDefaultCommand(new IntakeIndexerControlCommand(intake, indexer, xbox2));
+        new ShooterAlignSpeakerCommand(16 * 1.15, shooter, localizer).schedule();
         // Trigger xboxTrigger = new JoystickButton(xbox1, XboxController.Button.kY.value);
         // xboxTrigger.onTrue(new PreSpeakerAlignCommand(drive, localizer, new Rotation2d(0), 0.2 * Math.PI));
     }

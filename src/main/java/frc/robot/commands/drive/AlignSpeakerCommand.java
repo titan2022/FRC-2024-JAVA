@@ -34,11 +34,11 @@ public class AlignSpeakerCommand extends Command {
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-        Translation2d speakerPosition = localizer.getSpeakerPosition();
-        double angle = Math.tan(speakerPosition.getX() / speakerPosition.getY()) - (Math.PI / 2);
-        double rotationalAngle = 3 * Math.PI / 2;
-        setAngle = new Rotation2d(rotationalAngle + angle);
-        deltaAngle = new Rotation2d(setAngle.getRadians() - localizer.getTrueOrientation().getRadians());
+        // Translation2d speakerPosition = localizer.getSpeakerPosition();
+        // double angle = Math.tan(speakerPosition.getX() / speakerPosition.getY()) - (Math.PI / 2);
+        // double rotationalAngle = 3 * Math.PI / 2;
+        // setAngle = new Rotation2d(rotationalAngle + angle);
+        // deltaAngle = new Rotation2d(setAngle.getRadians() - localizer.getTrueOrientation().getRadians());
         // angle -= Math.PI / 2;
         // Rotation2d translationalDeltaAngle = new Rotation2d(angle);
         // Rotation2d rotationalDeltaAngle = localizer.getSpeakerHeading();
@@ -49,12 +49,12 @@ public class AlignSpeakerCommand extends Command {
         // setAngle = localizer.getOrientation().plus(deltaAngle.plus(SPIN_OFFSET));
         // setAngle = new Rotation2d(setAngle.getRadians() % (2 * Math.PI));
 
-        SmartDashboard.putNumber("delta angle", deltaAngle.getDegrees());
-        SmartDashboard.putNumber("set angle", setAngle.getDegrees());
-
         // SmartDashboard.putNumber("Translational Angle", translationalDeltaAngle.getDegrees());
         // SmartDashboard.putNumber("Rotational Angle", rotationalDeltaAngle.getDegrees());
         // SmartDashboard.putNumber("Total Angle", deltaAngle.getDegrees());
+
+        deltaAngle = localizer.getSpeakerHeading().plus(SPIN_OFFSET);
+        setAngle = localizer.getTrueOrientation().plus(deltaAngle);
 
         omega = new Rotation2d(Math.copySign(OMEGA.getRadians(), deltaAngle.getRadians()));
         // omega = new Rotation2d(0);
@@ -66,6 +66,9 @@ public class AlignSpeakerCommand extends Command {
     @Override
     public void execute() {
         drivebase.setRotationalVelocity(omega);
+
+        SmartDashboard.putNumber("delta angle", deltaAngle.getDegrees());
+        SmartDashboard.putNumber("set angle", setAngle.getDegrees());
     }
 
     // Called once the command ends or is interrupted.

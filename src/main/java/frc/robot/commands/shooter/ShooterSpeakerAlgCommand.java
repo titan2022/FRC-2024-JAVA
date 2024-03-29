@@ -74,15 +74,18 @@ public class ShooterSpeakerAlgCommand extends SequentialCommandGroup {
 
         // SmartDashboard.putNumber("Shoot Angle", setAngle.getDegrees());
         addCommands(
+            new RevShooterCommand(speed, shooter, led),
+            new FireShooterCommand(indexer, shooter, led)
             // new AlignSpeakerCommand(rotational, localizer)
-            new ParallelDeadlineGroup(
-                new SequentialCommandGroup(
-                    new RevShooterCommand(speed, shooter, led),
-                    new FireShooterCommand(indexer, shooter, led)
-                ), 
-                new ShooterAlignSpeakerCommand(speed * 1.15, shooter, localizer)
-            )
+            // new ParallelDeadlineGroup(
+            //     new SequentialCommandGroup(
+            //         new RevShooterCommand(speed, shooter, led),
+            //         new FireShooterCommand(indexer, shooter, led)
+            //     ), 
+                // new ShooterAlignSpeakerCommand(speed * 1.15, shooter, localizer)
+            // )
         );
     }
 }
 
+    

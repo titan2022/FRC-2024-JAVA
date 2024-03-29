@@ -6,6 +6,7 @@ import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 
+import static frc.robot.utility.Constants.Unit.DEG;
 import static frc.robot.utility.Constants.Unit.IN;
 import static frc.robot.utility.Constants.Unit.METERS;
 
@@ -91,24 +92,23 @@ public class ShooterAlignSpeakerCommand extends Command {
 
 
     }
-
+    private double last_angle = 30.0 * DEG;
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        Translation2d shootTarget = getShootVector(localizer);
-        // Translation2d shootTarget = new Translation2d(80 * IN, SPEAKER_HEIGHT);
-        SmartDashboard.putNumber("Shoot X", shootTarget.getX());
-        SmartDashboard.putNumber("Shoot Y", shootTarget.getY());
+        if (localizer.isSpeakerTagVisible()) {
 
-        try {
+            Translation2d shootTarget = getShootVector(localizer);
+            // Translation2d shootTarget = new Translation2d(80 * IN, SPEAKER_HEIGHT);
+            SmartDashboard.putNumber("Shoot X", shootTarget.getX());
+            SmartDashboard.putNumber("Shoot Y", shootTarget.getY());
             targetAngle = calculateAngle(speed, shootTarget);
-        } catch (Exception e) {
-            targetAngle = Rotation2d.fromDegrees(30);
-        }        
-
-        SmartDashboard.putNumber("Shoot Angle", targetAngle.getDegrees());
-
-        reachedAngle = shooter.setRotation(targetAngle.getRadians());
+            SmartDashboard.putNumber("Shoot Angle", targetAngle.getDegrees());
+            reachedAngle = shooter.setRotation(targetAngle.getRadians());     
+            last_angle = targetAngle.getRadians();
+        } else {
+            shooter.setRotation(last_angle);
+        }
     }
 
     @Override

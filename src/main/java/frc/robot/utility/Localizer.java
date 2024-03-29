@@ -54,6 +54,10 @@ public class Localizer {
     private Dictionary<Integer, NetworkingTag> tags = new Hashtable<>();
     private Translation2d[] speaker_location = {new Translation2d(-1.50, 218.42), new Translation2d(652.73, 218.42)};
     private boolean speakerTagVisible = false;
+    private Rotation2d speakerHeading = new Rotation2d();
+
+    private Translation2d speakerRobotPosition = new Translation2d();
+    private Rotation2d speakerRobotOrientation = new Rotation2d();
 
     public Pose2d startingPose2d = new Pose2d(); 
     /**
@@ -194,7 +198,8 @@ public class Localizer {
      * @return Rotation2d
      */
     public Rotation2d getSpeakerHeading() {
-        return globalOrientationFromTags.times(-1.0).plus(Rotation2d.fromDegrees(16.94));
+        // return globalOrientationFromTags.times(-1.0).plus(Rotation2d.fromDegrees(16.94));
+        return speakerHeading;
     }
 
     /**
@@ -202,7 +207,7 @@ public class Localizer {
      * @return meters
      */
     public Translation2d getSpeakerPosition() {
-        return new Translation2d(-globalPosition.getX(), globalPosition.getY()); // Speaker is 0, 0
+        return new Translation2d(-speakerRobotPosition.getX(), speakerRobotPosition.getY()); // Speaker is 0, 0
     }
 
     /**
@@ -223,14 +228,14 @@ public class Localizer {
             server.subscribe("pose", (NetworkingCall<NetworkingPose>)(NetworkingPose pose) -> {
                 SmartDashboard.putNumber("poseX", pose.position.getX());
                 SmartDashboard.putNumber("poseZ", pose.position.getZ());
-                globalPosition = new Translation2d(pose.position.getX(), pose.position.getZ());
-                globalOrientationFromTags = Rotation2d.fromRadians(pose.rotation.getY());
+                speakerRobotPosition = new Translation2d(pose.position.getX(), pose.position.getZ());
+                speakerRobotOrientation = Rotation2d.fromRadians(pose.rotation.getY());
             });
     
-            // server.subscribe("note",  (NetworkingCall<NetworkingPose>)(NetworkingPose note) -> {
-            //     // noteDistance = `
-            //     noteRotation = note.rotation;
-            // });
+            server.subscribe("speaker",  (NetworkingCall<NetworkingPose>)(NetworkingPose speaker) -> {
+                speakerHeading = Rotation2d.fromRadians(speaker.rotation.getY());
+                SmartDashboard.putNumber("speakerHeading", speakerHeading.getDegrees());
+            });
 
             server.subscribe("visible", (NetworkingCall<Translation3d>)(Translation3d fakeVec) -> {
                 speakerTagVisible = fakeVec.getX() > 0;
@@ -299,7 +304,7 @@ public class Localizer {
         Translation2d odometryVel = swerveVel.plus(navXVel).rotateBy(globalHeading);
         SmartDashboard.putNumber("odometryvx", odometryVel.getX());
         SmartDashboard.putNumber("odometryvy", odometryVel.getY());
-        // globalPosition = globalPosition.plus(odometryVel.times(0.02));
+        globalPosition = globalPosition.plus(odometryVel.times(0.02));
     }
     
     public Translation2d getSpeakerLocation(){
