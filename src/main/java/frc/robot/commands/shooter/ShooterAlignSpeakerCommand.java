@@ -34,6 +34,7 @@ public class ShooterAlignSpeakerCommand extends Command {
     private double speed;
     private boolean reachedAngle = false;
     private Rotation2d targetAngle;
+    private Rotation2d lastAngle = Rotation2d.fromDegrees(30);
     
 
     public static Rotation2d calculateAngle(double speed, Translation2d shootTarget) {
@@ -73,6 +74,7 @@ public class ShooterAlignSpeakerCommand extends Command {
         this.localizer = localizer;
         this.speed = speed;
 
+        // addRequirements(shooter);
     }
 
     @Override
@@ -92,7 +94,6 @@ public class ShooterAlignSpeakerCommand extends Command {
 
 
     }
-    private double last_angle = 30.0 * DEG;
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
@@ -104,21 +105,26 @@ public class ShooterAlignSpeakerCommand extends Command {
             SmartDashboard.putNumber("Shoot Y", shootTarget.getY());
             targetAngle = calculateAngle(speed, shootTarget);
             SmartDashboard.putNumber("Shoot Angle", targetAngle.getDegrees());
-            reachedAngle = shooter.setRotation(targetAngle.getRadians());     
-            last_angle = targetAngle.getRadians();
+            // reachedAngle = shooter.setRotation(targetAngle.getRadians());     
+            shooter.setTargetAngle(targetAngle);
+            lastAngle = targetAngle;
         } else {
-            shooter.setRotation(last_angle);
+            shooter.setTargetAngle(lastAngle);
         }
+        // shooter.setTargetAngle(new Rotation2d(60*DEG));
+        // reachedAngle = shooter.setRotation(targetAngle.getRadians());     
+
     }
 
     @Override
     public void end(boolean interrupted) {
-        shooter.holdAngle(SHOOTER_ARM_LENGTH, METERS, speed);
+        // shooter.holdAngle(SHOOTER_ARM_LENGTH, METERS, speed);
     }
 
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
+        // return !localizer.isSpeakerTagVisible();
         return false;
     }
 }

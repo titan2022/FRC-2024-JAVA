@@ -2,6 +2,7 @@ package frc.robot;
 
 import static frc.robot.utility.Constants.Unit.IN;
 
+import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
@@ -18,24 +19,31 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.commands.align.SpeakerRotationAlign;
 import frc.robot.commands.auto.AutoIntakeCommand;
 import frc.robot.commands.auto.HoldShooterRevCommand;
+import frc.robot.commands.auto.IndexManagerCommand;
 import frc.robot.commands.auto.ShootCommand;
+import frc.robot.commands.auto.SubwooferAlignCommand;
 import frc.robot.commands.control.ElevatorControlCommand;
 import frc.robot.commands.control.IntakeIndexerControlCommand;
 import frc.robot.commands.drive.AlignSpeakerCommand;
 import frc.robot.commands.drive.RotationalDriveCommand;
 import frc.robot.commands.drive.TranslationalDriveCommand;
+import frc.robot.commands.shooter.RotateShooterCommand;
 import frc.robot.commands.shooter.ShooterAlignSpeakerCommand;
 import frc.robot.commands.shooter.ShooterControlCommand;
 import frc.robot.commands.shooter.ShooterSpeakerAlgCommand;
+import frc.robot.commands.shooter.SimpleShootCommand;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
+import frc.robot.subsystems.drive.RotationalDrivebase;
 import frc.robot.subsystems.drive.SwerveDriveSubsystem;
 import frc.robot.utility.Localizer;
 
@@ -72,8 +80,8 @@ public class Robot extends TimedRobot {
             drive::getVelocities,
             drive::setVelocities, 
             new HolonomicPathFollowerConfig(
-                new PIDConstants(7.5, 0, 1),
-                new PIDConstants(.5, 0, 0),     
+                new PIDConstants(10, 0.1, 1),
+                new PIDConstants(1, 0.01, 0.1),     
                 drive.getMaxSpeed(), 
                 12.3743687 * IN,
                 new ReplanningConfig()
@@ -86,10 +94,12 @@ public class Robot extends TimedRobot {
                 return false;
             } , drive
         );
-        NamedCommands.registerCommand("Intake", new AutoIntakeCommand(indexer, intake, shooter));
+        NamedCommands.registerCommand("Intake", new AutoIntakeCommand(indexer, intake));
+        NamedCommands.registerCommand("Index", new IndexManagerCommand(indexer));
         NamedCommands.registerCommand("Rev", new HoldShooterRevCommand(16, shooter));
-        NamedCommands.registerCommand("Shoot", new ShootCommand(shooter, indexer,  intake));
+        NamedCommands.registerCommand("Shoot", new ShootCommand(shooter, indexer));
         NamedCommands.registerCommand("Align", new ShooterAlignSpeakerCommand(16 * 1.15, shooter, localizer));
+        NamedCommands.registerCommand("Subwoofer Align", new SubwooferAlignCommand(shooter));
     //     elevator.leftSpoolMotor.setSelectedSensorPosition(0.0);
     //     elevator.config();
     //     SmartDashboard.putNumber("swkP", 0.0056);
@@ -107,10 +117,10 @@ public class Robot extends TimedRobot {
 
         DataLogManager.start();
         log = DataLogManager.getLog();
-        auto = new PathPlannerAuto("Rotation Auto");
+        auto = new PathPlannerAuto("Source Side Auto");
 
     }
-
+  
     @Override
     public void robotPeriodic() {
         CommandScheduler.getInstance().run();
@@ -138,6 +148,27 @@ public class Robot extends TimedRobot {
         // SmartDashboard.putNumber("FR Enc Pos", drive.encoders[0].getPosition());
         // SmartDashboard.putNumber("FR Enc Abs", drive.encoders[0].getAbsolutePosition());
         SmartDashboard.putNumber("Robot Heading", localizer.getHeading().getDegrees());
+        if (indexer.hasNote()) {
+            if (localizer.isSpeakerTagVisible()) {
+                led.fill(0, 255, 0);
+                // new ShooterAlignSpeakerCommand(16 * 1.15, shooter, localizer).schedule();
+            } else {
+                led.fill(255, 20, 0);
+            }
+        } else {
+            led.fill(0, 0, 255);
+        }
+        // SmartDashboard.putBoolean("hasnote", indexer.hasNote());
+        // if (indexer.hasNote()) {
+        //     if (localizer.isSpeakerTagVisible()) {
+        //         led.fill(0, 255, 0);
+        //         // new ShooterAlignSpeakerCommand(16 * 1.15, shooter, localizer).schedule();
+        //     } else {
+        //         led.fill(255, 20, 0);
+        //     }
+        // } else {
+        //     led.fill(0, 0, 255);
+        // }
     }
 
     @Override
@@ -152,6 +183,12 @@ public class Robot extends TimedRobot {
         indexer.removeDefaultCommand();
         drive.getRotational().removeDefaultCommand();
         drive.getTranslational().removeDefaultCommand();
+        // new SequentialCommandGroup(
+        //     new RotateShooterCommand(Rotation2d.fromDegrees(63), shooter),
+        //     new SimpleShootCommand(0.8, shooter, indexer)
+            
+        // );
+
         auto.schedule();
         //  new AlignSpeakerCommand(drive.getRotational(), localizer).schedule();
         // new TranslationCommand(new Translation2d(0, 30), 6, drive.getTranslational()).schedule();
@@ -205,17 +242,15 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopInit() {
+        // new SpeakerRotationAlign(drive.getRotational(), localizer).schedule();
         // localizer.resetHeading(Rotation2d.fromDegrees(-30));
 
-        Trigger shootTrigger = new JoystickButton(xbox2, XboxController.Button.kLeftBumper.value);
-        shootTrigger.onTrue(new ShooterSpeakerAlgCommand(16, drive.getRotational(), shooter, indexer, localizer, led));
         // for (int i = 0; i < drive.motors.length; i++) {
         //     drive.motors[i].config_kP(0, SmartDashboard.getNumber("swkP", 0.0056));
         //     drive.motors[i].config_kI(0, SmartDashboard.getNumber("swkI", 0.0));
         //     drive.motors[i].config_kD(0, SmartDashboard.getNumber("swkD", 0.06));
         //     drive.motors[i].config_kF(0, SmartDashboard.getNumber("swkF", 0.02));
         // }
-
         // Main driver
         drive.getTranslational().setDefaultCommand(new TranslationalDriveCommand(drive.getTranslational(), localizer, xbox1, 6));
         drive.getRotational().setDefaultCommand(new RotationalDriveCommand(drive.getRotational(), localizer, xbox1, 2.5 * Math.PI));
@@ -224,16 +259,46 @@ public class Robot extends TimedRobot {
         // Second driver
         shooter.setDefaultCommand(new ShooterControlCommand(shooter, xbox2, log));
         elevator.setDefaultCommand(new ElevatorControlCommand(elevator, xbox2,  xbox1));
-        intake.setDefaultCommand(new IntakeIndexerControlCommand(intake, indexer, xbox2));
-        new ShooterAlignSpeakerCommand(16 * 1.15, shooter, localizer).schedule();
+        indexer.setDefaultCommand(new IntakeIndexerControlCommand(intake, indexer, xbox2));
         // Trigger xboxTrigger = new JoystickButton(xbox1, XboxController.Button.kY.value);
         // xboxTrigger.onTrue(new PreSpeakerAlignCommand(drive, localizer, new Rotation2d(0), 0.2 * Math.PI));
+
+        Trigger shootTrigger = new JoystickButton(xbox2, XboxController.Button.kLeftBumper.value);
+        shootTrigger.whileTrue(new ShooterSpeakerAlgCommand(16, drive.getRotational(), shooter, indexer, localizer, led));
     }
 
     int shooterDir = 1;
     double degrees = 30.0;
     @Override
     public void teleopPeriodic() {
+        SmartDashboard.putBoolean("hasnote", indexer.hasNote());
+        // if (indexer.hasNote()) {
+        //     if (localizer.isSpeakerTagVisible()) {
+        //         led.fill(0, 255, 0);
+        //         // new ShooterAlignSpeakerCommand(16 * 1.15, shooter, localizer).schedule();
+        //     } else {
+        //         led.fill(255, 20, 0);
+        //     }
+        // } else {
+        //     led.fill(0, 0, 255);
+        // }
+
+        // if (xbox2.getLeftBumperPressed()) {
+        //     new ShooterSpeakerAlgCommand(16, drive.getRotational(), shooter, indexer, localizer, led).schedule();
+        // }
+
+        // if (xbox1.getLeftBumperPressed()) {
+        //     for (int i = 0; i < drive.motors.length; i++) {
+        //         SupplyCurrentLimitConfiguration mainConfig = new SupplyCurrentLimitConfiguration(true, 45, 60, 0.01);
+        //         drive.motors[i].configSupplyCurrentLimit(mainConfig);
+        //     }
+        // } else {
+        //     for (int i = 0; i < drive.motors.length; i++) {
+        //         SupplyCurrentLimitConfiguration mainConfig = new SupplyCurrentLimitConfiguration(true, 36, 46, 0.01);
+        //         drive.motors[i].configSupplyCurrentLimit(mainConfig);
+        //     } 
+        // }
+
         // for (int i = 0; i < 4; i++) {
         //     drive.rotators[i].config_kP(0, SmartDashboard.getNumber("kP", 0));
         //     drive.rotators[i].config_kI(0, SmartDashboard.getNumber("kI", 0));
@@ -246,16 +311,7 @@ public class Robot extends TimedRobot {
         // drive.OFFSETS[1] = -3267 + 1024 + 2048 + (int) SmartDashboard.getNumber("Delta BL", 0);
         // drive.OFFSETS[3] = -2143 + 1024 + 2048 + (int) SmartDashboard.getNumber("Delta BR", 0);
 
-        SmartDashboard.putBoolean("hasnote", indexer.hasNote());
-        if (indexer.hasNote()) {
-            if (localizer.isSpeakerTagVisible()) {
-                led.fill(0, 255, 0);
-            } else {
-                led.fill(255, 20, 0);
-            }
-        } else {
-            led.fill(0, 0, 255);
-        }
+        
 
         // if (xbox1.getXButtonPressed()) {
         //     localizer.resetHeading();
@@ -324,4 +380,8 @@ public class Robot extends TimedRobot {
 
 
     }
+    
+    // @Override
+    // public void testInit(){
+    // }
 }

@@ -7,12 +7,12 @@ import com.ctre.phoenix.sensors.WPI_Pigeon2;
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -22,7 +22,6 @@ import frc.robot.utility.networking.NetworkingCall;
 import frc.robot.utility.networking.NetworkingServer;
 import frc.robot.utility.networking.types.NetworkingPose;
 import frc.robot.utility.networking.types.NetworkingTag;
-import frc.robot.utility.networking.types.NetworkingVector;
 
 /**
  * Localizer class for the 2024 Crescendo arena
@@ -45,6 +44,7 @@ public class Localizer {
     // public Rotation2d localOffset = new Rotation2d();
 
     private Translation2d globalPosition = new Translation2d();
+    private Translation2d cameraBasedGlobalPosition = new Translation2d();
     private Rotation2d globalHeading = new Rotation2d();
     private Rotation2d globalOrientation = new Rotation2d();
     private Rotation2d globalOrientationFromTags = new Rotation2d();
@@ -188,6 +188,10 @@ public class Localizer {
         return (new Pose2d(globalPosition,globalHeading)).relativeTo(startingPose2d);
     }
 
+    public Pose2d getCameraBasedDisplacementPose2d() {
+        return (new Pose2d(cameraBasedGlobalPosition, globalHeading)).relativeTo(startingPose2d);
+    }
+
     // public Pose2d getAutoDisplacementPose2d(){
     //     Pose2d normalPose2d = getDisplacementPose2d();
     //     return new Pose2d(normalPose2d.getTranslation().rotateBy(new Rotation2d(Math.PI/2)), normalPose2d.getRotation());
@@ -208,6 +212,10 @@ public class Localizer {
      */
     public Translation2d getSpeakerPosition() {
         return new Translation2d(-speakerRobotPosition.getX(), speakerRobotPosition.getY()); // Speaker is 0, 0
+    }
+
+    public Rotation2d getSpeakerOrientation(){
+        return speakerRobotOrientation;
     }
 
     /**

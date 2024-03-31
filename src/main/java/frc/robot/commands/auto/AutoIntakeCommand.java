@@ -1,5 +1,6 @@
 package frc.robot.commands.auto;
 
+
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.IndexerSubsystem;
@@ -8,21 +9,18 @@ import frc.robot.subsystems.ShooterSubsystem;
 
 @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
 public class AutoIntakeCommand extends Command {
-    public static final int INTAKE_TICKS = 5;
-    private int cur_ticks = 0;
+    public static final int INTAKE_TICKS = 6;
+    private int cur_ticks = INTAKE_TICKS;
     private IndexerSubsystem indexer;
     private IntakeSubsystem intake;
     private ShooterSubsystem shooter;
     public boolean isTriggered = false;
     public double endTime;
 
-    public AutoIntakeCommand(IndexerSubsystem indexer, IntakeSubsystem intake, ShooterSubsystem shooter) {
+    public AutoIntakeCommand(IndexerSubsystem indexer, IntakeSubsystem intake) {
         this.intake = intake;
         this.indexer = indexer;
-        // this.isReverse = isReverse;
-        this.shooter = shooter;
-
-        // addRequirements(intake, indexer);
+        addRequirements(intake);
     }
 
     @Override
@@ -31,15 +29,18 @@ public class AutoIntakeCommand extends Command {
 
     @Override
     public void execute() {
-        if(cur_ticks <= INTAKE_TICKS){
+        if(cur_ticks > 0){
             intake.intake();
-            indexer.intake();
+            indexer.auto_intake_yes = true;
         } else {
             intake.stop();
-            indexer.stop();
+            indexer.auto_intake_yes = false;
         }
-        if(indexer.hasNote()) cur_ticks++;
-        else cur_ticks--;
+        if (indexer.hasNote() && cur_ticks > 0) {
+            cur_ticks--;
+        } else if (cur_ticks <= 0 && !indexer.hasNote()) {
+            cur_ticks = INTAKE_TICKS;
+        }   
 
     }
 
@@ -47,7 +48,6 @@ public class AutoIntakeCommand extends Command {
     public void end(boolean interrupted) {
         intake.stop();
         indexer.stop();
-        shooter.holdIndex();
     }
 
     @Override

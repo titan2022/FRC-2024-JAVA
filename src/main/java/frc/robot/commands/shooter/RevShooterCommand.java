@@ -21,7 +21,7 @@ public class RevShooterCommand extends Command {
         this.speed = speed;
         this.led = led;
 
-        addRequirements(shooter);
+        // addRequirements(shooter);
     }
 
     @Override
@@ -39,6 +39,7 @@ public class RevShooterCommand extends Command {
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
+        shooter.shoot(0);
         // shooter.shootCoastToggle();
     }
 

@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.2599999999999993,
-        "y": 3.6563840519933786
+        "x": 1.7600000000000002,
+        "y": 2.790358648208939
       },
       "isLocked": false,
       "linkedName": "Source Start"
@@ -28,7 +28,13 @@
       "linkedName": "Bottom Note"
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1,
+      "rotationDegrees": 90.0,
+      "rotateFast": true
+    }
+  ],
   "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
@@ -40,12 +46,12 @@
   "goalEndState": {
     "velocity": 0,
     "rotation": 90.0,
-    "rotateFast": true
+    "rotateFast": false
   },
   "reversed": false,
   "folder": null,
   "previewStartingState": {
-    "rotation": -60.0,
+    "rotation": -58.76521383477895,
     "velocity": 0
   },
   "useDefaultConstraints": true

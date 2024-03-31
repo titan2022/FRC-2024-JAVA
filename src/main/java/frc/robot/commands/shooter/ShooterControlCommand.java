@@ -2,6 +2,7 @@ package frc.robot.commands.shooter;
 
 import static frc.robot.utility.Constants.Unit.DEG;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.util.datalog.BooleanLogEntry;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
@@ -20,7 +21,7 @@ public class ShooterControlCommand extends Command {
     private DoubleLogEntry angleLog;
     private BooleanLogEntry shotLog;
 
-    private double shooterAngle = ShooterSubsystem.ANGLE_OFFSET;
+    private double shooterAngle = 64.9*DEG;
     // private int shooterDir = 1;
 
     private ShooterControlCommand(ShooterSubsystem shooter, XboxController xbox) {
@@ -46,6 +47,7 @@ public class ShooterControlCommand extends Command {
 
     @Override
     public void execute() {
+
         if (Math.abs(xbox.getRightY()) > 0.1) {
             shooterAngle += -xbox.getRightY() * 80 * DEG * 0.02;// = SmartDashboard.getNumber("targetAngle", ShooterSubsystem.MIN_ANGLE);
             shooterAngle = Math.min(shooterAngle, ShooterSubsystem.MAX_ANGLE);
@@ -54,8 +56,9 @@ public class ShooterControlCommand extends Command {
             // shooter.setRotation(55 * DEG);
             // shooter.holdAngle();
         }
-        // shooterAngle = 65;
-        shooter.setRotation(shooterAngle);
+        // shooterAngle = 65;x  
+        // if(!xbox.getLeftBumper()) shooter.setTargetAngle(new Rotation2d(shooterAngle));
+        shooter.setTargetAngle(new Rotation2d(shooterAngle));
         
 
         if (xbox.getRightTriggerAxis() > 0.5) {

@@ -59,10 +59,10 @@ public class TranslationalDriveCommand extends Command {
 
     @Override
     public void execute() {
-        if (xbox.getLeftBumperPressed()) {
-            xOffset = xbox.getLeftX();
-            yOffset = xbox.getLeftY();
-        }
+        // if (xbox.getLeftBumperPressed()) {
+        //     xOffset = xbox.getLeftX();
+        //     yOffset = xbox.getLeftY();
+        // }
 
         if (xbox.getBButtonPressed() && localizer != null) {
             isFieldOriented = !isFieldOriented;

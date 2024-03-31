@@ -253,9 +253,9 @@ public class ShooterSubsystem extends SubsystemBase {
 		indexerMotor.set(ControlMode.PercentOutput, 0);
 	}
 
-    // @Override 
-    // public void periodic() {
-    //     setRotation(targetAngle.getDegrees());
-    // }
+    @Override 
+    public void periodic() {
+        setRotation(targetAngle.getRadians());
+    }
 
 }

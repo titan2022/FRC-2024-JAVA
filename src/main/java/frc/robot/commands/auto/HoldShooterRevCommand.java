@@ -41,6 +41,7 @@ public class HoldShooterRevCommand extends Command {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
+        // shooter.shoot(0.2);
         if(!reached) shooter.shoot(REV_SPEED);
         else{
             shooter.shoot(0.5);

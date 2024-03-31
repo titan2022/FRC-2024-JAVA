@@ -3,44 +3,39 @@ package frc.robot.commands.auto;
 import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
+
+import static frc.robot.utility.Constants.Unit.DEG;
+
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 
 /** An example command that uses an example subsystem. */
-public class ShootCommand extends Command {
+public class SubwooferAlignCommand extends Command {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
     public ShooterSubsystem shooter;
-    public IndexerSubsystem indexer;
-    public IntakeSubsystem intake;
-    public double FIRE_TIME = 1.0;
+    public double DURATION = 2.7;
     public double endTime = 0;
     // public double endTime;
     
-    public ShootCommand(ShooterSubsystem shooter, IndexerSubsystem indexer) {
+    public SubwooferAlignCommand(ShooterSubsystem shooter) {
         this.shooter = shooter;
-        this.indexer = indexer;
-        // addRequirements(shooter);
-        // addRequirements(indexer);
     }
     @Override
     public void initialize() {
+        shooter.setTargetAngle(new Rotation2d(60*DEG));
         // delayTime = Timer.getFPGATimestamp() + DELAY_TIME;
-        endTime = Timer.getFPGATimestamp() + FIRE_TIME;
+        endTime = Timer.getFPGATimestamp() + DURATION;
     }
 
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        // shooter.shoot(0.5);
-        shooter.intake();
-        indexer.auto_shooter_yes = true;
     }
 
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
-        shooter.holdIndex();
-        indexer.auto_shooter_yes = false;
         // shooter.shoot(0);
     }
 

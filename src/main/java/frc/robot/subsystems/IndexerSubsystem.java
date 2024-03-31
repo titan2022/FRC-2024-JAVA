@@ -16,6 +16,8 @@ public class IndexerSubsystem extends SubsystemBase {
 
 	private final WPI_TalonFX intakeMotor = new WPI_TalonFX(22);
 	public final AnalogInput beamBreakerInput = new AnalogInput(0);
+	public boolean auto_intake_yes = false;
+	public boolean auto_shooter_yes = false;
 
 	private boolean noteStatus = false;
 	private int noteStatusTimer = 0;

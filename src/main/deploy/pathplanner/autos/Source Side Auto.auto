@@ -30,7 +30,13 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "Align"
+                  "name": "Index"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Subwoofer Align"
                 }
               },
               {
@@ -40,7 +46,7 @@
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 1.5
+                        "waitTime": 2.5
                       }
                     },
                     {
