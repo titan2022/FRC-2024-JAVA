@@ -54,6 +54,8 @@ public final class Constants {
 		public static final double PID_OUT = 1.0 / 1024 * PCT_OUT;
 	}
 
+    public static final double MAX_VOLTAGE = 12;
+
 	public enum LimelightPipeline {
 		TAPE(0), APRILTAGS(1),
 		// RED_GRID_APRILTAGS(2), BLUE_GRID_APRILTAGS(3),
