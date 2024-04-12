@@ -1,20 +1,19 @@
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.DemandType;
-import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
-import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
-import com.ctre.phoenix.sensors.SensorInitializationStrategy;
+import static frc.robot.utility.Constants.*;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.ControlRequest;
+import com.ctre.phoenix6.controls.VoltageOut;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-@SuppressWarnings({"deprecated", "removal"})
 public class IntakeSubsystem extends SubsystemBase {
 	private static final double INTAKE_SPEED = 0.6;
-	
-	private static final WPI_TalonFX wheelMotor = new WPI_TalonFX(19);
+    
+    public TalonFX wheelMotor = new TalonFX(19);
+    public VoltageOut voltage = new VoltageOut(0);
 
     // public static TalonFXConfiguration getIntakeTalonConfig() {
     //     TalonFXConfiguration talon = new TalonFXConfiguration();
@@ -28,30 +27,23 @@ public class IntakeSubsystem extends SubsystemBase {
 	// }
 
 	public IntakeSubsystem() {
-		wheelMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
-		wheelMotor.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
-		wheelMotor.setInverted(false);
-		wheelMotor.setNeutralMode(NeutralMode.Brake);
+        config();
+		// wheelMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
+		// wheelMotor.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
+		// wheelMotor.setInverted(false);
+		// wheelMotor.setNeutralMode(NeutralMode.Brake);
 	}
+
+    public void config() {
+        wheelMotor.setNeutralMode(NeutralModeValue.Coast);
+    }
 
 	/***
 	 * Sets the speed of the wheels
 	 * @param speed in Falcon ticks per 100ms
 	 */
 	public void setWheelSpeed(double speed) {
-		wheelMotor.set(ControlMode.Velocity, 0, DemandType.ArbitraryFeedForward, speed);
-	}
-
-	public double getWheelSpeed() {
-		return wheelMotor.getSelectedSensorVelocity();
-	}
-
-	public void toggle() {
-		if (Math.abs(getWheelSpeed()) <= 0.01) {
-			intake();
-		} else {
-			stop();
-		}
+        wheelMotor.setControl(voltage.withOutput(speed * MAX_VOLTAGE));
 	}
 
 	public void intake() {
