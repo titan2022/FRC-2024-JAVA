@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class P6IntakeSubsystem extends SubsystemBase {
 	private static final double INTAKE_SPEED = 0.6;
+    
     public TalonFX wheelMotor = new TalonFX(19);
     public VoltageOut voltage = new VoltageOut(0);
 

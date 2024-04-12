@@ -31,9 +31,7 @@ public class ShooterSubsystem extends SubsystemBase {
 	private static final double LINKAGE_PIVOT_DX = 5.270846*IN;
 	private static final double LINKAGE_PIVOT_DY = -0.57172*IN;
 	public static final double ANGLE_OFFSET = 16.9 * DEG;
-	private static final double ENCODER_ABSOLUTE_ZERO = 0;
 	private static final double INTAKE_SPEED = 0.6;
-	private static final double DEADZONE = 0.1 * DEG;
     private static final double SHOOTER_GEAR_RATIO = 2;
     private static final double SHOOTER_WHEEL_RADIUS = 2 * IN;
     private Rotation2d targetAngle = Rotation2d.fromDegrees(16);

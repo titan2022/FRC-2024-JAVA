@@ -19,6 +19,8 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -192,6 +194,12 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
             ChassisSpeeds speeds = getVelocities();
             return new Translation2d(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond);
         }
+
+        @Override
+        public Command translationalDrive(CommandXboxController xbox) {
+            // TODO Auto-generated method stub
+            throw new UnsupportedOperationException("Unimplemented method 'translationalDrive'");
+        }
     };
 
     private final RotationalDrivebase rotationalLock = new RotationalDrivebase() {
@@ -209,6 +217,12 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
         public Rotation2d getRotationalVelocity() {
             ChassisSpeeds speeds = getVelocities();
             return Rotation2d.fromRadians(speeds.omegaRadiansPerSecond);
+        }
+
+        @Override
+        public Command rotationalDrive(CommandXboxController xbox) {
+            // TODO Auto-generated method stub
+            throw new UnsupportedOperationException("Unimplemented method 'rotationalDrive'");
         }
     };
 
