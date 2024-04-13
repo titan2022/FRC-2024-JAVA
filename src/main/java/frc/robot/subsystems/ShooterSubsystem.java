@@ -3,12 +3,17 @@ package frc.robot.subsystems;
 import static frc.robot.utility.Constants.Unit.DEG;
 import static frc.robot.utility.Constants.Unit.FALCON_TICKS;
 import static frc.robot.utility.Constants.Unit.IN;
+import static frc.robot.utility.Constants.Unit.ROT;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -16,12 +21,12 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.utility.Constants;
 
 /***
  * A linkage shooter subsystem designed to take notes from the IntakeSubsystem and shoot them into
  * the speaker
  */
-@SuppressWarnings({"deprecated", "removal"})
 public class ShooterSubsystem extends SubsystemBase {
 	// TODO: measure these in CAD
 	private static final double SHOOTER_LENGTH = 7.078305 * IN; // this is from the shooter pivot to its linkage connection
@@ -30,59 +35,43 @@ public class ShooterSubsystem extends SubsystemBase {
 	// The distance of the motor axis from the shooter pivot
 	private static final double LINKAGE_PIVOT_DX = 5.270846*IN;
 	private static final double LINKAGE_PIVOT_DY = -0.57172*IN;
-	public static final double ANGLE_OFFSET = 16.9 * DEG;
+	private static final double ANGLE_OFFSET = 16.9 * DEG;
 	private static final double INTAKE_SPEED = 0.6;
     private static final double SHOOTER_GEAR_RATIO = 2;
     private static final double SHOOTER_WHEEL_RADIUS = 2 * IN;
-    private Rotation2d targetAngle = Rotation2d.fromDegrees(16);
-	
-	public final PIDController rotationPID = new PIDController(7500, 0, 5);
-	// private DoubleLogEntry angleLog;
-	// private BooleanLogEntry hasShot;
-
-	public final WPI_TalonFX linkageMotor = new WPI_TalonFX(12, "CANivore");
-	private final WPI_TalonFX topShooterMotor = new WPI_TalonFX(13, "CANivore");
-	private final WPI_TalonFX bottomShooterMotor = new WPI_TalonFX(5, "CANivore");
-	private final WPI_TalonFX indexerMotor = new WPI_TalonFX(16, "CANivore");
-	private final DutyCycleEncoder linkageEncoder = new DutyCycleEncoder(9);
-	public static final double MIN_ANGLE = 15*DEG;
-	// public static final double MAX_ANGLE = 65*DEG;
+    private static final double ENCODER_OFFSET = -2.55;
+    private static final double DEAD_ZONE = 0.015;
+    public static final double MIN_ANGLE = 15*DEG;
     public static final double MAX_ANGLE = 65*DEG;
 
+	
+	private final PIDController rotationPID = new PIDController(7500, 0, 5);
+	// private DoubleLogEntry angleLog;
+	// private BooleanLogEntry hasShot;
+    
+    
+    private Rotation2d targetAngle = Rotation2d.fromDegrees(16);
+	public final TalonFX linkageMotor = new TalonFX(12, "CANivore");
+	private final TalonFX topShooterMotor = new TalonFX(13, "CANivore");
+	private final TalonFX bottomShooterMotor = new TalonFX(5, "CANivore");
+	private final TalonFX indexerMotor = new TalonFX(16, "CANivore");
+	private final DutyCycleEncoder linkageEncoder = new DutyCycleEncoder(9);
+    
+    private final StatusSignal<Double> topShooterVelocity = topShooterMotor.getVelocity();
+    private final StatusSignal<Double> botShooterVelocity = topShooterMotor.getVelocity();
 
-	public static TalonFXConfiguration getShooterTalonConfig() {
-		TalonFXConfiguration talon = new TalonFXConfiguration();
-		// Add configs here:
-		// talon.slot0.kP = 0;
-		// talon.slot0.kI = 0;
-		// talon.slot0.kD = 0;
-		// talon.slot0.kF = 0;
-		// talon.slot0.integralZone = 75;
-		// talon.slot0.allowableClosedloopError = 5;// 217;
-		// talon.slot0.maxIntegralAccumulator = 5120;
-
-        talon.supplyCurrLimit.currentLimit = 70;
-        talon.supplyCurrLimit.enable = true;
-        talon.supplyCurrLimit.triggerThresholdCurrent = 80;
-        talon.supplyCurrLimit.triggerThresholdTime = 0.1;
-
-		return talon;
-	}
 
 	public ShooterSubsystem() {
 		// this.angleLog = angleLog;
 		// this.hasShot = hasShot;
-		topShooterMotor.setNeutralMode(NeutralMode.Coast);
-		bottomShooterMotor.setNeutralMode(NeutralMode.Coast);
-		linkageMotor.setNeutralMode(NeutralMode.Brake);
-		indexerMotor.setNeutralMode(NeutralMode.Brake);
+		topShooterMotor.setNeutralMode(NeutralModeValue.Coast);
+		bottomShooterMotor.setNeutralMode(NeutralModeValue.Coast);
+		indexerMotor.setNeutralMode(NeutralModeValue.Coast);
+		linkageMotor.setNeutralMode(NeutralModeValue.Brake);
 		topShooterMotor.setInverted(true);
 		// bottomShooterMotor.follow(topShooterMotor);
 		bottomShooterMotor.setInverted(true);
 		linkageEncoder.reset();
-
-		topShooterMotor.configAllSettings(getShooterTalonConfig());
-		bottomShooterMotor.configAllSettings(getShooterTalonConfig());
 	}
 
 	/**
@@ -90,7 +79,8 @@ public class ShooterSubsystem extends SubsystemBase {
 	 * @param percent
 	 */
 	public void setLinkageMotor(double percent) {
-		linkageMotor.set(ControlMode.PercentOutput, percent);
+        percent = Constants.boundPercentOutput(percent);
+		linkageMotor.setVoltage(percent);
 	}
 
 	/**
@@ -98,7 +88,7 @@ public class ShooterSubsystem extends SubsystemBase {
 	 * @return Angle in radians (zero is ground, positive is up)
 	 */
 	public double getRotation() {
-		return linkageEncoder.getAbsolutePosition() * 2.0 * Math.PI + -2.55;
+		return linkageEncoder.getAbsolutePosition() * ROT + ENCODER_OFFSET;
 	}
 
     public double calculateShooterRotation() {
@@ -114,7 +104,6 @@ public class ShooterSubsystem extends SubsystemBase {
 	 * @param set_angle in radians (zero is parallel to the ground, positive is up)
 	 */
 	public boolean setRotation(double angle) {
-		double deadzone = 0.015; // maybe decrease
 		// SmartDashboard.putNumber("counter2", SmartDashboard.getNumber("counter2", 0.0) + 1);
 		// SmartDashboard.putNumber("angle", angle);
 		if(angle < MIN_ANGLE || angle > MAX_ANGLE) {
@@ -139,7 +128,7 @@ public class ShooterSubsystem extends SubsystemBase {
             targetRotation -= 2 * Math.PI;
         }
 		double in_rotation = lawOfCosines(LINKAGE_LONG_ARM_LENGTH, LINKAGE_SHORT_ARM_LENGTH, d);
-		if(targetRotation - deadzone < getRotation() && getRotation() < targetRotation + deadzone){
+		if(targetRotation - DEAD_ZONE < getRotation() && getRotation() < targetRotation + DEAD_ZONE){
 			// linkageMotor.set(0.061 * Math.sin(in_rotation));
 			holdAngle(angle, targetRotation, d);
 			// SmartDashboard.putBoolean("Dead", true);
@@ -150,9 +139,7 @@ public class ShooterSubsystem extends SubsystemBase {
 		double linkageMag = rotationPID.calculate(getRotation(), targetRotation);
         double PID = Math.copySign(Math.min(Math.abs(linkageMag), 40 / FALCON_TICKS), linkageMag);
 		double FF = ((PID < 0) ? -0.04 : 0.04);
-		linkageMotor.set(ControlMode.Velocity, PID,
-			DemandType.ArbitraryFeedForward, FF
-		);
+		setLinkageMotor(FF);
 		// angleLog.append(targetRotation / DEG);
 		SmartDashboard.putNumber("Target Shooter Angle", angle / DEG);
 		// SmartDashboard.putNumber("Shooter PID", PID);
@@ -174,25 +161,23 @@ public class ShooterSubsystem extends SubsystemBase {
 	 * @param percent
 	 */
 	public void shoot(double percent) {
-        if (percent > 1) {
-            percent = 1;
-        }
-		topShooterMotor.set(ControlMode.PercentOutput, percent);
-        bottomShooterMotor.set(ControlMode.PercentOutput, percent);
+        percent = Constants.boundPercentOutput(percent);
+		topShooterMotor.setVoltage(percent);
+        bottomShooterMotor.setVoltage(percent);
 	}
 
-    public void shootCoastToggle() {
-        topShooterMotor.setNeutralMode(NeutralMode.Coast);
-        bottomShooterMotor.setNeutralMode(NeutralMode.Coast);
+    public void setShooterCoast() {
+        topShooterMotor.setNeutralMode(NeutralModeValue.Coast);
+        bottomShooterMotor.setNeutralMode(NeutralModeValue.Coast);
     }
 
-    public void shootBrakeToggle() {
-        topShooterMotor.setNeutralMode(NeutralMode.Brake);
-        bottomShooterMotor.setNeutralMode(NeutralMode.Brake);
+    public void setShooterBrake() {
+        topShooterMotor.setNeutralMode(NeutralModeValue.Brake);
+        bottomShooterMotor.setNeutralMode(NeutralModeValue.Brake);
     }
 
     public double getShooterVelocity() {
-        double averageMotorSpeed = Math.abs(topShooterMotor.getSelectedSensorVelocity()) + Math.abs(bottomShooterMotor.getSelectedSensorVelocity());
+        double averageMotorSpeed = Math.abs(topShooterVelocity.getValueAsDouble()) + Math.abs(topShooterVelocity.getValueAsDouble());
         double rotationsPerSec = (averageMotorSpeed * 10) * FALCON_TICKS;
         double metersPerSec = rotationsPerSec * SHOOTER_WHEEL_RADIUS / SHOOTER_GEAR_RATIO;
         return metersPerSec;
@@ -219,7 +204,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
         // guys velocity = 0 doesn't work
 		// angle shifts down by a couple degrees, pls trust me on this
-		linkageMotor.set(ControlMode.Velocity, 0);
+		linkageMotor.setVoltage(0);
 	}
 
 	/**
@@ -227,7 +212,8 @@ public class ShooterSubsystem extends SubsystemBase {
 	 * @param percent
 	 */
 	public void index(double percent) {
-		indexerMotor.set(ControlMode.PercentOutput, percent);
+        percent = Constants.boundPercentOutput(percent);
+		indexerMotor.setVoltage(percent);
 	}
 
 	/**
@@ -248,7 +234,7 @@ public class ShooterSubsystem extends SubsystemBase {
 	 * Holds note in place with break mode
 	 */
 	public void holdIndex() {
-		indexerMotor.set(ControlMode.PercentOutput, 0);
+		indexerMotor.setVoltage(0);
 	}
 
     @Override 

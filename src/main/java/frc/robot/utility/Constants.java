@@ -1,7 +1,5 @@
 package frc.robot.utility;
 
-import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
-
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
@@ -55,6 +53,12 @@ public final class Constants {
 	}
 
     public static final double MAX_VOLTAGE = 12;
+    public static final double boundPercentOutput(double input) {
+        double output = input;
+        output = Math.min(output, 1);
+        output = Math.max(-1, output);
+        return output * MAX_VOLTAGE;
+    }
 
 	public enum LimelightPipeline {
 		TAPE(0), APRILTAGS(1),

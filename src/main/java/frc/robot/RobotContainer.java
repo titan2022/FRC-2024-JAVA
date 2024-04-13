@@ -33,13 +33,21 @@ public class RobotContainer {
     private final Command intakeCommand = new RunCommand(() -> {
             intake.intake();
             indexer.intake();
-        }, intake, indexer
+        }, 
+        intake, indexer
     );
 
     private final Command reverseIntakeCommand = new RunCommand(() -> {
             intake.reverse();
             indexer.reverse();
-        }, intake, indexer
+        }, 
+        intake, indexer
+    );
+
+    private final Command brakeDrivetrain = new RunCommand(() -> {
+        drivetrain.brake();
+        }, 
+        translationalDrivetrain, rotationalDrivebase
     );
 
     private void configureBindings() {
@@ -52,18 +60,18 @@ public class RobotContainer {
 
         driveController.a().onTrue(drivetrain.runOnce(drivetrain::setFieldControl));
         driveController.x().onTrue(drivetrain.runOnce(drivetrain::setRobotControl));
-        driveController.y().whileTrue(drivetrain.brake());
-
+        driveController.y().whileTrue(brakeDrivetrain);
+        
         // driveController.b().whileTrue(drivetrain
         //     .applyRequest(() -> point.withModuleDirection(new Rotation2d(-driveController.getLeftY(), -driveController.getLeftX()))));
         // reset the field-centric heading on left bumper press
         driveController.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldRelative()));
-
+        
         // if (Utils.isSimulation()) {
-        //   drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
-        // }
-        // drivetrain.registerTelemetry(logger::telemeterize);
-
+            //   drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
+            // }
+            // drivetrain.registerTelemetry(logger::telemeterize);
+            
         robotController.y().whileTrue(intakeCommand);
         robotController.a().whileTrue(reverseIntakeCommand);
 

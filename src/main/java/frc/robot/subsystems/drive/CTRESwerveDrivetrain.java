@@ -71,9 +71,7 @@ public class CTRESwerveDrivetrain extends SwerveDrivetrain implements Subsystem 
                     SmartDashboard.putString("Control Mode", "Robot");
                     setRobotVelocity(v_x, v_y);
                     applyRobotRequest();
-                } else {
-                    setControl(brake);
-                }
+                } 
             });
         }
     };
@@ -161,20 +159,14 @@ public class CTRESwerveDrivetrain extends SwerveDrivetrain implements Subsystem 
         robotOrientedControl.RotationalRate = omega;
     }
 
-    public Command brake() {
-        Command brakeCommand = run(() -> {
-            //This is to prevent backlack where releasing the brake 
-            //makes it try to go back to old swerve state suddenly
-            fieldOrientedControl.RotationalRate = 0;
-            fieldOrientedControl.VelocityX = 0;
-            fieldOrientedControl.VelocityX = 0;
-            robotOrientedControl.RotationalRate = 0;
-            robotOrientedControl.VelocityX = 0;
-            robotOrientedControl.VelocityX = 0;
-            setControl(brake);
-        });
-        brakeCommand.addRequirements(translational, rotational);
-        return brakeCommand;
+    public void brake() {
+        fieldOrientedControl.RotationalRate = 0;
+        fieldOrientedControl.VelocityX = 0;
+        fieldOrientedControl.VelocityX = 0;
+        robotOrientedControl.RotationalRate = 0;
+        robotOrientedControl.VelocityX = 0;
+        robotOrientedControl.VelocityX = 0;
+        setControl(brake);
     }
 
     private static final double XBOX_DEADBAND = 0.15;
@@ -184,23 +176,6 @@ public class CTRESwerveDrivetrain extends SwerveDrivetrain implements Subsystem 
         else 
             return 0;
     }
-
-    public Command fieldTranslation(Translation2d position) {
-        return null;
-    }
-
-    public Command relativeTranslation(Translation2d displacement) {
-        return null;
-    }
-
-    public Command relativeRotation(Rotation2d rotation) {
-        return null;
-    }
-
-    public Command fieldRotation(Rotation2d angle) {
-        return null;
-    }
-
 
     private void startSimThread() {
         m_lastSimTime = Utils.getCurrentTimeSeconds();

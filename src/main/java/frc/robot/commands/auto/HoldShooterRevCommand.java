@@ -45,7 +45,7 @@ public class HoldShooterRevCommand extends Command {
         if(!reached) shooter.shoot(REV_SPEED);
         else{
             shooter.shoot(0.5);
-            shooter.shootCoastToggle();
+            shooter.setShooterCoast();
         }
         reached = shooter.getShooterVelocity() >= speed;
     }

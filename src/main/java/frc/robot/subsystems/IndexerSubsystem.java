@@ -1,16 +1,18 @@
 package frc.robot.subsystems;
 
+import static frc.robot.utility.Constants.MAX_VOLTAGE;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import com.ctre.phoenix6.controls.VoltageOut;
 
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.utility.Constants;
 
-@SuppressWarnings({"deprecated", "removal"})
 public class IndexerSubsystem extends SubsystemBase {
 	private static final double INTAKE_SPEED = 0.7;
     private static final double OUTAKE_SPEED = -1;
@@ -19,8 +21,8 @@ public class IndexerSubsystem extends SubsystemBase {
     
 	private final WPI_TalonSRX intakeMotor = new WPI_TalonSRX(22);
 	private final AnalogInput beamBreakerInput = new AnalogInput(0);
+    
     private double timer = NOTE_INTAKE_DURATION;
-
 	public boolean auto_intake_yes = false;
 	public boolean auto_shooter_yes = false;
 
@@ -32,11 +34,12 @@ public class IndexerSubsystem extends SubsystemBase {
 	}
 
 	public void stop() {
-		intakeMotor.set(ControlMode.PercentOutput, 0);
+		intakeMotor.setVoltage(0);
 	}
 
 	public void index(double speed) {
-		intakeMotor.set(ControlMode.Velocity, 0, DemandType.ArbitraryFeedForward, speed);
+        speed = Constants.boundPercentOutput(speed);
+		intakeMotor.setVoltage(speed);
 	}
 
 	public void intake() {
