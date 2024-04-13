@@ -1,15 +1,21 @@
 package frc.robot.subsystems;
 
+import static frc.robot.utility.Constants.MAX_VOLTAGE;
 import static frc.robot.utility.Constants.Unit.FALCON_CPR;
 import static frc.robot.utility.Constants.Unit.IN;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.DemandType;
-import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
-import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
-import com.ctre.phoenix.sensors.SensorInitializationStrategy;
+import com.ctre.phoenix.motorcontrol.FollowerType;
+import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.configs.HardwareLimitSwitchConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.controls.ControlRequest;
+import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.StaticBrake;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.ForwardLimitTypeValue;
+import com.ctre.phoenix6.signals.GravityTypeValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -22,61 +28,71 @@ public class ElevatorSubsystem extends SubsystemBase {
 	private static final double STALL_CURRENT_LIMIT = 15;
 	private static final double SPOOL_RADIUS = 1 * IN;
 	private static final double GEAR_RATIO = 28;
-	private static final double TICKS_PER_METER = FALCON_CPR * GEAR_RATIO / (10 * SPOOL_RADIUS * 2 * Math.PI);
+	// private static final double TICKS_PER_METER = FALCON_CPR * GEAR_RATIO / (10 * SPOOL_RADIUS * 2 * Math.PI);
 	private static final double WINCH_SPEED = -0.5;
 	public static int TOP_ENCODER_VALUE = 183500;
 	public static final int BOT_ENCODER_VALUE = -500;
 	private static final double VELOCITY_STALL_LIMIT = 1000;
 
-	public final WPI_TalonFX leftSpoolMotor = new WPI_TalonFX(18, "CANivore");
-	public final WPI_TalonFX rightSpoolMotor = new WPI_TalonFX(14, "CANivore");
+	public final TalonFX leftSpoolMotor = new TalonFX(18, "CANivore");
+	public final TalonFX rightSpoolMotor = new TalonFX(14, "CANivore");
+
+    private final Follower rightMotorControl = new Follower(18, true);
+    private final MotionMagicVoltage leftMotorControl = new MotionMagicVoltage(0);
+    private final StaticBrake brakeControl = new StaticBrake();
+
+    private final StatusSignal<Double> elevatorPosition = leftSpoolMotor.getRotorPosition();
+    private final StatusSignal<Double> motorCurrent = leftSpoolMotor.getSupplyCurrent();
+
+    private final HardwareLimitSwitchConfigs limitSwitch = new HardwareLimitSwitchConfigs()
+    .withForwardLimitEnable(true);
 
 	private int stallTimer = 0;
 	public boolean unlocked = false;
 
-    public static TalonFXConfiguration getSpoolTalonConfig() {
-        TalonFXConfiguration talon = new TalonFXConfiguration();
-        // Add configs here: 
-        talon.slot0.kP = 0.05;
-        talon.slot0.kI = 0.0;
-        talon.slot0.kD = 0.00022;
-        talon.slot0.kF = 0;
-        talon.slot0.integralZone = 75;
-        talon.slot0.allowableClosedloopError = 5;
-        talon.slot0.maxIntegralAccumulator = 5120;
+    private final Slot0Configs talon = new Slot0Configs()
+    .withKV(1.5)
+    .withKG(0);
+    // public static Slot0Configs getSpoolTalonConfig() {
+    //     // Add configs here: 
+    //     talon.slot0.kP = 0.05;
+    //     talon.slot0.kI = 0.0;
+    //     talon.slot0.kD = 0.00022;
+    //     talon.slot0.kF = 0;
+    //     talon.slot0.integralZone = 75;
+    //     talon.slot0.allowableClosedloopError = 5;
+    //     talon.slot0.maxIntegralAccumulator = 5120;
 
-        talon.supplyCurrLimit.currentLimit = 40;//25
-        talon.supplyCurrLimit.enable = true;
-        talon.supplyCurrLimit.triggerThresholdCurrent = 50;
-        talon.supplyCurrLimit.triggerThresholdTime = 0.1;
+    //     talon.supplyCurrLimit.currentLimit = 40;//25
+    //     talon.supplyCurrLimit.enable = true;
+    //     talon.supplyCurrLimit.triggerThresholdCurrent = 50;
+    //     talon.supplyCurrLimit.triggerThresholdTime = 0.1;
 
-        return talon;
-	}
+    //     return talon;
+	// }
 
 
     public ElevatorSubsystem(){
         config();
     }
 
-    public double getPosition(){
-        return leftSpoolMotor.getSelectedSensorPosition();
+    public void config() {
+        rightSpoolMotor.setControl(rightMotorControl);
+        leftSpoolMotor.setInverted(true);
+
+        leftSpoolMotor.setNeutralMode(NeutralModeValue.Brake);
+        rightSpoolMotor.setNeutralMode(NeutralModeValue.Brake);
+
+        // leftSpoolMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
+        // leftSpoolMotor.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
+        // leftSpoolMotor.setSelectedSensorPosition(0);
+        leftSpoolMotor.getConfigurator().setPosition(0);
     }
 
-    public void config() {
-        leftSpoolMotor.configAllSettings(getSpoolTalonConfig());
-        rightSpoolMotor.configAllSettings(getSpoolTalonConfig());
+    public double getPosition(){
+        return elevatorPosition.getValue();
+    }
 
-        rightSpoolMotor.follow(leftSpoolMotor);
-        leftSpoolMotor.setInverted(true);
-        rightSpoolMotor.setSensorPhase(true);
-
-        leftSpoolMotor.setNeutralMode(NeutralMode.Brake);
-        rightSpoolMotor.setNeutralMode(NeutralMode.Brake);
-
-		leftSpoolMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 0);
-		leftSpoolMotor.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
-		leftSpoolMotor.setSelectedSensorPosition(0);
-	}
 
 	/**
 	 * Winches elevator for climb
@@ -98,7 +114,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 	 * @param speed in Falcon ticks per 100ms (?)
 	 */
 	public void elevate(double speed) {
-		leftSpoolMotor.set(ControlMode.Velocity, 0, DemandType.ArbitraryFeedForward, speed);
+		// leftSpoolMotor.set(ControlMode.Velocity, 0, DemandType.ArbitraryFeedForward, speed);
 	}
 
 	/**
@@ -116,15 +132,15 @@ public class ElevatorSubsystem extends SubsystemBase {
 		if (!unlocked) {
 			if (canRun()) {
                 if (setPoint == 0) {
-				    leftSpoolMotor.set(ControlMode.Position,BOT_ENCODER_VALUE);
+				    leftSpoolMotor.setControl(leftMotorControl.withPosition(BOT_ENCODER_VALUE));
                 } else {
-                    leftSpoolMotor.set(ControlMode.Position, setPoint * TOP_ENCODER_VALUE);
+                    leftSpoolMotor.setControl(leftMotorControl.withPosition(TOP_ENCODER_VALUE));
                 }
 			} else {
-				leftSpoolMotor.set(ControlMode.Velocity, 0);
+                hold();
 			}
 		} else {
-			leftSpoolMotor.set(ControlMode.Position, setPoint * TOP_ENCODER_VALUE);
+            leftSpoolMotor.setControl(leftMotorControl.withPosition(BOT_ENCODER_VALUE));
 		}
 	}
 
@@ -146,7 +162,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 	 * Holds elevator using brake mode
 	 */
 	public void hold() {
-		leftSpoolMotor.set(ControlMode.Velocity, 0);
+		leftSpoolMotor.setControl(brakeControl);
 	}
 
 	/**
@@ -179,12 +195,12 @@ public class ElevatorSubsystem extends SubsystemBase {
 	 * @return position in Falcon integrated encoder ticks
 	 */
 	public double getEncoder() {
-		return leftSpoolMotor.getSelectedSensorPosition();
+		return elevatorPosition.getValue();
 	}
 
 	public void setMotors(double percent) {
 		unlocked = true;
-		leftSpoolMotor.set(ControlMode.Velocity, percent);
+		leftSpoolMotor.setVoltage(percent * MAX_VOLTAGE);
 	}
 
 	public void unlock() {	

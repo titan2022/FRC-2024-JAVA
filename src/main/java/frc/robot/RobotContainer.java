@@ -6,7 +6,10 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.subsystems.IndexerSubsystem;
+import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.drive.CTRESwerveDrivetrain;
 import frc.robot.subsystems.drive.RotationalDrivebase;
 import frc.robot.subsystems.drive.TranslationalDrivebase;
@@ -20,30 +23,36 @@ public class RobotContainer {
 
     public final CTRESwerveDrivetrain drivetrain = new CTRESwerveDrivetrain(); // My drivetrain
     public final TranslationalDrivebase translationalDrivetrain = drivetrain.translational;
-    public final RotationalDrivebase rotatinoalDrivetrain = drivetrain.rotational;
+    public final RotationalDrivebase rotationalDrivebase = drivetrain.rotational;
+
+    public final IntakeSubsystem intake = new IntakeSubsystem();
+    public final IndexerSubsystem indexer = new IndexerSubsystem();
 
     // private final Telemetry logger = new Telemetry(TunerConstants.MAX_SPEED);
 
-    private double XBOX_DEADBAND = 0.15;
-    private double deadband(double input, double deadband) {
-        if (Math.abs(input) < deadband)
-            return 0;
-        else
-            return input; 
-    }
+    private final Command intakeCommand = new RunCommand(() -> {
+            intake.intake();
+            indexer.intake();
+        }, intake, indexer
+    );
+
+    private final Command reverseIntakeCommand = new RunCommand(() -> {
+            intake.reverse();
+            indexer.reverse();
+        }, intake, indexer
+    );
 
     private void configureBindings() {
         translationalDrivetrain.setDefaultCommand(translationalDrivetrain.translationalDrive(driveController));
-        rotatinoalDrivetrain.setDefaultCommand(rotatinoalDrivetrain.rotationalDrive(driveController));
-
-
+        rotationalDrivebase.setDefaultCommand(rotationalDrivebase.rotationalDrive(driveController));
+        intake.setDefaultCommand(intake.run(intake::stop));
+        indexer.setDefaultCommand(indexer.run(indexer::stop));
 
         // Drivetrain will execute this command periodically
 
         driveController.a().onTrue(drivetrain.runOnce(drivetrain::setFieldControl));
         driveController.x().onTrue(drivetrain.runOnce(drivetrain::setRobotControl));
         driveController.y().whileTrue(drivetrain.brake());
-
 
         // driveController.b().whileTrue(drivetrain
         //     .applyRequest(() -> point.withModuleDirection(new Rotation2d(-driveController.getLeftY(), -driveController.getLeftX()))));
@@ -54,6 +63,10 @@ public class RobotContainer {
         //   drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
         // }
         // drivetrain.registerTelemetry(logger::telemeterize);
+
+        robotController.y().whileTrue(intakeCommand);
+        robotController.a().whileTrue(reverseIntakeCommand);
+
     }
 
     public RobotContainer() {

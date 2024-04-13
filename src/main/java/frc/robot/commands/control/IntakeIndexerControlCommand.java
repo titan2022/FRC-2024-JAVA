@@ -10,8 +10,7 @@ import frc.robot.subsystems.IntakeSubsystem;
 
 @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
 public class IntakeIndexerControlCommand extends Command {
-    private static final double NOTE_INTAKE_DURATION = 6
-    ;
+    private static final double NOTE_INTAKE_DURATION = 6;
     private double timer = NOTE_INTAKE_DURATION;
     private boolean hasNote = false;
     private IntakeSubsystem intake;
