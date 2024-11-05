@@ -39,12 +39,12 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
     private static final double ROTATOR_DEADBAND = 0.0001;
 
     // CAN ID numbers
-    private static final int LEFT_FRONT_MOTOR_PORT = 41;
+    private static final int LEFT_FRONT_MOTOR_PORT = 31;//41;
     private static final int LEFT_BACK_MOTOR_PORT = 40;
     private static final int RIGHT_FRONT_MOTOR_PORT = 42;
     private static final int RIGHT_BACK_MOTOR_PORT = 43;
 
-    private static final int LEFT_FRONT_MOTOR_ROTATOR_PORT = 31;
+    private static final int LEFT_FRONT_MOTOR_ROTATOR_PORT = 41;//31;
     private static final int LEFT_BACK_MOTOR_ROTATOR_PORT = 30;
     private static final int RIGHT_FRONT_MOTOR_ROTATOR_PORT = 32;
     private static final int RIGHT_BACK_MOTOR_ROTATOR_PORT = 33;
@@ -55,7 +55,7 @@ public class SwerveDriveSubsystem implements DriveSubsystem {
     private static final int RIGHT_BACK_ENCODER_ROTATOR_PORT = 53;
 
     // Rotator encoder offsets
-     public static int FRONT_LEFT_OFFSET = -2930 + 1024 + 2048; // 1
+     public static int FRONT_LEFT_OFFSET = 887;//-2930 + 1024 + 2048; // 1
      public static int BACK_LEFT_OFFSET = -3267 + 1024 + 2048; // 0
      public static int FRONT_RIGHT_OFFSET = -2841 + 1024 + 2048; // 2
      public static int BACK_RIGHT_OFFSET = -2143 + 1024 + 2048; // 3
