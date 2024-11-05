@@ -40,9 +40,9 @@ public final class Constants {
 		public static final double RADIANS = 1.0, RAD = RADIANS;
 		public static final double DEG = Math.PI / 180.0 * RAD; // Degrees to radians
 		public static final double ROT = Math.PI * 2 * RAD; // Rotations to radians
-		public static final double FALCON_CPR = 2048;
-		public static final double CANCODER_CPR = 4096;
-		public static final double QUAD_ENCODER_CPR = 1024;
+		public static final double FALCON_CPR = 2048; // Rotations to ticks
+		public static final double CANCODER_CPR = 4096; // Rotation to ticks
+		public static final double QUAD_ENCODER_CPR = 1024; // Rotations to ticks
 		public static final double FALCON_TICKS = ROT / FALCON_CPR; // Ticks to radians
 		public static final double CANCODER_TICKS = ROT / CANCODER_CPR; // Ticks to radians
         public static final double DEG_TO_CANCODER_TICKS = (DEG / ROT) * CANCODER_CPR; // Deg to can ticks
