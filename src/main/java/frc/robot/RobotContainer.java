@@ -9,8 +9,13 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.commands.indexer.IntakeIndexerControlCommand;
+import frc.robot.commands.elevator.ElevatorControlCommand;
+import frc.robot.commands.shooter.ShooterControlCommand;
+import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.IndexerSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.drive.CTRESwerveDrivetrain;
 import frc.robot.subsystems.drive.RotationalDrivebase;
 import frc.robot.subsystems.drive.TranslationalDrivebase;
@@ -28,6 +33,8 @@ public class RobotContainer {
 
     public final IntakeSubsystem intake = new IntakeSubsystem();
     public final IndexerSubsystem indexer = new IndexerSubsystem();
+    public final ShooterSubsystem shooter = new ShooterSubsystem();
+    public final ElevatorSubsystem elevator = new ElevatorSubsystem();
 
     // private final Telemetry logger = new Telemetry(TunerConstants.MAX_SPEED);
 
@@ -73,9 +80,12 @@ public class RobotContainer {
             // }
             // drivetrain.registerTelemetry(logger::telemeterize);
             
-        robotController.y().whileTrue(intakeCommand);
-        robotController.a().whileTrue(reverseIntakeCommand);
-
+        // robotController.y().whileTrue(intakeCommand);
+        // robotController.a().whileTrue(reverseIntakeCommand);
+        // Second driver
+        // shooter.setDefaultCommand(new ShooterControlCommand(shooter, robotController.getHID(), null));
+        elevator.setDefaultCommand(new ElevatorControlCommand(elevator, robotController.getHID(),  driveController.getHID()));
+        indexer.setDefaultCommand(new IntakeIndexerControlCommand(intake, indexer, robotController.getHID()));
     }
 
     public RobotContainer() {
