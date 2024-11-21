@@ -256,7 +256,8 @@ public class ShooterSubsystem extends SubsystemBase {
 
     @Override 
     public void periodic() {
-        setRotation(targetAngle.getRadians());
+        // setRotation(targetAngle.getRadians());
+		holdAngle(SHOOTER_GEAR_RATIO, MAX_ANGLE, DEG);
     }
 
 }
