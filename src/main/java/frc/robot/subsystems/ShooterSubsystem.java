@@ -151,6 +151,7 @@ public class ShooterSubsystem extends SubsystemBase {
 		
 		double linkageMag = rotationPID.calculate(getRotation(), targetRotation);
         double PID = Math.copySign(Math.min(Math.abs(linkageMag), 40 / FALCON_TICKS), linkageMag);
+		SmartDashboard.putNumber("PID", PID);
 		double FF = ((PID < 0) ? -0.04 : 0.04);
 		linkageMotor.set(ControlMode.Velocity, PID,
 			DemandType.ArbitraryFeedForward, FF
