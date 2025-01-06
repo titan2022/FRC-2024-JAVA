@@ -3,6 +3,7 @@ package frc.robot;
 import static frc.robot.utility.Constants.Unit.IN;
 
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
@@ -257,14 +258,14 @@ public class Robot extends TimedRobot {
        
 
         // Second driver
-        shooter.setDefaultCommand(new ShooterControlCommand(shooter, xbox2, log));
+        // shooter.setDefaultCommand(new ShooterControlCommand(shooter, xbox2, log));
         elevator.setDefaultCommand(new ElevatorControlCommand(elevator, xbox2,  xbox1));
         indexer.setDefaultCommand(new IntakeIndexerControlCommand(intake, indexer, xbox2));
         // Trigger xboxTrigger = new JoystickButton(xbox1, XboxController.Button.kY.value);
         // xboxTrigger.onTrue(new PreSpeakerAlignCommand(drive, localizer, new Rotation2d(0), 0.2 * Math.PI));
 
-        Trigger shootTrigger = new JoystickButton(xbox2, XboxController.Button.kLeftBumper.value);
-        shootTrigger.whileTrue(new ShooterSpeakerAlgCommand(16, drive.getRotational(), shooter, indexer, localizer, led));
+        // Trigger shootTrigger = new JoystickButton(xbox2, XboxController.Button.kLeftBumper.value);
+        // shootTrigger.whileTrue(new ShooterSpeakerAlgCommand(16, drive.getRotational(), shooter, indexer, localizer, led));
     }
 
     int shooterDir = 1;

@@ -59,10 +59,12 @@ public class ShooterControlCommand extends Command {
         // shooterAngle = 65;x  
         // if(!xbox.getLeftBumper()) shooter.setTargetAngle(new Rotation2d(shooterAngle));
         shooter.setTargetAngle(new Rotation2d(shooterAngle));
+
+        SmartDashboard.putNumber("NEW_TARGET_ANGLE", shooterAngle);
         
 
         if (xbox.getRightTriggerAxis() > 0.5) {
-            double shooterMag = 0.6;//xbox.getRightTriggerAxis() * 0.5 * shooterDir;
+            double shooterMag = 0.25;//xbox.getRightTriggerAxis() * 0.5 * shooterDir;
             shooter.shoot(shooterMag);
             shotLog.append(true);
             angleLog.append(shooterAngle);

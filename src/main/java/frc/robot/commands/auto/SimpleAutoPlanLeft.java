@@ -25,7 +25,7 @@ import frc.robot.utility.Localizer;
 /** An example command that uses an example subsystem. */
 public class SimpleAutoPlanLeft extends SequentialCommandGroup {
     @SuppressWarnings({ "PMD.UnusedPrivateField", "PMD.SingularField" })
-    public static double SHOOT_SPEAKER_SPEED = 0.7;
+    public static double SHOOT_SPEAKER_SPEED = 0.1;
     public static final double SPEAKER_HEIGHT = 2 * METERS;
     public static Rotation2d SHOOT_ANGLE = Rotation2d.fromDegrees(60);
     public static double MOVE_SPEED = 1;

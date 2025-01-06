@@ -10,7 +10,7 @@ public class RevShooterCommand extends Command {
     // public static final double RAMP_TIME = 1;
     // public static final double INDEX_SPEED = 0.5;
     // public static final double REV_DURATION = 3;
-    public static final double SHOOT_SPEED = 0.8;
+    public static final double SHOOT_SPEED = 0.1;
     private ShooterSubsystem shooter;
     private LEDSubsystem led;
     public double speed;
